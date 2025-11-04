@@ -1,2 +1,87 @@
-$prdbg1: #f1d8d8;
-$prdbg2: rgb(248, 186, 186);
+@use "sass:color";
+@use "sass:map";
+
+// Brand color system
+$color-navy: #003057;
+$color-indigo: #4b3d97;
+$color-lime: #7bbd21;
+$color-amber: #ffc857;
+$color-sky: #f5f9ff;
+$color-blush: #ffe7e7;
+$color-forest: #1b2e00;
+$color-slate: #374151;
+$color-charcoal: #1f2933;
+
+// Extended palette helpers
+$color-lime-dark: color.scale($color-lime, $lightness: -20%);
+$color-lime-soft: color.scale($color-lime, $lightness: 25%);
+$color-indigo-soft: color.scale($color-indigo, $lightness: 18%);
+$color-amber-soft: color.scale($color-amber, $lightness: 30%);
+
+// Typography
+$font-sans: "sailecMedium", "Helvetica Neue", Arial, sans-serif;
+$font-heading: "sailecBold", "Helvetica Neue", Arial, sans-serif;
+
+// Bootstrap theme overrides map
+$theme-colors-map: (
+  "primary": $color-navy,
+  "secondary": $color-indigo,
+  "success": $color-lime,
+  "info": #00a3c4,
+  "warning": $color-amber,
+  "danger": #e54b4b,
+  "light": $color-sky,
+  "dark": $color-charcoal,
+);
+
+// Global design tokens
+$body-bg-color: #ffffff;
+$body-text-color: $color-slate;
+$section-muted-bg: $color-sky;
+$section-highlight-bg: $color-amber-soft;
+$card-shadow: 0 26px 54px rgba(16, 24, 40, 0.08);
+$focus-ring-color: color.change($color-lime, $alpha: 0.35);
+
+// Mixins
+@mixin pill-button($variant: "primary") {
+  $bg: map.get($theme-colors-map, $variant);
+  background-color: $bg;
+  color: if(color.contrast($bg) > 4.5, #fff, $color-charcoal);
+  border-radius: 50rem;
+  border: none;
+  padding: 0.75rem 1.75rem;
+  font-family: $font-heading;
+  font-weight: 600;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+  &:hover,
+  &:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 30px color.change($bg, $alpha: 0.22);
+  }
+
+  &:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem $focus-ring-color;
+  }
+}
+
+@mixin section-frame($background: $section-muted-bg) {
+  background: $background;
+  border-radius: 1.75rem;
+  box-shadow: $card-shadow;
+  padding: clamp(2rem, 4vw, 4rem);
+}
+
+@mixin gradient-banner {
+  background: linear-gradient(
+    135deg,
+    color.scale($color-indigo, $lightness: 12%),
+    color.scale($color-navy, $lightness: 6%)
+  );
+  color: #fff;
+}
+
+// Legacy aliases (for backwards compatibility with existing stylesheets)
+$prdbg1: $color-blush;
+$prdbg2: color.scale($color-blush, $lightness: -6%);

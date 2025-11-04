@@ -1,182 +1,195 @@
 import React from "react";
-import Video from "../../assets/images/home-video.mp4";
+import { Button, Card, Col, Container, Row } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import { FaAngleRight } from "react-icons/fa";
 
+import MissionImg from "../../assets/images/group6.png";
 import Testifier from "../../assets/images/fast.avif";
 import Testifier2 from "../../assets/images/oprah.avif";
 import Testifier3 from "../../assets/images/corp.avif";
 import Testifier4 from "../../assets/images/today.avif";
-import MissionImg from "../../assets/images/group6.png";
-import CountUp from "react-countup";
-import { ProductsSlide } from "./ProductsSlide/ProductsSlide";
-import { ProductsHolder } from "./ProductsHolder";
-import { FaAngleRight } from "react-icons/fa";
-import Carousel from "react-bootstrap/Carousel";
 
-import "./home.scss";
-import { Link } from "react-router-dom";
+import { ProductsHolder } from "./ProductsHolder";
+import SampleSlide from "./ProductsSlide/ProductsSlide";
 import TestimonialCarousel from "./Testimonials";
-import { TabletAndBelow } from "../../Utils/mediaQueries";
 import { HomeSlide } from "./HomeSlide/HomeSlide";
 import FBSocials from "./FBSocials";
 import TwitterHandle from "./TwitterHandle/TwitterHandle";
 import YouTube from "./Youtube";
-import SampleSlide from "./ProductsSlide/ProductsSlide";
-const OPTIONS = { loop: true };
-const SLIDE_COUNT = 5;
-const SLIDES = Array.from(Array(SLIDE_COUNT).keys());
+
+import "./home.scss";
+
+const pressMentions = [
+  {
+    quote: '"Best sustainable cleaning products"',
+    image: Testifier,
+    alt: "Fast Company",
+  },
+  {
+    quote: "Best for the Environment",
+    image: Testifier2,
+    alt: "Oprah",
+  },
+  {
+    quote: '"Tried the whole line and absolutely love it. It\'s genius"',
+    image: Testifier3,
+    alt: "Corporate Review",
+  },
+  {
+    quote: "World Changing Ideas",
+    image: Testifier4,
+    alt: "Today Show",
+  },
+];
 
 export const Home = () => {
   return (
-    <div className="home-div">
+    <div className="home">
       <HomeSlide />
 
-      <div className="col-md-8 offset-md-2 d-md-flex abt-div">
-        <div className="col-md-6 col-12">
-          <h6>ABOUT US</h6>
-          <h5>
-            One of the largest manufacturer and distributor of Laundry, Hygiene
-            and Hair Care products in Nigeria.
-          </h5>
-        </div>
-        <div className="col-md-6">
-          <p>
-            At Olivia Products, we take pride in redefining everyday care
-            through innovation, quality, and trust. Our growing portfolio spans
-            across hair care, skin care, dish wash, fabric cleaner, tile and
-            toilet wash, car wash, window cleaner, and air fresheners—each
-            crafted to bring freshness, brilliance, and protection to your daily
-            life. Guided by a commitment to excellence, we create products that
-            combine powerful performance with gentle care, ensuring every Olivia
-            experience leaves your home, your car, and your family feeling
-            renewed.
-          </p>
-          <Link to={"/about-us"}>
-            {" "}
-            <button>Explore More</button>
-          </Link>
-        </div>
-      </div>
+      <section className="home__section home__section--about">
+        <Container>
+          <Row className="align-items-center g-5">
+            <Col lg={6}>
+              <span className="home__eyebrow">About Us</span>
+              <h2 className="home__headline">
+                One of the largest manufacturer and distributor of Laundry,
+                Hygiene and Hair Care products in Nigeria.
+              </h2>
+            </Col>
+            <Col lg={6}>
+              <p>
+                At Olivia Products, we take pride in redefining everyday care
+                through innovation, quality, and trust. Our growing portfolio
+                spans across hair care, skin care, dish wash, fabric cleaner,
+                tile and toilet wash, car wash, window cleaner, and air
+                fresheners—each crafted to bring freshness, brilliance, and
+                protection to your daily life. Guided by a commitment to
+                excellence, we create products that combine powerful performance
+                with gentle care, ensuring every Olivia experience leaves your
+                home, your car, and your family feeling renewed.
+              </p>
+              <Button as={Link} to="/about-us" variant="outline-success" className="home__cta">
+                Explore More
+              </Button>
+            </Col>
+          </Row>
+        </Container>
+      </section>
 
-      <div className="products-intro-corner">
-        {" "}
-        <center>
-          <div className="col-md-5 home-prd">
-            <h6>OUR PRODUCTS</h6>
-            <h2>Millions trust our touch. Every day begins with Olivia.</h2>
-            <p>
-              At Olivia Products, quality is never compromised. Every item we
-              produce undergoes rigorous testing to ensure purity, safety, and
-              exceptional performance. From formulation to packaging, each
-              product meets the highest standards before leaving our factory —
-              because we believe our customers deserve nothing less than
-              perfection. It’s this unwavering commitment to excellence that has
-              made Olivia Products a trusted name in homes across Nigeria.
-            </p>
-            <h5>From homes to hearts — Olivia makes a difference every day.</h5>
-          </div>
-        </center>
-        <SampleSlide />
-      </div>
-
-      {/* Testifiers Section */}
-      <div className="testifiers-div d-md-flex">
-        <div className="col-12 col-md-6 d-flex">
-          <div className="col-6 testifiers">
-            <center>
-              <h5>"Best sustainable cleaning products”</h5>
-              <img src={Testifier} alt="Testifier 1" width="154px" />
-            </center>
-          </div>
-          <div className="col-6  testifiers">
-            <center>
-              <h5>Best for the Environment</h5>
-              <img src={Testifier2} alt="Testifier 2" width="154px" />
-            </center>
-          </div>
-        </div>
-        <div className="col-12 col-md-6 d-flex">
-          {" "}
-          <div className="col-6 testifiers">
-            <center>
-              <h5>
-                "Tried the whole line and absolutely love it. It's genius"
-              </h5>
-              <img src={Testifier3} alt="Testifier 3" width="104px" />
-            </center>
-          </div>
-          <div className="col-6 testifiers">
-            <center>
-              <h5>World Changing Ideas</h5>
-              <img src={Testifier4} alt="Testifier 4" width="104px" />
-            </center>
-          </div>
-        </div>
-      </div>
-
-      {/* Bestsellers Section */}
-      <center>
-        <h1>Our Bestsellers</h1>
-      </center>
-      <ProductsHolder showOnlyBestSellers={true} />
-
-      <div className=" col-md-10 offset-md-1 d-md-flex mt-5">
-        <div className="col-md-6 mission-vision">
-          <img src={MissionImg} width="100%" alt="" />
-        </div>
-        <div className="col-md-6 statement">
-          <h5>OLIVIACARE</h5>
-
-          <h2>
-            Make A Difference With <span>Olivia Products</span>
+      <section className="home__section home__section--products text-center">
+        <Container className="col-lg-8">
+          <span className="home__eyebrow">Our Products</span>
+          <h2 className="home__headline">
+            Millions trust our touch. Every day begins with Olivia.
           </h2>
           <p>
-            At Olivia Products, making a difference goes beyond what we create —
-            it’s about how we care. We’re dedicated to enriching everyday lives
-            and uplifting communities through purposeful action. Our focus
-            remains on empowering the youth, nurturing talent, and supporting
-            education — helping tomorrow’s leaders build brighter futures, one
-            opportunity at a time.
+            At Olivia Products, quality is never compromised. Every item we
+            produce undergoes rigorous testing to ensure purity, safety, and
+            exceptional performance. From formulation to packaging, each product
+            meets the highest standards before leaving our factory — because we
+            believe our customers deserve nothing less than perfection. It’s
+            this unwavering commitment to excellence that has made Olivia
+            Products a trusted name in homes across Nigeria.
           </p>
-          <Link to={"/our-mission"}>
-            Our Mission <FaAngleRight />
-          </Link>
+          <h5 className="home__subhead">
+            From homes to hearts — Olivia makes a difference every day.
+          </h5>
+        </Container>
+        <div className="home__carousel">
+          <SampleSlide />
         </div>
-      </div>
-      <br />
-      <br />
-      <br />
-      <br />
-      <div className="news-div">
-        <center>
-          <h6>NEWS AND EVENTS</h6>
-          <div className="col-md-6">
-            <h3>Get To Know More About Us From The Media</h3>
-            <p>
-              Get to know more about Olivia – the leading personal care product
-              suppliers in Nigeria – with news and stories appearing in
-              prominent media.
-            </p>
-          </div>
-        </center>
-        <div className="news-inner">
-          <div className="col-md-10 offset-md-1 d-md-flex ">
-            <div className="col-md-4">
-              <FBSocials />
-            </div>
-            <div className="col-md-4">
-              <TwitterHandle />
-            </div>{" "}
-            <div className="col-md-4">
-              <YouTube />
-            </div>
-          </div>
-        </div>
-      </div>
+      </section>
 
-      <center>
-        <h2>Over 100,000 5-Star Reviews</h2>
-      </center>
-      <TestimonialCarousel />
+      <section className="home__section home__section--bestsellers text-center">
+        <Container>
+          <h2 className="home__headline">Our Bestsellers</h2>
+        </Container>
+        <ProductsHolder showOnlyBestSellers={true} />
+      </section>
+
+      <section className="home__section home__section--press">
+        <Container>
+          <Row className="g-4">
+            {pressMentions.map(({ quote, image, alt }) => (
+              <Col xs={6} lg={3} key={alt}>
+                <Card className="home__press-card h-100 text-center">
+                  <Card.Body>
+                    <Card.Text className="home__press-quote">{quote}</Card.Text>
+                    <img src={image} alt={alt} className="home__press-logo" />
+                  </Card.Body>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        </Container>
+      </section>
+
+      <section className="home__section home__section--mission">
+        <Container>
+          <Row className="align-items-center g-4">
+            <Col lg={6}>
+              <div className="home__mission-visual">
+                <img src={MissionImg} alt="OliviaCare outreach" className="img-fluid" />
+              </div>
+            </Col>
+            <Col lg={6}>
+              <span className="home__eyebrow">OliviaCare</span>
+              <h2 className="home__headline">
+                Make a Difference with <span>Olivia Products</span>
+              </h2>
+              <p>
+                At Olivia Products, making a difference goes beyond what we
+                create — it’s about how we care. We’re dedicated to enriching
+                everyday lives and uplifting communities through purposeful
+                action. Our focus remains on empowering the youth, nurturing
+                talent, and supporting education — helping tomorrow’s leaders
+                build brighter futures, one opportunity at a time.
+              </p>
+              <Button
+                as={Link}
+                to="/our-mission"
+                variant="success"
+                className="home__cta-link"
+              >
+                Our Mission <FaAngleRight />
+              </Button>
+            </Col>
+          </Row>
+        </Container>
+      </section>
+
+      <section className="home__section home__section--media text-center">
+        <Container>
+          <span className="home__eyebrow">News and Events</span>
+          <h2 className="home__headline">
+            Get to know more about us from the media
+          </h2>
+          <p className="home__description mx-auto col-lg-7">
+            Discover how Olivia Products is shaping better homes across
+            Nigeria—from community spotlights to innovation features, stay in
+            the loop with our latest stories and updates.
+          </p>
+          <Row className="g-4 mt-4">
+            <Col md={4}>
+              <FBSocials />
+            </Col>
+            <Col md={4}>
+              <TwitterHandle />
+            </Col>
+            <Col md={4}>
+              <YouTube />
+            </Col>
+          </Row>
+        </Container>
+      </section>
+
+      <section className="home__section home__section--testimonials text-center">
+        <Container>
+          <h2 className="home__headline">Over 100,000 5-star reviews</h2>
+        </Container>
+        <TestimonialCarousel />
+      </section>
     </div>
   );
 };

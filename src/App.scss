@@ -1,61 +1,96 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-
+@use "sass:color";
+@use "./_variables" as *;
 
 @font-face {
   font-family: sailecMedium;
-  src: url(./assets/fonts/Sailec-Font/Sailec-Medium/Sailec-Medium.ttf);
+  src: url("./assets/fonts/Sailec-Font/Sailec-Medium/Sailec-Medium.ttf")
+    format("truetype");
+  font-weight: 500;
+  font-style: normal;
 }
+
 @font-face {
   font-family: sailecRegularIt;
-  src: url(./assets/fonts/Sailec-Font/Sailec-Regular-Italic/Sailec-Regular-Italic.ttf);
+  src: url("./assets/fonts/Sailec-Font/Sailec-Regular-Italic/Sailec-Regular-Italic.ttf")
+    format("truetype");
+  font-weight: 400;
+  font-style: italic;
 }
+
 @font-face {
   font-family: sailecBold;
-  src: url(./assets/fonts/Sailec-Font/Sailec-Bold/Sailec-Bold.ttf);
+  src: url("./assets/fonts/Sailec-Font/Sailec-Bold/Sailec-Bold.ttf")
+    format("truetype");
+  font-weight: 700;
+  font-style: normal;
 }
+
 @font-face {
   font-family: sailecLight;
-  src: url(./assets/fonts/Sailec-Font/Sailec-Light/Sailec-Light.ttf);
+  src: url("./assets/fonts/Sailec-Font/Sailec-Light/Sailec-Light.ttf")
+    format("truetype");
+  font-weight: 300;
+  font-style: normal;
 }
+
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  font-family: sailecBold;
-  color: black;
+  font-family: $font-heading;
+  color: $color-charcoal;
+  letter-spacing: -0.02em;
 }
+
 p {
-  font-family: sailecMedium;
-  color: rgb(59, 59, 59) !important;
+  font-family: $font-sans;
+  color: $body-text-color;
+  line-height: 1.7;
 }
+
 a {
-  font-family: sailecMedium;
+  font-family: $font-sans;
 }
-img {
-  // position: relative;
-  // z-index: -1;
-}
-body{
+
+body {
   scroll-behavior: smooth;
 }
-.bck-to-top{
-  height:50px;
-  width:50px;
-  border-radius: 100%;
-  background:#7bbd21;
-  z-index:100;
-  bottom:0;
-  right:0;
-  font-size:30px;
-  text-align: center;
-  position:fixed;
-  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-  a{
-    color:black;
+
+.text-gradient {
+  @include gradient-banner;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.elevated-card {
+  border-radius: 1.5rem;
+  box-shadow: $card-shadow;
+  background: #fff;
+}
+
+.bck-to-top {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  height: 3.25rem;
+  width: 3.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: $color-lime;
+  color: #fff;
+  font-size: 1.75rem;
+  z-index: 100;
+  box-shadow: 0 12px 24px color.change($color-lime, $alpha: 0.35);
+
+  a {
+    color: inherit;
+  }
+
+  &:hover {
+    background: $color-lime-dark;
   }
 }

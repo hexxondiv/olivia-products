@@ -1,9 +1,6 @@
 import React from "react";
 
-import "./App.scss";
-import { BrowserRouter, Routes, Route, Link, Outlet } from "react-router-dom";
-
-import "bootstrap/dist/css/bootstrap.min.css";
+import { Routes, Route } from "react-router-dom";
 import { Home } from "./Pages/Home/Home";
 import ScrollToTop from "./scrollToTop";
 import { ViewProductPage } from "./Pages/ViewProductPage/ViewProductPage";
@@ -16,7 +13,6 @@ import { OurMission } from "./Pages/OurMission/OurMission";
 import { Collections } from "./Pages/Collections/Collections";
 import { About } from "./Pages/About/About";
 import { FAQPage } from "./Pages/FAQPage/FAQPage";
-import SmoothScroll from "./Components/SmoothScroll";
 import { TopNav } from "./Components/TopNav/TopNav";
 import { MdOutlineVerticalAlignTop } from "react-icons/md";
 import CartOffcanvas from "./Components/CartList/CartList";

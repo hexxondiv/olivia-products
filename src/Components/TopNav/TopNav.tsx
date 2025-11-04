@@ -1,300 +1,77 @@
-import { useState } from 'react';
+import { Badge, Button, Container, Nav, NavDropdown, Navbar } from "react-bootstrap";
 import { Link, NavLink } from "react-router-dom";
-import { Desktop, TabletAndBelow } from "../../Utils/mediaQueries";
-import Dropdown from "react-bootstrap/Dropdown";
 import { useCart } from "../../CartContext";
-import ListGroup from 'react-bootstrap/ListGroup';
-import Offcanvas from 'react-bootstrap/Offcanvas';
-import Accordion from 'react-bootstrap/Accordion';
 import Logo from "../../assets/images/logo.png";
-
 import { GrCart } from "react-icons/gr";
-import { IoMenu } from "react-icons/io5";
-import './top-nav.scss'
-export const TopNav = () => {
-  const { setIsOffCanvasOpen, cart } = useCart();
-  const [show, setShow] = useState(false);
+import "./top-nav.scss";
 
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+const productLinks = [
+  { to: "/collections?category=*", label: "All Olivia Products" },
+  { to: "/collections?category=hand-soap", label: "Hand Wash" },
+  { to: "/collections?category=dish-wash", label: "Dish Wash" },
+  { to: "/collections?category=air-freshener", label: "Air Freshener" },
+  { to: "/collections?category=hair-care", label: "Hair Care" },
+  { to: "/collections?category=car-wash", label: "Car Wash" },
+  { to: "/collections?category=toilet-Wash", label: "Toilet Wash" },
+  { to: "/collections?category=window-cleaner", label: "Window Cleaner" },
+  { to: "/collections?category=personal-care", label: "Skin Care" },
+  { to: "/collections?category=tile-cleaner", label: "Tile / Floor Cleaner" },
+  { to: "/collections?category=fabric-wash", label: "Fabric Wash" },
+];
+
+const primaryLinks = [
+  { to: "/", label: "Home" },
+  { to: "/wholesale-page", label: "Wholesale" },
+  { to: "/wholesale-page", label: "Distribution" },
+  { to: "/wholesale-page", label: "Retail" },
+  { to: "/about-us", label: "About" },
+  { to: "/our-mission", label: "OliviaCare" },
+  { to: "/our-mission", label: "Careers" },
+  { to: "/contact-us", label: "Contact" },
+];
+
+export const TopNav = () => {
+  const { cart, openCart } = useCart();
+
+  const cartCount = cart.reduce((total, item) => total + (item.quantity ?? 1), 0);
 
   return (
-   <>
-    <Desktop>
-      {" "}
-      <div className="lower-nav-div d-md-flex">
-        <div className="col-md-1 logo" >
-         <Link to={"/"} > <img src={Logo} width="100%" /></Link>
-        </div>
-        <div style={{flexGrow:1}} />
-        <center>
-          <ul className="list-inline list-unstyled">
-          
-            <li className="list-inline-item">
-              <NavLink to={"/"} style={{ fontFamily: "sailecBold" }}>
-                Home
-              </NavLink>
-            </li>{" "}
-            <li className="list-inline-item">
-              <NavLink
-                to={"/wholesale-page"}
-                style={{ color: "green", fontFamily: "sailecBold" }}
-              >
-                Wholesale
-              </NavLink>
-            </li>{" "}
-            <li className="list-inline-item">
-              <NavLink
-                to={"/wholesale-page"}
-                style={{ color: "green", fontFamily: "sailecBold" }}
-              >
-                Distribution
-              </NavLink>
-            </li>{" "}
-            <li className="list-inline-item">
-              <NavLink
-                to={"/wholesale-page"}
-                style={{ color: "green", fontFamily: "sailecBold" }}
-              >
-                Retail
-              </NavLink>
-            </li>{" "}
-            <span>||</span>
-            <li className="list-inline-item">
-              {" "}
-              <Dropdown>
-                <Dropdown.Toggle variant="">Our Products</Dropdown.Toggle>
-
-                <Dropdown.Menu>
-                  <Dropdown.Item href="#/action-1">
-                    {" "}
-                    <NavLink to={"/collections?category=*"}>
-                      All Olivia Products
-                    </NavLink>
-                  </Dropdown.Item>
-                  <Dropdown.Item href="#/action-1">
-                    {" "}
-                    <NavLink to={"/collections?category=hand-soap"}>
-                      Hand Wash
-                    </NavLink>
-                  </Dropdown.Item>
-                  <Dropdown.Item href="#/action-2">
-                    <NavLink to={"/collections?category=dish-wash"}>
-                    Dish Wash
-                    </NavLink>
-                  </Dropdown.Item>
-                  <Dropdown.Item href="#/action-3">
-                    {" "}
-                    <NavLink to={"/collections?category=air-freshener"}>
-                      Air Freshener
-                    </NavLink>
-                    
-                  </Dropdown.Item>{" "}
-                  <Dropdown.Item href="#/action-3">
-                    {" "}
-                    <NavLink to={"/collections?category=hair-care"}>
-                    Hair Care
-                    </NavLink>
-                    
-                  </Dropdown.Item>{" "}
-                  <Dropdown.Item href="#/action-3">
-                    {" "}
-                    <NavLink to={"/collections?category=car-wash"}>
-                      Car Wash
-                    </NavLink>
-                  </Dropdown.Item>{" "}
-                  
-                  <Dropdown.Item href="#/action-3">
-                    {" "}
-                    <NavLink to={"/collections?category=toilet-Wash"}>
-                      Toilet Wash
-                    </NavLink>
-                  </Dropdown.Item>{" "}
-                 
-                  <Dropdown.Item href="#/action-3">
-                    {" "}
-                    <NavLink to={"/collections?category=window-cleaner"}>
-                   Window Cleaner
-                    </NavLink>
-                  </Dropdown.Item> 
-                  <Dropdown.Item href="#/action-3">
-                    {" "}
-                    <NavLink to={"/collections?category=personal-care"}>
-                     Skin Care
-                    </NavLink>
-                  </Dropdown.Item> <Dropdown.Item href="#/action-3">
-                    {" "}
-                    <NavLink to={"/collections?category=tile-cleaner"}>
-                    Tile Cleaner
-                    </NavLink>
-                  </Dropdown.Item> <Dropdown.Item href="#/action-3">
-                    {" "}
-                    <NavLink to={"/collections?category=fabric-wash"}>
-                     Fabric Wash
-                    </NavLink>
-                  </Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
-            </li>
-            <li className="list-inline-item">
-              <NavLink to={"/about-us"}>About us</NavLink>
-            </li>{" "}
-            <li className="list-inline-item">
-              <NavLink to={"/our-mission"}>OliviaCare</NavLink>
-            </li>{" "}<li className="list-inline-item">
-              <NavLink to={"/our-mission"}>Careers</NavLink>
-            </li>{" "}
-            <li className="list-inline-item">
-              <NavLink to={"/contact-us"}>Contact us</NavLink>
-            </li>
-            <li className="list-inline-item">
-              {" "}
-              <div style={{ position: "relative", cursor: "pointer" }}>
-                <GrCart size={30} onClick={() => setIsOffCanvasOpen(true)} />
-                {cart.length > 0 && (
-                  <span
-                    style={{
-                      position: "absolute",
-                      top: "-8px",
-                      right: "-8px",
-                      backgroundColor: "red",
-                      color: "white",
-                      borderRadius: "50%",
-                      padding: "2px 6px",
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {cart.length}
-                  </span>
-                )}
-              </div>
-            </li>
-          </ul>
-        </center>
-      </div>
-    </Desktop>
-
-
-
-<TabletAndBelow>
-<div className="mobile-nav d-flex">
- 
-  <div className="col-3 logo " >
-         <Link to={"/"} > <img src={Logo} width="100%" /></Link>
-        </div>
-         <div style={{flexGrow:1}} />
-  <div style={{ position: "relative", cursor: "pointer" }}>
-                <GrCart size={30} onClick={() => setIsOffCanvasOpen(true)} />
-                {cart.length > 0 && (
-                  <span
-                    style={{
-                      position: "absolute",
-                      top: "-8px",
-                      right: "-8px",
-                      backgroundColor: "red",
-                      color: "white",
-                      borderRadius: "50%",
-                      padding: "2px 6px",
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {cart.length}
-                  </span>
-                )}
-              </div>
-
-  <IoMenu onClick={handleShow} className="menu-icon text-dark" />
-
-     
-      </div>
-
-
-      <Offcanvas show={show} onHide={handleClose}>
-        <Offcanvas.Header closeButton>
-          {/* <Offcanvas.Title>Offcanvas</Offcanvas.Title> */}
-        </Offcanvas.Header>
-        <Offcanvas.Body>
-      <div className="mobile-nav">
-          <ListGroup>
-      <ListGroup.Item onClick={handleClose}>
-        <NavLink to={"/"}>Home</NavLink>
-      </ListGroup.Item> <ListGroup.Item>  
-
-<Accordion defaultActiveKey="">
-      <Accordion.Item eventKey="0">
-        <Accordion.Header>Our Products</Accordion.Header>
-        <Accordion.Body>
-           <ul className="list-unstyled">
-            <li onClick={handleClose}><NavLink to={"/collections?category=*"}>
-                      All Olivia Products
-                    </NavLink></li>
-                    <li onClick={handleClose}>   <NavLink to={"/collections?category=hand-soap"}>
-                      Hand Wash
-                    </NavLink></li>
-                    <li onClick={handleClose}>   <NavLink to={"/collections?category=dish-wash"}>
-                      Dish Wash
-                    </NavLink></li>
-                    <li>   <NavLink to={"/collections?category=air-freshener"}>
-                      Air Freshener
-                    </NavLink></li>
-                    <li onClick={handleClose}>   <NavLink to={"/collections?category=hair-care"}>
-                      Hair Care
-                    </NavLink></li>
-                    <li onClick={handleClose}>   <NavLink to={"/collections?category=car-wash"}>
-                      Car Wash
-                    </NavLink></li>
-                   
-                    <li onClick={handleClose}><NavLink to={"/collections?category=toilet-Wash"}>
-                      Toilet Wash
-                    </NavLink></li>
-                    <li onClick={handleClose}> <NavLink to={"/collections?category=window-cleaner"}>
-                   Window Cleaner
-                    </NavLink></li>
-                    <li onClick={handleClose}><NavLink to={"/collections?category=personal-care"}>
-                     Skin Care
-                    </NavLink></li> 
-                    <li onClick={handleClose}><NavLink to={"/collections?category=tile-cleaner"}>
-                     Tile / Floor Cleaner
-                    </NavLink></li> <li onClick={handleClose}><NavLink to={"/collections?category=fabric-wash"}>
-                    Fabric Wash
-                    </NavLink></li>
-                   
-           </ul>
-        </Accordion.Body>
-      </Accordion.Item>
-      
-    </Accordion>
-     </ListGroup.Item>
-      <ListGroup.Item onClick={handleClose}>  
-     <NavLink to={"/wholesale-page"}>Wholesale</NavLink>
-     </ListGroup.Item >  <ListGroup.Item onClick={handleClose}>  
-     <NavLink to={"/wholesale-page"}>Distribution</NavLink>
-     </ListGroup.Item>  
-     <ListGroup.Item onClick={handleClose}>  
-     <NavLink to={"/wholesale-page"}>Retail</NavLink>
-     </ListGroup.Item> 
-     
-     
-     
-     <ListGroup.Item onClick={handleClose}>  
-     <NavLink to={"/about-us"}>About Us</NavLink>
-     </ListGroup.Item>  <ListGroup.Item>  
-     <NavLink to={"/our-mission"}>Olivia Care</NavLink>
-     </ListGroup.Item>  
-     <ListGroup.Item onClick={handleClose}>  
-     <NavLink to={"/"}>Careers</NavLink>
-     </ListGroup.Item > <ListGroup.Item onClick={handleClose}>  
-     <NavLink to={"/contact-us"}>Contact Us</NavLink>
-     </ListGroup.Item> 
-    </ListGroup>
-      </div>
-        </Offcanvas.Body>
-      </Offcanvas>
-
-</TabletAndBelow>
-   
-   </>
+    <Navbar expand="lg" bg="light" sticky="top" className="top-nav shadow-sm">
+      <Container fluid="lg">
+        <Navbar.Brand as={Link} to="/" className="d-flex align-items-center gap-2">
+          <img src={Logo} alt="Olivia Products" className="top-nav__logo" />
+        </Navbar.Brand>
+        <Navbar.Toggle aria-controls="main-navbar" />
+        <Navbar.Collapse id="main-navbar" className="justify-content-lg-end">
+          <Nav className="align-items-lg-center gap-lg-3 top-nav__links">
+            {primaryLinks.map((link) => (
+              <Nav.Link key={link.label} as={NavLink} to={link.to} end>
+                {link.label}
+              </Nav.Link>
+            ))}
+            <NavDropdown title="Our Products" id="products-dropdown" menuVariant="light">
+              {productLinks.map((link) => (
+                <NavDropdown.Item key={link.label} as={NavLink} to={link.to}>
+                  {link.label}
+                </NavDropdown.Item>
+              ))}
+            </NavDropdown>
+          </Nav>
+          <Button
+            variant="success"
+            className="top-nav__cart ms-lg-4 mt-3 mt-lg-0 position-relative"
+            onClick={openCart}
+            aria-label="Open cart"
+          >
+            <GrCart size={22} />
+            {cartCount > 0 && (
+              <Badge bg="danger" pill className="top-nav__cart-badge">
+                {cartCount}
+              </Badge>
+            )}
+          </Button>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
   );
 };

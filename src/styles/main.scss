@@ -1,0 +1,61 @@
+@use "sass:map";
+@use "sass:color";
+@use "../_variables" as *;
+
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
+
+// Merge custom theme colors into Bootstrap map
+$theme-colors: map.merge($theme-colors, $theme-colors-map);
+
+// Global Bootstrap variable overrides
+$body-bg: $body-bg-color;
+$body-color: $body-text-color;
+$font-family-sans-serif: $font-sans;
+$headings-font-family: $font-heading;
+$headings-font-weight: 600;
+$link-color: map.get($theme-colors-map, "primary");
+$link-hover-color: color.scale(map.get($theme-colors-map, "primary"), $lightness: -10%);
+$btn-border-radius: 999px;
+$btn-border-radius-lg: 999px;
+$btn-font-weight: 600;
+$btn-padding-y: 0.65rem;
+$btn-padding-x: 1.4rem;
+$border-radius: 0.875rem;
+$border-radius-lg: 1.25rem;
+$border-radius-xl: 1.75rem;
+$input-btn-focus-color: $focus-ring-color;
+$enable-rounded: true;
+
+@import "bootstrap/scss/bootstrap";
+
+// Brand tokens exposed as CSS variables
+:root {
+  --color-navy: #{$color-navy};
+  --color-indigo: #{$color-indigo};
+  --color-lime: #{$color-lime};
+  --color-amber: #{$color-amber};
+  --color-sky: #{$color-sky};
+  --color-blush: #{$color-blush};
+  --color-forest: #{$color-forest};
+  --shadow-soft: #{$card-shadow};
+}
+
+body {
+  background: $body-bg-color;
+  color: $body-text-color;
+  font-family: $font-sans;
+}
+
+a {
+  color: $color-navy;
+  text-decoration: none;
+
+  &:hover {
+    color: color.scale($color-navy, $lightness: -8%);
+  }
+}
+
+@import "../App";
