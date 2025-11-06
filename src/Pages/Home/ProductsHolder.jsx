@@ -148,20 +148,51 @@ const filteredProducts =
         {" "}
         <Desktop>
           {showOnlyBestSellers ? (
-            <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-              <MdNavigateBefore
+            <div style={{ position: "relative", display: "flex", alignItems: "center", padding: "0 60px" }}>
+              <button
                 onClick={handlePrev}
                 style={{
                   position: "absolute",
-                  left: "-50px",
+                  left: "0",
                   top: "50%",
                   transform: "translateY(-50%)",
+                  width: "48px",
+                  height: "48px",
+                  borderRadius: "50%",
+                  backgroundColor: "#ffffff",
+                  border: "2px solid #003057",
                   color: "#003057",
-                  fontSize: "38px",
+                  fontSize: "24px",
                   cursor: "pointer",
                   zIndex: 10,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+                  transition: "all 0.3s ease",
+                  outline: "none",
                 }}
-              />
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#003057";
+                  e.currentTarget.style.color = "#ffffff";
+                  e.currentTarget.style.transform = "translateY(-50%) scale(1.1)";
+                  e.currentTarget.style.boxShadow = "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "#ffffff";
+                  e.currentTarget.style.color = "#003057";
+                  e.currentTarget.style.transform = "translateY(-50%) scale(1)";
+                  e.currentTarget.style.boxShadow = "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)";
+                }}
+                onMouseDown={(e) => {
+                  e.currentTarget.style.transform = "translateY(-50%) scale(0.95)";
+                }}
+                onMouseUp={(e) => {
+                  e.currentTarget.style.transform = "translateY(-50%) scale(1.1)";
+                }}
+              >
+                <MdNavigateBefore />
+              </button>
               <div
                 className="carousel"
                 style={{
@@ -193,19 +224,50 @@ const filteredProducts =
                   </div>
                 ))}
               </div>
-              <MdNavigateNext
+              <button
                 onClick={handleNext}
                 style={{
                   position: "absolute",
-                  right: "-50px",
+                  right: "0",
                   top: "50%",
                   transform: "translateY(-50%)",
+                  width: "48px",
+                  height: "48px",
+                  borderRadius: "50%",
+                  backgroundColor: "#ffffff",
+                  border: "2px solid #003057",
                   color: "#003057",
-                  fontSize: "38px",
+                  fontSize: "24px",
                   cursor: "pointer",
                   zIndex: 10,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+                  transition: "all 0.3s ease",
+                  outline: "none",
                 }}
-              />
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#003057";
+                  e.currentTarget.style.color = "#ffffff";
+                  e.currentTarget.style.transform = "translateY(-50%) scale(1.1)";
+                  e.currentTarget.style.boxShadow = "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "#ffffff";
+                  e.currentTarget.style.color = "#003057";
+                  e.currentTarget.style.transform = "translateY(-50%) scale(1)";
+                  e.currentTarget.style.boxShadow = "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)";
+                }}
+                onMouseDown={(e) => {
+                  e.currentTarget.style.transform = "translateY(-50%) scale(0.95)";
+                }}
+                onMouseUp={(e) => {
+                  e.currentTarget.style.transform = "translateY(-50%) scale(1.1)";
+                }}
+              >
+                <MdNavigateNext />
+              </button>
             </div>
           ) : (
             <>
