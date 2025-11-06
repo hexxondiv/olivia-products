@@ -4,7 +4,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { useCart } from "../../CartContext";
 import { allProductsData } from "../../TestData/allProductsData";
 import "./checkout-page.scss";
-import { MdDelete } from "react-icons/md";
+import { MdDelete, MdEmail } from "react-icons/md";
+import { FaWhatsapp } from "react-icons/fa";
 
 export const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
@@ -79,15 +80,15 @@ export const CheckoutPage: React.FC = () => {
     let message = "Hello! 👋\n\n";
     message += "I'd like to place a _new order_. Here are the details:\n\n";
     
-    message += "🆔 *Order ID:* `" + orderId + "`\n";
-    message += "📆 *Order Date:* " + orderDate + "\n\n";
+    message += "*Order ID:* `" + orderId + "`\n";
+    message += "*Order Date:* " + orderDate + "\n\n";
     
-    message += "*👤 CUSTOMER INFORMATION*\n";
+    message += "*CUSTOMER INFORMATION*\n";
     message += `*Name:* ${formData.fullName}\n`;
     message += `*Email:* ${formData.email}\n`;
     message += `*Phone:* ${formData.phone}\n\n`;
     
-    message += "*🏠 SHIPPING ADDRESS*\n";
+    message += "*SHIPPING ADDRESS*\n";
     message += `${formData.address}\n`;
     message += `${formData.city}, ${formData.state}`;
     if (formData.postalCode) {
@@ -95,21 +96,21 @@ export const CheckoutPage: React.FC = () => {
     }
     message += "\n\n";
     
-    message += "*🛒 ORDER ITEMS*\n";
+    message += "*ORDER ITEMS*\n";
     cart.forEach((item, index) => {
       const formattedName = formatProductName(item);
       message += `*${index + 1}. ${formattedName}*\n`;
       message += `   Qty: *${item.quantity}* × ${formatCurrency(item.productPrice)} = *${formatCurrency(item.productPrice * item.quantity)}*\n\n`;
     });
     
-    message += `*💵 TOTAL AMOUNT: ${formatCurrency(calculateTotalPrice())}*\n\n`;
+    message += `*TOTAL AMOUNT: ${formatCurrency(calculateTotalPrice())}*\n\n`;
     
     if (formData.notes) {
-      message += "*📄 SPECIAL NOTES:*\n";
+      message += "*SPECIAL NOTES:*\n";
       message += `_${formData.notes}_\n\n`;
     }
     
-    message += "Thank you! Looking forward to your confirmation. 😊";
+    message += "Thank you! Looking forward to your confirmation.";
     
     // Encode message for URL
     const encodedMessage = encodeURIComponent(message);
@@ -487,10 +488,11 @@ export const CheckoutPage: React.FC = () => {
               <div className="form-actions">
                 <button 
                   type="submit" 
-                  className="submit-order-btn"
+                  className="submit-order-btn email-btn"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Processing Order..." : "Place Order"}
+                  <MdEmail className="btn-icon" />
+                  <span>{isSubmitting ? "Processing..." : "Place Order"}</span>
                 </button>
                 <button 
                   type="button" 
@@ -498,7 +500,8 @@ export const CheckoutPage: React.FC = () => {
                   onClick={handleWhatsAppSubmit}
                   disabled={isSubmitting}
                 >
-                  📱 Submit via WhatsApp
+                  <FaWhatsapp className="btn-icon" />
+                  <span>Submit via WhatsApp</span>
                 </button>
               </div>
             </form>

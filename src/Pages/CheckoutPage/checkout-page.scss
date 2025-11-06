@@ -1,4 +1,5 @@
 @use "sass:map";
+@use "sass:color";
 @use "../../_variables" as *;
 
 .checkout-page {
@@ -151,11 +152,26 @@
         flex-wrap: wrap;
 
         .submit-order-btn {
-          @include modern-button("success", "lg");
+          @include modern-button("success", "md");
           flex: 1;
-          min-width: 200px;
-          font-size: $font-size-lg;
-          padding: $spacing-lg $spacing-2xl;
+          min-width: 180px;
+          font-size: $font-size-base;
+          font-weight: 600;
+          padding: $spacing-md $spacing-lg;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: $spacing-xs;
+          transition: all $transition-base;
+
+          .btn-icon {
+            font-size: $font-size-lg;
+            flex-shrink: 0;
+          }
+
+          span {
+            white-space: nowrap;
+          }
 
           &:disabled {
             opacity: 0.7;
@@ -164,9 +180,30 @@
           }
 
           @media screen and (max-width: 576px) {
-            padding: $spacing-md $spacing-lg;
-            font-size: $font-size-base;
+            padding: $spacing-sm $spacing-md;
+            font-size: $font-size-sm;
             min-width: 100%;
+            gap: $spacing-xs;
+
+            .btn-icon {
+              font-size: $font-size-base;
+            }
+          }
+
+          &.email-btn {
+            background: linear-gradient(135deg, $color-lime-dark 0%, color.scale($color-lime-dark, $lightness: -5%) 100%);
+            border-color: $color-lime-dark;
+            color: #fff;
+
+            &:hover:not(:disabled) {
+              background: linear-gradient(135deg, color.scale($color-lime-dark, $lightness: -3%) 0%, color.scale($color-lime-dark, $lightness: -8%) 100%);
+              transform: translateY(-2px);
+              box-shadow: 0 6px 16px rgba($color-lime-dark, 0.3);
+            }
+
+            &:active:not(:disabled) {
+              transform: translateY(0);
+            }
           }
 
           &.whatsapp-btn {
@@ -178,7 +215,7 @@
               background: linear-gradient(135deg, #20BA5A 0%, #0F7A6D 100%);
               border-color: #20BA5A;
               transform: translateY(-2px);
-              box-shadow: 0 8px 20px rgba(37, 211, 102, 0.3);
+              box-shadow: 0 6px 16px rgba(37, 211, 102, 0.3);
             }
 
             &:active:not(:disabled) {
