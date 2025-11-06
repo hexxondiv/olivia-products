@@ -382,3 +382,540 @@ function getCustomerOrderEmailTextTemplate($orderData) {
     return $text;
 }
 
+/**
+ * Get contact form email template for team (HTML with Bootstrap)
+ */
+function getContactFormEmailTemplate($contactData) {
+    $submittedAt = date('F j, Y \a\t g:i A', strtotime($contactData['submittedAt']));
+    $fullName = htmlspecialchars($contactData['fullName']);
+    $email = !empty($contactData['email']) ? htmlspecialchars($contactData['email']) : 'Not provided';
+    $phone = htmlspecialchars($contactData['phone']);
+    $address = !empty($contactData['address']) ? htmlspecialchars($contactData['address']) : 'Not provided';
+    $message = nl2br(htmlspecialchars($contactData['message']));
+    
+    return '
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Contact Form Submission</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f5f5f5; }
+        .email-container { max-width: 800px; margin: 0 auto; background-color: #ffffff; }
+        .header { background: linear-gradient(135deg, #003057 0%, #4b3d97 100%); color: #ffffff; padding: 30px; text-align: center; }
+        .content { padding: 30px; }
+        .contact-badge { display: inline-block; background-color: #7bbd21; color: #ffffff; padding: 8px 16px; border-radius: 20px; font-weight: bold; margin-bottom: 20px; }
+        .info-box { background-color: #f5f9ff; border-left: 4px solid #003057; padding: 20px; margin: 20px 0; border-radius: 4px; }
+        .message-box { background-color: #ffffff; border: 2px solid #e0e0e0; border-radius: 8px; padding: 20px; margin: 20px 0; min-height: 100px; }
+        .footer { background-color: #f8f9fa; padding: 20px; text-align: center; color: #6c757d; font-size: 0.9em; }
+        .info-row { margin-bottom: 15px; }
+        .info-label { font-weight: 600; color: #003057; display: inline-block; min-width: 120px; }
+        .info-value { color: #333333; }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1 style="margin: 0; font-size: 28px;">New Contact Form Submission</h1>
+            <p style="margin: 10px 0 0 0; font-size: 16px;">Someone has contacted you through the website</p>
+        </div>
+        
+        <div class="content">
+            <div class="contact-badge">Contact Form Submission</div>
+            <p style="color: #6c757d; margin-bottom: 20px;">Submitted: ' . $submittedAt . '</p>
+            
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="info-box">
+                        <h3 style="margin-top: 0; color: #003057;">Contact Information</h3>
+                        <div class="info-row">
+                            <span class="info-label">Full Name:</span>
+                            <span class="info-value">' . $fullName . '</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Email:</span>
+                            <span class="info-value">' . ($email !== 'Not provided' ? '<a href="mailto:' . $email . '">' . $email . '</a>' : $email) . '</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Phone:</span>
+                            <span class="info-value"><a href="tel:' . $phone . '">' . $phone . '</a></span>
+                        </div>
+                        ' . ($address !== 'Not provided' ? '
+                        <div class="info-row">
+                            <span class="info-label">Address:</span>
+                            <span class="info-value">' . $address . '</span>
+                        </div>
+                        ' : '') . '
+                    </div>
+                </div>
+            </div>
+            
+            <div class="info-box">
+                <h3 style="margin-top: 0; color: #003057;">Message</h3>
+                <div class="message-box">
+                    ' . $message . '
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="mailto:' . ($email !== 'Not provided' ? htmlspecialchars($email) : htmlspecialchars(CONTACT_EMAIL)) . '" style="display: inline-block; padding: 12px 30px; background-color: #7bbd21; color: #ffffff; text-decoration: none; border-radius: 25px; font-weight: 600;">Reply to Contact</a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p style="margin: 0;">This is an automated email from Olivia Products contact form system.</p>
+            <p style="margin: 5px 0 0 0;">Please respond to this inquiry promptly.</p>
+        </div>
+    </div>
+</body>
+</html>';
+}
+
+/**
+ * Get contact form email template for team (Plain Text)
+ */
+function getContactFormEmailTextTemplate($contactData) {
+    $submittedAt = date('F j, Y \a\t g:i A', strtotime($contactData['submittedAt']));
+    $fullName = $contactData['fullName'];
+    $email = !empty($contactData['email']) ? $contactData['email'] : 'Not provided';
+    $phone = $contactData['phone'];
+    $address = !empty($contactData['address']) ? $contactData['address'] : 'Not provided';
+    $message = $contactData['message'];
+    
+    $text = "NEW CONTACT FORM SUBMISSION\n";
+    $text .= "==========================\n\n";
+    $text .= "Submitted: $submittedAt\n\n";
+    
+    $text .= "CONTACT INFORMATION\n";
+    $text .= "-------------------\n";
+    $text .= "Full Name: $fullName\n";
+    $text .= "Email: $email\n";
+    $text .= "Phone: $phone\n";
+    if ($address !== 'Not provided') {
+        $text .= "Address: $address\n";
+    }
+    $text .= "\n";
+    
+    $text .= "MESSAGE\n";
+    $text .= "-------\n";
+    $text .= "$message\n\n";
+    
+    $text .= "This is an automated email from Olivia Products contact form system.\n";
+    $text .= "Please respond to this inquiry promptly.\n";
+    
+    return $text;
+}
+
+/**
+ * Get contact form acknowledgement email template for customer (HTML with Bootstrap)
+ */
+function getContactAcknowledgementEmailTemplate($contactData) {
+    $fullName = htmlspecialchars($contactData['fullName']);
+    $submittedAt = date('F j, Y \a\t g:i A', strtotime($contactData['submittedAt']));
+    
+    return '
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You for Contacting Us</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f5f5f5; }
+        .email-container { max-width: 800px; margin: 0 auto; background-color: #ffffff; }
+        .header { background: linear-gradient(135deg, #003057 0%, #4b3d97 100%); color: #ffffff; padding: 40px 30px; text-align: center; }
+        .success-icon { font-size: 60px; color: #7bbd21; margin-bottom: 20px; }
+        .content { padding: 30px; }
+        .info-box { background-color: #f5f9ff; border-left: 4px solid #7bbd21; padding: 20px; margin: 20px 0; border-radius: 4px; }
+        .next-steps { background-color: #fff9e6; border: 2px solid #ffc857; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .footer { background-color: #f8f9fa; padding: 30px; text-align: center; color: #6c757d; }
+        .btn { display: inline-block; padding: 12px 30px; background-color: #7bbd21; color: #ffffff; text-decoration: none; border-radius: 25px; font-weight: 600; margin: 10px 5px; }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <div class="success-icon">✓</div>
+            <h1 style="margin: 0; font-size: 32px;">Thank You for Contacting Us!</h1>
+            <p style="margin: 15px 0 0 0; font-size: 18px;">We\'ve received your message and will get back to you soon</p>
+        </div>
+        
+        <div class="content">
+            <div class="info-box">
+                <h3 style="margin-top: 0; color: #003057;">Hello ' . $fullName . '!</h3>
+                <p style="margin: 0; line-height: 1.6;">Thank you for reaching out to Olivia Products. We have successfully received your message submitted on ' . $submittedAt . ' and our team will review it and respond to you as soon as possible.</p>
+            </div>
+            
+            <div class="next-steps">
+                <h4 style="margin-top: 0; color: #003057;">What\'s Next?</h4>
+                <ul style="margin: 10px 0; padding-left: 20px; line-height: 1.8;">
+                    <li>Our team will review your message within 24 hours</li>
+                    <li>We\'ll respond to your inquiry via email or phone</li>
+                    <li>For urgent matters, please call us at +234 901 419 6902</li>
+                    <li>You can also reach us via WhatsApp at +234 912 350 9090</li>
+                </ul>
+            </div>
+            
+            <div class="info-box">
+                <h4 style="margin-top: 0; color: #003057;">Our Contact Information</h4>
+                <p style="margin: 5px 0;"><strong>Email:</strong> <a href="mailto:' . MAILGUN_REPLY_TO . '">' . MAILGUN_REPLY_TO . '</a></p>
+                <p style="margin: 5px 0;"><strong>Phone (Lagos):</strong> +234 901 419 6902</p>
+                <p style="margin: 5px 0;"><strong>WhatsApp:</strong> +234 912 350 9090</p>
+                <p style="margin: 5px 0;"><strong>Business Hours:</strong> Monday - Friday, 8am - 5pm</p>
+                <p style="margin: 5px 0;"><strong>Location:</strong> KM 8 Hadejia Road, Kano, Nigeria</p>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="https://oliviaproducts.com" class="btn">Visit Our Website</a>
+                <a href="mailto:' . MAILGUN_REPLY_TO . '" class="btn" style="background-color: #003057;">Contact Us</a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p style="margin: 0; font-weight: 600; color: #003057;">Olivia Products</p>
+            <p style="margin: 5px 0;">We appreciate your interest in our products!</p>
+            <p style="margin: 10px 0 0 0; font-size: 0.9em;">This is an automated acknowledgement email. Please do not reply to this email.</p>
+        </div>
+    </div>
+</body>
+</html>';
+}
+
+/**
+ * Get contact form acknowledgement email template for customer (Plain Text)
+ */
+function getContactAcknowledgementEmailTextTemplate($contactData) {
+    $fullName = $contactData['fullName'];
+    $submittedAt = date('F j, Y \a\t g:i A', strtotime($contactData['submittedAt']));
+    
+    $text = "THANK YOU FOR CONTACTING US!\n";
+    $text .= "============================\n\n";
+    $text .= "Hello $fullName!\n\n";
+    $text .= "Thank you for reaching out to Olivia Products. We have successfully received your message submitted on $submittedAt and our team will review it and respond to you as soon as possible.\n\n";
+    
+    $text .= "WHAT'S NEXT?\n";
+    $text .= "------------\n";
+    $text .= "- Our team will review your message within 24 hours\n";
+    $text .= "- We'll respond to your inquiry via email or phone\n";
+    $text .= "- For urgent matters, please call us at +234 901 419 6902\n";
+    $text .= "- You can also reach us via WhatsApp at +234 912 350 9090\n\n";
+    
+    $text .= "OUR CONTACT INFORMATION\n";
+    $text .= "-----------------------\n";
+    $text .= "Email: " . MAILGUN_REPLY_TO . "\n";
+    $text .= "Phone (Lagos): +234 901 419 6902\n";
+    $text .= "WhatsApp: +234 912 350 9090\n";
+    $text .= "Business Hours: Monday - Friday, 8am - 5pm\n";
+    $text .= "Location: KM 8 Hadejia Road, Kano, Nigeria\n\n";
+    
+    $text .= "We appreciate your interest in our products!\n\n";
+    $text .= "Olivia Products\n";
+    $text .= "This is an automated acknowledgement email. Please do not reply to this email.\n";
+    
+    return $text;
+}
+
+/**
+ * Get wholesale form email template for team (HTML with Bootstrap)
+ */
+function getWholesaleFormEmailTemplate($wholesaleData) {
+    $formType = ucfirst(strtolower($wholesaleData['formType']));
+    $submittedAt = date('F j, Y \a\t g:i A', strtotime($wholesaleData['submittedAt']));
+    $firstName = htmlspecialchars($wholesaleData['firstName']);
+    $lastName = !empty($wholesaleData['lastName']) ? htmlspecialchars($wholesaleData['lastName']) : '';
+    $fullName = trim($firstName . ' ' . $lastName);
+    $email = htmlspecialchars($wholesaleData['email']);
+    $phone = htmlspecialchars($wholesaleData['phone']);
+    $businessName = htmlspecialchars($wholesaleData['businessName']);
+    $website = !empty($wholesaleData['website']) ? htmlspecialchars($wholesaleData['website']) : 'Not provided';
+    $city = htmlspecialchars($wholesaleData['city']);
+    $state = htmlspecialchars($wholesaleData['state']);
+    $country = htmlspecialchars($wholesaleData['country']);
+    $aboutBusiness = nl2br(htmlspecialchars($wholesaleData['aboutBusiness']));
+    $businessTypes = !empty($wholesaleData['businessTypes']) && is_array($wholesaleData['businessTypes']) 
+        ? $wholesaleData['businessTypes'] 
+        : [];
+    
+    $businessTypesHtml = '';
+    if (!empty($businessTypes)) {
+        $businessTypesHtml = '<ul style="margin: 10px 0; padding-left: 20px;">';
+        foreach ($businessTypes as $type) {
+            $businessTypesHtml .= '<li>' . htmlspecialchars($type) . '</li>';
+        }
+        $businessTypesHtml .= '</ul>';
+    } else {
+        $businessTypesHtml = '<p style="color: #6c757d; font-style: italic;">No business types selected</p>';
+    }
+    
+    return '
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New ' . $formType . ' Form Submission</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f5f5f5; }
+        .email-container { max-width: 800px; margin: 0 auto; background-color: #ffffff; }
+        .header { background: linear-gradient(135deg, #003057 0%, #4b3d97 100%); color: #ffffff; padding: 30px; text-align: center; }
+        .content { padding: 30px; }
+        .form-badge { display: inline-block; background-color: #7bbd21; color: #ffffff; padding: 8px 16px; border-radius: 20px; font-weight: bold; margin-bottom: 20px; }
+        .info-box { background-color: #f5f9ff; border-left: 4px solid #003057; padding: 20px; margin: 20px 0; border-radius: 4px; }
+        .message-box { background-color: #ffffff; border: 2px solid #e0e0e0; border-radius: 8px; padding: 20px; margin: 20px 0; min-height: 100px; }
+        .footer { background-color: #f8f9fa; padding: 20px; text-align: center; color: #6c757d; font-size: 0.9em; }
+        .info-row { margin-bottom: 15px; }
+        .info-label { font-weight: 600; color: #003057; display: inline-block; min-width: 150px; }
+        .info-value { color: #333333; }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1 style="margin: 0; font-size: 28px;">New ' . $formType . ' Form Submission</h1>
+            <p style="margin: 10px 0 0 0; font-size: 16px;">Someone has submitted a ' . strtolower($formType) . ' partnership inquiry</p>
+        </div>
+        
+        <div class="content">
+            <div class="form-badge">' . $formType . ' Partnership Inquiry</div>
+            <p style="color: #6c757d; margin-bottom: 20px;">Submitted: ' . $submittedAt . '</p>
+            
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="info-box">
+                        <h3 style="margin-top: 0; color: #003057;">Contact Information</h3>
+                        <div class="info-row">
+                            <span class="info-label">Full Name:</span>
+                            <span class="info-value">' . $fullName . '</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Email:</span>
+                            <span class="info-value"><a href="mailto:' . $email . '">' . $email . '</a></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Phone:</span>
+                            <span class="info-value"><a href="tel:' . $phone . '">' . $phone . '</a></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="info-box">
+                        <h3 style="margin-top: 0; color: #003057;">Business Information</h3>
+                        <div class="info-row">
+                            <span class="info-label">Business Name:</span>
+                            <span class="info-value">' . $businessName . '</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Website:</span>
+                            <span class="info-value">' . ($website !== 'Not provided' ? '<a href="' . $website . '" target="_blank">' . $website . '</a>' : $website) . '</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Location:</span>
+                            <span class="info-value">' . $city . ', ' . $state . ', ' . $country . '</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="info-box">
+                <h3 style="margin-top: 0; color: #003057;">Type of Business</h3>
+                ' . $businessTypesHtml . '
+            </div>
+            
+            <div class="info-box">
+                <h3 style="margin-top: 0; color: #003057;">About the Business</h3>
+                <div class="message-box">
+                    ' . $aboutBusiness . '
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="mailto:' . $email . '" style="display: inline-block; padding: 12px 30px; background-color: #7bbd21; color: #ffffff; text-decoration: none; border-radius: 25px; font-weight: 600;">Reply to Inquiry</a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p style="margin: 0;">This is an automated email from Olivia Products ' . strtolower($formType) . ' partnership form system.</p>
+            <p style="margin: 5px 0 0 0;">Please respond to this inquiry promptly.</p>
+        </div>
+    </div>
+</body>
+</html>';
+}
+
+/**
+ * Get wholesale form email template for team (Plain Text)
+ */
+function getWholesaleFormEmailTextTemplate($wholesaleData) {
+    $formType = ucfirst(strtolower($wholesaleData['formType']));
+    $submittedAt = date('F j, Y \a\t g:i A', strtotime($wholesaleData['submittedAt']));
+    $firstName = $wholesaleData['firstName'];
+    $lastName = !empty($wholesaleData['lastName']) ? $wholesaleData['lastName'] : '';
+    $fullName = trim($firstName . ' ' . $lastName);
+    $email = $wholesaleData['email'];
+    $phone = $wholesaleData['phone'];
+    $businessName = $wholesaleData['businessName'];
+    $website = !empty($wholesaleData['website']) ? $wholesaleData['website'] : 'Not provided';
+    $city = $wholesaleData['city'];
+    $state = $wholesaleData['state'];
+    $country = $wholesaleData['country'];
+    $aboutBusiness = $wholesaleData['aboutBusiness'];
+    $businessTypes = !empty($wholesaleData['businessTypes']) && is_array($wholesaleData['businessTypes']) 
+        ? $wholesaleData['businessTypes'] 
+        : [];
+    
+    $text = "NEW " . strtoupper($formType) . " FORM SUBMISSION\n";
+    $text .= str_repeat("=", strlen($formType) + 20) . "\n\n";
+    $text .= "Submitted: $submittedAt\n\n";
+    
+    $text .= "CONTACT INFORMATION\n";
+    $text .= "-------------------\n";
+    $text .= "Full Name: $fullName\n";
+    $text .= "Email: $email\n";
+    $text .= "Phone: $phone\n\n";
+    
+    $text .= "BUSINESS INFORMATION\n";
+    $text .= "--------------------\n";
+    $text .= "Business Name: $businessName\n";
+    $text .= "Website: $website\n";
+    $text .= "Location: $city, $state, $country\n\n";
+    
+    if (!empty($businessTypes)) {
+        $text .= "TYPE OF BUSINESS\n";
+        $text .= "----------------\n";
+        foreach ($businessTypes as $type) {
+            $text .= "- $type\n";
+        }
+        $text .= "\n";
+    }
+    
+    $text .= "ABOUT THE BUSINESS\n";
+    $text .= "------------------\n";
+    $text .= "$aboutBusiness\n\n";
+    
+    $text .= "This is an automated email from Olivia Products " . strtolower($formType) . " partnership form system.\n";
+    $text .= "Please respond to this inquiry promptly.\n";
+    
+    return $text;
+}
+
+/**
+ * Get wholesale form acknowledgement email template for customer (HTML with Bootstrap)
+ */
+function getWholesaleAcknowledgementEmailTemplate($wholesaleData) {
+    $formType = ucfirst(strtolower($wholesaleData['formType']));
+    $firstName = htmlspecialchars($wholesaleData['firstName']);
+    $submittedAt = date('F j, Y \a\t g:i A', strtotime($wholesaleData['submittedAt']));
+    
+    return '
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You for Your ' . $formType . ' Partnership Inquiry</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f5f5f5; }
+        .email-container { max-width: 800px; margin: 0 auto; background-color: #ffffff; }
+        .header { background: linear-gradient(135deg, #003057 0%, #4b3d97 100%); color: #ffffff; padding: 40px 30px; text-align: center; }
+        .success-icon { font-size: 60px; color: #7bbd21; margin-bottom: 20px; }
+        .content { padding: 30px; }
+        .info-box { background-color: #f5f9ff; border-left: 4px solid #7bbd21; padding: 20px; margin: 20px 0; border-radius: 4px; }
+        .next-steps { background-color: #fff9e6; border: 2px solid #ffc857; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .footer { background-color: #f8f9fa; padding: 30px; text-align: center; color: #6c757d; }
+        .btn { display: inline-block; padding: 12px 30px; background-color: #7bbd21; color: #ffffff; text-decoration: none; border-radius: 25px; font-weight: 600; margin: 10px 5px; }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <div class="success-icon">✓</div>
+            <h1 style="margin: 0; font-size: 32px;">Thank You for Your ' . $formType . ' Partnership Inquiry!</h1>
+            <p style="margin: 15px 0 0 0; font-size: 18px;">We\'ve received your application and will review it soon</p>
+        </div>
+        
+        <div class="content">
+            <div class="info-box">
+                <h3 style="margin-top: 0; color: #003057;">Hello ' . $firstName . '!</h3>
+                <p style="margin: 0; line-height: 1.6;">Thank you for your interest in becoming a ' . strtolower($formType) . ' partner with Olivia Products. We have successfully received your application submitted on ' . $submittedAt . ' and our team will review it and respond to you as soon as possible.</p>
+            </div>
+            
+            <div class="next-steps">
+                <h4 style="margin-top: 0; color: #003057;">What\'s Next?</h4>
+                <ul style="margin: 10px 0; padding-left: 20px; line-height: 1.8;">
+                    <li>Our partnership team will review your application within 5-7 business days</li>
+                    <li>We\'ll evaluate your business profile and partnership potential</li>
+                    <li>You\'ll receive a response via email or phone regarding the next steps</li>
+                    <li>If approved, we\'ll discuss partnership terms and benefits</li>
+                    <li>For urgent inquiries, please call us at +234 901 419 6902</li>
+                </ul>
+            </div>
+            
+            <div class="info-box">
+                <h4 style="margin-top: 0; color: #003057;">Our Contact Information</h4>
+                <p style="margin: 5px 0;"><strong>Email:</strong> <a href="mailto:' . MAILGUN_REPLY_TO . '">' . MAILGUN_REPLY_TO . '</a></p>
+                <p style="margin: 5px 0;"><strong>Phone (Lagos):</strong> +234 901 419 6902</p>
+                <p style="margin: 5px 0;"><strong>WhatsApp:</strong> +234 912 350 9090</p>
+                <p style="margin: 5px 0;"><strong>Business Hours:</strong> Monday - Friday, 8am - 5pm</p>
+                <p style="margin: 5px 0;"><strong>Location:</strong> KM 8 Hadejia Road, Kano, Nigeria</p>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="https://oliviaproducts.com" class="btn">Visit Our Website</a>
+                <a href="mailto:' . MAILGUN_REPLY_TO . '" class="btn" style="background-color: #003057;">Contact Us</a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p style="margin: 0; font-weight: 600; color: #003057;">Olivia Products</p>
+            <p style="margin: 5px 0;">We look forward to the possibility of partnering with you!</p>
+            <p style="margin: 10px 0 0 0; font-size: 0.9em;">This is an automated acknowledgement email. Please do not reply to this email.</p>
+        </div>
+    </div>
+</body>
+</html>';
+}
+
+/**
+ * Get wholesale form acknowledgement email template for customer (Plain Text)
+ */
+function getWholesaleAcknowledgementEmailTextTemplate($wholesaleData) {
+    $formType = ucfirst(strtolower($wholesaleData['formType']));
+    $firstName = $wholesaleData['firstName'];
+    $submittedAt = date('F j, Y \a\t g:i A', strtotime($wholesaleData['submittedAt']));
+    
+    $text = "THANK YOU FOR YOUR " . strtoupper($formType) . " PARTNERSHIP INQUIRY!\n";
+    $text .= str_repeat("=", strlen($formType) + 35) . "\n\n";
+    $text .= "Hello $firstName!\n\n";
+    $text .= "Thank you for your interest in becoming a " . strtolower($formType) . " partner with Olivia Products. We have successfully received your application submitted on $submittedAt and our team will review it and respond to you as soon as possible.\n\n";
+    
+    $text .= "WHAT'S NEXT?\n";
+    $text .= "------------\n";
+    $text .= "- Our partnership team will review your application within 5-7 business days\n";
+    $text .= "- We'll evaluate your business profile and partnership potential\n";
+    $text .= "- You'll receive a response via email or phone regarding the next steps\n";
+    $text .= "- If approved, we'll discuss partnership terms and benefits\n";
+    $text .= "- For urgent inquiries, please call us at +234 901 419 6902\n\n";
+    
+    $text .= "OUR CONTACT INFORMATION\n";
+    $text .= "-----------------------\n";
+    $text .= "Email: " . MAILGUN_REPLY_TO . "\n";
+    $text .= "Phone (Lagos): +234 901 419 6902\n";
+    $text .= "WhatsApp: +234 912 350 9090\n";
+    $text .= "Business Hours: Monday - Friday, 8am - 5pm\n";
+    $text .= "Location: KM 8 Hadejia Road, Kano, Nigeria\n\n";
+    
+    $text .= "We look forward to the possibility of partnering with you!\n\n";
+    $text .= "Olivia Products\n";
+    $text .= "This is an automated acknowledgement email. Please do not reply to this email.\n";
+    
+    return $text;
+}
+

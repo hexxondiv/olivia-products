@@ -67,7 +67,7 @@ export const CheckoutPage: React.FC = () => {
   };
 
   const formatOrderForWhatsApp = (orderId?: string) => {
-    const salesWhatsAppNumber = process.env.REACT_APP_SALES_WHATSAPP_NUMBER || "+2348068122576";
+    const salesWhatsAppNumber = process.env.REACT_APP_SALES_WHATSAPP_NUMBER || "+2348068527731";
     // Use provided orderId or generate a new one (for backwards compatibility)
     const orderIdToUse = orderId || generateOrderId();
     const orderDate = new Date().toLocaleString("en-NG", {

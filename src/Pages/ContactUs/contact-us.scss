@@ -45,6 +45,18 @@
     padding: 10px 20px;
     border: solid 1px #e7e7e7;
     border-radius: 5px;
+    transition: border-color 0.3s ease;
+    
+    &.error {
+      border-color: rgb(249, 84, 84);
+      border-width: 2px;
+    }
+    
+    &:focus {
+      outline: none;
+      border-color: rgba(51, 50, 131, 1);
+      border-width: 2px;
+    }
   }
   textarea {
     min-height: 150px;
@@ -53,9 +65,90 @@
     border: solid 1px #e7e7e7;
     border-radius: 10px;
     margin-bottom: 30px;
+    transition: border-color 0.3s ease;
+    
+    &.error {
+      border-color: rgb(249, 84, 84);
+      border-width: 2px;
+    }
+    
+    &:focus {
+      outline: none;
+      border-color: rgba(51, 50, 131, 1);
+      border-width: 2px;
+    }
+  }
+  
+  .error-message {
+    display: block;
+    color: rgb(249, 84, 84);
+    font-size: 14px;
+    margin-top: 5px;
+    font-family: sailecMedium;
+  }
+  
+  // Bootstrap Alert customization
+  .alert {
+    margin-bottom: 25px;
+    border-radius: 8px;
+    border: none;
+    padding: 15px 20px;
+    font-family: sailecMedium;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    
+    &.alert-success {
+      background-color: #d4edda;
+      color: #155724;
+      border-left: 4px solid #28a745;
+      
+      .btn-close {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23155724'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e");
+      }
+    }
+    
+    &.alert-danger {
+      background-color: #f8d7da;
+      color: #721c24;
+      border-left: 4px solid #dc3545;
+      
+      .btn-close {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23721c24'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e");
+      }
+    }
+    
+    .alert-heading {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    
+    .btn-close {
+      opacity: 0.7;
+      padding: 0.5rem;
+      background-size: 1em;
+      background-position: center;
+      background-repeat: no-repeat;
+      width: 1.25em;
+      height: 1.25em;
+      filter: none;
+      
+      // Ensure the close icon SVG is visible
+      // Bootstrap 5 uses a data URI for the close icon
+      // Use explicit SVG data URI to ensure it displays
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e");
+      background-color: transparent;
+      border: 0;
+      
+      &:hover {
+        opacity: 1;
+      }
+      
+      &:focus {
+        box-shadow: 0 0 0 0.25rem rgba(0, 0, 0, 0.1);
+        outline: none;
+      }
+    }
   }
   button {
-   
     padding: 10px 35px;
     border-radius: 5px;
     border: none;
@@ -64,6 +157,79 @@
     background: rgba(51, 50, 131, 1);
     color: #fff;
     font-family: sailecBold;
+    transition: all 0.3s ease;
+    
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(51, 50, 131, 0.3);
+    }
+    
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+  
+  .form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+    
+    .submit-btn {
+      flex: 1;
+      min-width: 180px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 25px;
+      font-size: 16px !important;
+      border-radius: 5px;
+      font-family: sailecBold;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      
+      .btn-icon {
+        font-size: 18px;
+        flex-shrink: 0;
+      }
+      
+      &.email-btn {
+        background: rgba(51, 50, 131, 1);
+        color: #fff;
+        
+        &:hover:not(:disabled) {
+          background: rgba(51, 50, 131, 0.9);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(51, 50, 131, 0.3);
+        }
+      }
+      
+      &.whatsapp-btn {
+        background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+        color: #fff;
+        border: none;
+        
+        &:hover:not(:disabled) {
+          background: linear-gradient(135deg, #20BA5A 0%, #0F7A6D 100%);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+        }
+      }
+      
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+      
+      @media screen and (max-width: 576px) {
+        min-width: 100%;
+        font-size: 14px !important;
+        padding: 10px 20px;
+      }
+    }
   }
   h6 {
     margin-top: 30px;

@@ -11,7 +11,7 @@ define('MAILGUN_FROM_NAME', getenv('MAILGUN_FROM_NAME') ?: 'Your Company Name');
 define('MAILGUN_REPLY_TO', getenv('MAILGUN_REPLY_TO') ?: 'Info@yourdomain.com');
 define('MAILGUN_FORCE_FROM_ADDRESS', getenv('MAILGUN_FORCE_FROM_ADDRESS') ?: 'Info@yourdomain.com');
 define('SALES_EMAIL', getenv('SALES_EMAIL') ?: 'sales@yourdomain.com');
-
+define('CONTACT_EMAIL', getenv('CONTACT_EMAIL') ?: 'contact@yourdomain.com');
 // Mailgun API endpoint
 define('MAILGUN_API_URL', 'https://api.mailgun.net/v3/' . MAILGUN_DOMAIN . '/messages');
 

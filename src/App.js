@@ -15,6 +15,7 @@ import { About } from "./Pages/About/About";
 import { FAQPage } from "./Pages/FAQPage/FAQPage";
 import { CheckoutPage } from "./Pages/CheckoutPage/CheckoutPage";
 import { SuccessPage } from "./Pages/SuccessPage/SuccessPage";
+import { TermsAndConditions } from "./Pages/TermsAndConditions/TermsAndConditions";
 import { TopNav } from "./Components/TopNav/TopNav";
 import { MdOutlineVerticalAlignTop } from "react-icons/md";
 import CartOffcanvas from "./Components/CartList/CartList";
@@ -63,6 +64,7 @@ function App() {
           <Route path="/faqs" element={<FAQPage />} />{" "}
           <Route path="/checkout" element={<CheckoutPage />} />{" "}
           <Route path="/order-success" element={<SuccessPage />} />{" "}
+          <Route path="/terms-and-conditions" element={<TermsAndConditions />} />{" "}
         </Routes>
         <Footer />
       </CartProvider>{" "}

@@ -135,3 +135,102 @@ function sendOrderConfirmationToCustomer($orderData) {
     return sendMailgunEmail($customerEmail, $subject, $htmlBody, $textBody);
 }
 
+/**
+ * Send contact form email to team
+ */
+function sendContactEmailToTeam($contactData) {
+    $subject = 'New Contact Form Submission - ' . $contactData['fullName'];
+    $htmlBody = getContactFormEmailTemplate($contactData);
+    $textBody = getContactFormEmailTextTemplate($contactData);
+    
+    return sendMailgunEmail(CONTACT_EMAIL, $subject, $htmlBody, $textBody);
+}
+
+/**
+ * Send contact form acknowledgement email to customer
+ */
+function sendContactAcknowledgementToCustomer($contactData) {
+    // Validate contact data
+    if (!isset($contactData['email'])) {
+        throw new Exception("Customer email is required for acknowledgement");
+    }
+    
+    if (empty($contactData['email'])) {
+        throw new Exception("Customer email cannot be empty");
+    }
+    
+    $customerEmail = $contactData['email'];
+    $customerName = $contactData['fullName'] ?? 'Customer';
+    $subject = 'Thank You for Contacting Olivia Products';
+    
+    // Generate email templates
+    $htmlBody = getContactAcknowledgementEmailTemplate($contactData);
+    $textBody = getContactAcknowledgementEmailTextTemplate($contactData);
+    
+    // Validate templates were generated
+    if (empty($htmlBody)) {
+        throw new Exception("Failed to generate acknowledgement email HTML template");
+    }
+    
+    if (empty($textBody)) {
+        throw new Exception("Failed to generate acknowledgement email text template");
+    }
+    
+    error_log("Sending contact acknowledgement email to: $customerEmail");
+    error_log("Email subject: $subject");
+    error_log("HTML body length: " . strlen($htmlBody) . " characters");
+    error_log("Text body length: " . strlen($textBody) . " characters");
+    
+    return sendMailgunEmail($customerEmail, $subject, $htmlBody, $textBody);
+}
+
+/**
+ * Send wholesale form email to team
+ */
+function sendWholesaleEmailToTeam($wholesaleData) {
+    $formType = ucfirst(strtolower($wholesaleData['formType']));
+    $subject = 'New ' . $formType . ' Partnership Inquiry - ' . $wholesaleData['businessName'];
+    $htmlBody = getWholesaleFormEmailTemplate($wholesaleData);
+    $textBody = getWholesaleFormEmailTextTemplate($wholesaleData);
+    
+    return sendMailgunEmail(CONTACT_EMAIL, $subject, $htmlBody, $textBody);
+}
+
+/**
+ * Send wholesale form acknowledgement email to customer
+ */
+function sendWholesaleAcknowledgementToCustomer($wholesaleData) {
+    // Validate wholesale data
+    if (!isset($wholesaleData['email'])) {
+        throw new Exception("Customer email is required for acknowledgement");
+    }
+    
+    if (empty($wholesaleData['email'])) {
+        throw new Exception("Customer email cannot be empty");
+    }
+    
+    $customerEmail = $wholesaleData['email'];
+    $formType = ucfirst(strtolower($wholesaleData['formType']));
+    $subject = 'Thank You for Your ' . $formType . ' Partnership Inquiry - Olivia Products';
+    
+    // Generate email templates
+    $htmlBody = getWholesaleAcknowledgementEmailTemplate($wholesaleData);
+    $textBody = getWholesaleAcknowledgementEmailTextTemplate($wholesaleData);
+    
+    // Validate templates were generated
+    if (empty($htmlBody)) {
+        throw new Exception("Failed to generate acknowledgement email HTML template");
+    }
+    
+    if (empty($textBody)) {
+        throw new Exception("Failed to generate acknowledgement email text template");
+    }
+    
+    error_log("Sending wholesale acknowledgement email to: $customerEmail");
+    error_log("Email subject: $subject");
+    error_log("HTML body length: " . strlen($htmlBody) . " characters");
+    error_log("Text body length: " . strlen($textBody) . " characters");
+    
+    return sendMailgunEmail($customerEmail, $subject, $htmlBody, $textBody);
+}
+
