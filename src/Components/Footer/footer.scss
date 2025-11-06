@@ -27,9 +27,11 @@
 
   a {
     text-decoration: none;
+    transition: color $transition-base;
 
     &:hover {
       color: $color-amber;
+      transform: translateX(2px);
     }
   }
 
@@ -60,12 +62,12 @@
   }
 
   &__subscribe-btn {
-    @include pill-button("success");
+    @include modern-button("success", "md");
     padding: 0.9rem 1.35rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.35rem;
+    font-size: $font-size-lg;
   }
 
   &__legal {
@@ -83,18 +85,24 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 2.5rem;
-      height: 2.5rem;
+      width: 2.75rem;
+      height: 2.75rem;
       border-radius: 50%;
       background: rgba(#fff, 0.14);
       color: #fff;
-      font-size: 1.25rem;
-      transition: transform 0.25s ease, background 0.25s ease;
+      font-size: $font-size-xl;
+      transition: all $transition-base;
+      box-shadow: $shadow-sm;
 
       &:hover {
-        transform: translateY(-2px);
+        transform: translateY(-4px) scale(1.1);
         background: $color-lime;
         color: $color-forest;
+        box-shadow: $shadow-lg;
+      }
+      
+      &:active {
+        transform: translateY(-2px) scale(1.05);
       }
     }
   }
@@ -122,8 +130,9 @@
         height: 2px;
         transform: scaleX(0);
         transform-origin: left;
-        transition: transform 0.3s ease;
+        transition: transform $transition-base;
         background: $color-amber;
+        border-radius: 2px;
       }
 
       &:hover::after,

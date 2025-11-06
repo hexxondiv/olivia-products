@@ -1,15 +1,25 @@
+@use "sass:map";
 @use "../../_variables" as *;
 
 .top-nav {
-  background: linear-gradient(90deg, rgba($color-sky, 0.92), rgba($color-blush, 0.92));
+  background: linear-gradient(90deg, rgba($color-sky, 0.95), rgba($color-blush, 0.95));
   border-bottom: 1px solid rgba($color-navy, 0.08);
+  backdrop-filter: blur(20px);
+  box-shadow: $shadow-sm;
+  transition: all $transition-base;
 
   .navbar-toggler {
     border: none;
-    padding: 0.5rem 0.75rem;
+    padding: $spacing-sm $spacing-md;
     border-radius: 0.75rem;
     box-shadow: none;
     background: rgba($color-navy, 0.08);
+    transition: all $transition-base;
+
+    &:hover {
+      background: rgba($color-navy, 0.12);
+      transform: scale(1.05);
+    }
 
     &:focus {
       box-shadow: 0 0 0 0.25rem $focus-ring-color;
@@ -19,15 +29,17 @@
   .navbar-nav {
     .nav-link {
       font-family: $font-heading;
-      font-size: 0.95rem;
+      font-size: $font-size-base;
       color: $color-navy;
-      padding: 0.35rem 0.25rem;
+      padding: $spacing-sm $spacing-xs;
       position: relative;
-      transition: color 0.2s ease;
+      transition: all $transition-base;
+      font-weight: 500;
 
       &.active,
       &:hover {
         color: $color-lime-dark;
+        transform: translateY(-1px);
       }
 
       &.active::after {
@@ -39,26 +51,33 @@
         height: 3px;
         border-radius: 999px;
         background: $color-lime;
+        animation: slideIn $transition-base $ease-out-expo;
       }
     }
 
     .dropdown-menu {
       border: none;
       border-radius: 1rem;
-      box-shadow: 0 1.5rem 3rem rgba($color-charcoal, 0.08);
-      padding: 0.75rem;
+      box-shadow: $shadow-lg;
+      padding: $spacing-md;
       min-width: 16rem;
+      margin-top: $spacing-sm;
+      @include fade-in;
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.98);
 
       .dropdown-item {
         font-family: $font-sans;
         border-radius: 0.75rem;
-        padding: 0.5rem 0.75rem;
+        padding: $spacing-sm $spacing-md;
         color: $color-slate;
+        transition: all $transition-fast;
 
         &:hover,
         &:focus {
           background: rgba($color-lime, 0.12);
           color: $color-lime-dark;
+          transform: translateX(4px);
         }
       }
     }
@@ -80,13 +99,14 @@
   }
 
   &__cart {
-    @include pill-button("success");
+    @include modern-button("success", "md");
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.35rem;
+    gap: $spacing-xs;
     min-width: 3rem;
     min-height: 3rem;
+    position: relative;
 
     .btn-check:focus + &,
     &:focus {
@@ -99,8 +119,33 @@
     position: absolute;
     top: -0.4rem;
     right: -0.4rem;
-    font-size: 0.75rem;
-    font-weight: 600;
-    padding: 0.3rem 0.45rem;
+    font-size: $font-size-xs;
+    font-weight: 700;
+    padding: $spacing-xs $spacing-sm;
+    background: map.get($theme-colors-map, "danger");
+    color: #fff;
+    border-radius: 50rem;
+    box-shadow: $shadow-md;
+    animation: pulse 2s infinite;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    width: 0;
+    opacity: 0;
+  }
+  to {
+    width: 100%;
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
   }
 }

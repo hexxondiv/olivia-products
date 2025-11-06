@@ -42,49 +42,37 @@ export const Collections: React.FC = () => {
   const itemCount = filteredProducts.length;
 
   return (
-    <div className="col-md-12 collection-section line">
+    <div className="collection-section">
       <h2>{categoryHeading}</h2>
 
-      <p className="col-md-5 animate-charcter lineUp">{categoryIntro}</p>
+      <p className="collection-intro animate-charcter lineUp">{categoryIntro}</p>
 
-      <div className="d-md-flex">
-        <p style={{ flexGrow: 1 }} className="prd-figure">
+      <div className="collection-header">
+        <p className="prd-figure">
           {itemCount} Item{itemCount !== 1 ? "s" : ""}
         </p>
 
-        <div className="d-flex">
-          <div
-            className="sort-bar col-md-"
-            style={{
-              borderRight: "solid 1px #e7e7e7",
-              marginRight: "10px",
-            }}
-          >
+        <div className="sort-controls">
+          <div className="sort-bar">
             <PurchaseType />
           </div>
 
-          <div
-            className="sort-bar col-md-"
-            style={{
-              borderRight: "solid 1px #e7e7e7",
-              marginRight: "10px",
-            }}
-          >
+          <div className="sort-bar">
             <SelectDrop />
           </div>
-        </div>
 
-        <div className="sort-bar col-md-2">
-          <select
-            value={sortType}
-            onChange={(e) => setSortType(e.target.value)}
-            className="form-select"
-          >
-            <option value="price-asc">Price: Low to High</option>
-            <option value="price-desc">Price: High to Low</option>
-            <option value="rating-desc">Rating: High to Low</option>
-            <option value="rating-asc">Rating: Low to High</option>
-          </select>
+          <div className="sort-bar">
+            <select
+              value={sortType}
+              onChange={(e) => setSortType(e.target.value)}
+              className="form-select"
+            >
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+              <option value="rating-desc">Rating: High to Low</option>
+              <option value="rating-asc">Rating: Low to High</option>
+            </select>
+          </div>
         </div>
       </div>
 

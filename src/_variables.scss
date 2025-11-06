@@ -42,6 +42,50 @@ $section-highlight-bg: $color-amber-soft;
 $card-shadow: 0 26px 54px rgba(16, 24, 40, 0.08);
 $focus-ring-color: color.change($color-lime, $alpha: 0.35);
 
+// Modern spacing scale (8px base)
+$spacing-xs: 0.25rem;   // 4px
+$spacing-sm: 0.5rem;    // 8px
+$spacing-md: 1rem;      // 16px
+$spacing-lg: 1.5rem;    // 24px
+$spacing-xl: 2rem;      // 32px
+$spacing-2xl: 3rem;     // 48px
+$spacing-3xl: 4rem;     // 64px
+$spacing-4xl: 6rem;     // 96px
+
+// Typography scale
+$font-size-xs: 0.75rem;    // 12px
+$font-size-sm: 0.875rem;   // 14px
+$font-size-base: 1rem;     // 16px
+$font-size-lg: 1.125rem;   // 18px
+$font-size-xl: 1.25rem;    // 20px
+$font-size-2xl: 1.5rem;    // 24px
+$font-size-3xl: 1.875rem;  // 30px
+$font-size-4xl: 2.25rem;   // 36px
+$font-size-5xl: 3rem;      // 48px
+
+// Line heights
+$line-height-tight: 1.25;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.75;
+
+// Modern shadow system
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+$shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+$shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+$shadow-card: 0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+$shadow-card-hover: 0 12px 40px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.08);
+
+// Animation tokens
+$transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+$transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+$transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+$transition-bounce: 400ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+$ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+$ease-in-out-quart: cubic-bezier(0.77, 0, 0.175, 1);
+
 // Mixins
 @mixin pill-button($variant: "primary") {
   $bg: map.get($theme-colors-map, $variant);
@@ -81,6 +125,162 @@ $focus-ring-color: color.change($color-lime, $alpha: 0.35);
     color.scale($color-navy, $lightness: 6%)
   );
   color: #fff;
+}
+
+// Modern product card mixin
+@mixin product-card {
+  background: #fff;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  box-shadow: $shadow-card;
+  transition: all $transition-base;
+  position: relative;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-card-hover;
+  }
+}
+
+// Modern button mixin with variants
+@mixin modern-button($variant: "primary", $size: "md") {
+  $bg: if($variant == "outline", transparent, map.get($theme-colors-map, $variant));
+  $is-light: if($variant == "outline", false, color.lightness($bg) > 50%);
+  $border-color: if($variant == "outline", map.get($theme-colors-map, "primary"), transparent);
+  $text-color: if($variant == "outline", map.get($theme-colors-map, "primary"), if($is-light, $color-charcoal, #fff));
+  
+  background-color: $bg;
+  color: $text-color;
+  border: 2px solid $border-color;
+  border-radius: 50rem;
+  font-family: $font-heading;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all $transition-base;
+  position: relative;
+  overflow: hidden;
+  
+  // Size variants
+  @if $size == "sm" {
+    padding: 0.5rem 1.25rem;
+    font-size: $font-size-sm;
+  } @else if $size == "lg" {
+    padding: 1rem 2.5rem;
+    font-size: $font-size-lg;
+  } @else {
+    padding: 0.75rem 1.75rem;
+    font-size: $font-size-base;
+  }
+  
+  @if $variant != "outline" {
+    &::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      transform: translate(-50%, -50%);
+      transition: width $transition-base, height $transition-base;
+    }
+  }
+  
+  &:hover {
+    transform: translateY(-2px);
+    @if $variant == "outline" {
+      background-color: rgba($border-color, 0.05);
+      border-color: $border-color;
+      box-shadow: 0 4px 12px rgba($border-color, 0.2);
+    } @else {
+      box-shadow: 0 8px 24px color.change($bg, $alpha: 0.3);
+      
+      &::before {
+        width: 300px;
+        height: 300px;
+      }
+    }
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+  
+  &:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem $focus-ring-color;
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+// Smooth fade-in animation
+@mixin fade-in($duration: $transition-base) {
+  animation: fadeIn $duration $ease-out-expo;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Slide up animation
+@mixin slide-up($duration: $transition-base) {
+  animation: slideUp $duration $ease-out-expo;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Scale on hover
+@mixin scale-on-hover($scale: 1.05) {
+  transition: transform $transition-base;
+  
+  &:hover {
+    transform: scale($scale);
+  }
+}
+
+// Modern input styling
+@mixin modern-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid rgba($color-slate, 0.2);
+  border-radius: 0.75rem;
+  font-family: $font-sans;
+  font-size: $font-size-base;
+  color: $color-charcoal;
+  background: #fff;
+  transition: all $transition-base;
+  
+  &:focus {
+    outline: none;
+    border-color: $color-lime;
+    box-shadow: 0 0 0 0.25rem $focus-ring-color;
+  }
+  
+  &::placeholder {
+    color: rgba($color-slate, 0.5);
+  }
 }
 
 // Legacy aliases (for backwards compatibility with existing stylesheets)

@@ -1,105 +1,32 @@
-.add-to-cart-btn {
-  position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 10px 20px;
-  background-color: #000;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  border-radius: 5px;
-  transition: opacity 0.3s ease-in-out;
-}
-.product-img {
-  position: absolute;
-  top: 0;
-  left: 0;
+@use "../../_variables" as *;
+
+// Modern product container
+.product-container {
+  @include product-card;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  transition: opacity 0.5s ease-in-out;
-}
-.cart-btn {
-  position: absolute;
-  bottom: 10px;
-  padding: 0.5rem 1rem;
-  background-color: blue;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-.product-container {
-  display: inline-block;
-  width: 100%;
-
-  img {
-    position: relative;
-    border-radius: 10px;
-  }
-  h6 {
-    font-size: 10px;
-  }
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  @include fade-in;
 }
 
+// Image wrapper with modern styling
 .image-wrapper {
   position: relative;
   width: 100%;
-  height: auto;
+  padding-top: 100%; // Maintain square aspect ratio
   overflow: hidden;
-
-
-  .hidden {
-    opacity: 0;
-  }
-
-  .visible {
-    opacity: 1;
-  }
-}
-
-.cart-btn {
-  position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #ff5722;
-  color: #fff;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: transform 0.3s ease-in-out;
-
-  &:hover {
-    transform: translateX(-50%) scale(1.1);
-  }
-}
-.product-container {
-  position: relative;
-  // background: rgb(209, 199, 199);
-  // padding-bottom:30px;
-  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-  width: 100%; /* Ensures the component occupies the expected space */
-  margin: auto;
-  height:500px;
-}
-
-.image-wrapper {
-  position: relative;
-  width: 100%;
-  padding-top: 100%; /* Maintain aspect ratio */
-  overflow: hidden;
-height: 500px;
+  background: linear-gradient(135deg, $color-sky 0%, $color-blush 100%);
+  
   .product-image {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-   height: 500px;
-    object-fit:cover;
-    transition: opacity 0.5s ease-in-out; /* Smooth transition effect */
+    height: 100%;
+    object-fit: cover;
+    transition: transform $transition-slow, opacity $transition-base;
   }
 
   .hidden {
@@ -109,53 +36,76 @@ height: 500px;
   .visible {
     opacity: 1;
   }
+  
+  // Image zoom on hover
+  .product-container:hover & .product-image {
+    transform: scale(1.08);
+  }
 }
 
+// Modern cart button
 .cart-btn {
+  @include modern-button("primary", "md");
   position: absolute;
-  bottom: 10px;
+  bottom: $spacing-md;
   left: 50%;
   transform: translateX(-50%);
-  background-color: rgb(51, 105, 255);
-  color: #fff;
-  border: solid 1px #003057;
-  padding: 7px 50px;
-  border-radius: 35px;
-  cursor: pointer;
-  transition: transform 1s ease-in-out;
-  font-family: sailecBold;
+  min-width: 160px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity $transition-base, transform $transition-base;
+  
+  .product-container:hover & {
+    opacity: 1;
+    pointer-events: all;
+  }
+  
   &:hover {
-    color: #003057;
-    transform: translateX(-50%) scale(1.1);
-    background: rgb(222, 234, 255);
-    background: linear-gradient(
-      90deg,
-      rgba(222, 234, 255, 1) 13%,
-      rgba(250, 230, 255, 1) 78%,
-      rgba(255, 242, 223, 1) 93%
-    );
+    transform: translateX(-50%) translateY(-2px);
   }
 }
-.clear-all-btn {
-  background-color: #f44336;
-  color: white;
-  padding: 12px;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
 
-  &:hover {
-    background-color: #d32f2f;
+// Product details section
+.prd-details {
+  padding: $spacing-lg $spacing-md;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  
+  h5 {
+    margin: 0;
+    font-size: $font-size-lg;
+    font-weight: 600;
+    color: $color-charcoal;
+    line-height: $line-height-tight;
+    @include slide-up;
+    animation-delay: 50ms;
+  }
+  
+  h6 {
+    margin: 0;
+    font-size: $font-size-xl;
+    font-weight: 700;
+    color: $color-navy;
+    line-height: $line-height-tight;
+    @include slide-up;
+    animation-delay: 100ms;
+  }
+  
+  p {
+    margin: 0;
+    font-size: $font-size-sm;
+    color: $color-slate;
+    line-height: $line-height-normal;
   }
 }
-.prd-details {
-  h5{
-    margin-top: 10px;
-  }
-  h6 {
-    font-size: 18px;
-    margin-top:10px;
-  }
+
+// Legacy support
+.add-to-cart-btn {
+  @extend .cart-btn;
+}
+
+.clear-all-btn {
+  @include modern-button("danger", "md");
 }

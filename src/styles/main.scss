@@ -47,14 +47,38 @@ body {
   background: $body-bg-color;
   color: $body-text-color;
   font-family: $font-sans;
+  font-size: $font-size-base;
+  line-height: $line-height-normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 a {
   color: $color-navy;
   text-decoration: none;
+  transition: color $transition-fast;
 
   &:hover {
     color: color.scale($color-navy, $lightness: -8%);
+  }
+}
+
+// Modern scrollbar styling
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: $color-sky;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba($color-navy, 0.3);
+  border-radius: 5px;
+  
+  &:hover {
+    background: rgba($color-navy, 0.5);
   }
 }
 

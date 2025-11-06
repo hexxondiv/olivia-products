@@ -1,71 +1,215 @@
+@use "../../_variables" as *;
+
 .collection-section {
-  margin-top: 100px;
-  padding-right: 70px;
-  padding-left: 70px;
-  @media screen and (max-width:820px){
-    margin-top:50px;
-    padding-right: 10px;
-      padding-left: 10px;
+  margin-top: $spacing-4xl;
+  padding: $spacing-2xl $spacing-3xl;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+  @include fade-in;
+  
+  @media screen and (max-width: 991.98px) {
+    padding: $spacing-xl $spacing-lg;
+    margin-top: $spacing-3xl;
+  }
+  
+  @media screen and (max-width: 820px) {
+    padding: $spacing-lg $spacing-md;
+    margin-top: $spacing-2xl;
+  }
+  
+  h2 {
+    font-size: $font-size-5xl;
+    font-weight: 700;
+    color: $color-charcoal;
+    margin-bottom: $spacing-lg;
+    line-height: $line-height-tight;
+    @include slide-up;
+    
+    @media screen and (max-width: 820px) {
+      font-size: $font-size-4xl;
+      margin-bottom: $spacing-md;
+    }
+  }
+  
+  hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba($color-navy, 0.2), transparent);
+    margin: $spacing-2xl 0;
+    
+    @media screen and (max-width: 820px) {
+      margin: $spacing-xl 0;
+    }
   }
 }
-.sort-bar {
-  font-family: sailecMedium;
-  @media screen and (max-width:820px) {
-      margin-top: 30px;
-     
-    }
+
+.collection-intro {
+  font-size: $font-size-lg;
+  line-height: $line-height-relaxed;
+  color: $color-slate;
+  margin-bottom: $spacing-2xl;
+  max-width: 600px;
+  @include slide-up;
+  animation-delay: 100ms;
+  
+  @media screen and (max-width: 820px) {
+    font-size: $font-size-base;
+    margin-bottom: $spacing-xl;
+  }
 }
+
+.collection-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: $spacing-lg;
+  margin-bottom: $spacing-2xl;
+  padding: $spacing-lg;
+  background: linear-gradient(135deg, rgba($color-sky, 0.5), rgba($color-blush, 0.3));
+  border-radius: 1.25rem;
+  backdrop-filter: blur(10px);
+  
+  @media screen and (max-width: 820px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: $spacing-md;
+    padding: $spacing-md;
+  }
+}
+
+.prd-figure {
+  color: $color-slate;
+  font-size: $font-size-xl;
+  font-weight: 600;
+  font-family: $font-heading;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  
+  &::before {
+    content: "";
+    width: 4px;
+    height: 24px;
+    background: linear-gradient(180deg, $color-lime, $color-indigo);
+    border-radius: 2px;
+  }
+  
+  @media screen and (max-width: 820px) {
+    font-size: $font-size-lg;
+  }
+}
+
+.sort-controls {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  flex-wrap: wrap;
+  
+  @media screen and (max-width: 820px) {
+    width: 100%;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+}
+
+.sort-bar {
+  font-family: $font-sans;
+  padding: $spacing-sm $spacing-md;
+  position: relative;
+  
+  &:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 24px;
+    background: rgba($color-slate, 0.2);
+    
+    @media screen and (max-width: 820px) {
+      display: none;
+    }
+  }
+  
+  @media screen and (max-width: 820px) {
+    width: 100%;
+    padding: $spacing-xs 0;
+    margin-top: $spacing-sm;
+  }
+}
+
+.form-select {
+  @include modern-input;
+  padding: $spacing-sm $spacing-md;
+  font-size: $font-size-sm;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23003057' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right $spacing-sm center;
+  padding-right: $spacing-2xl;
+  appearance: none;
+  min-width: 180px;
+  
+  &:hover {
+    border-color: $color-lime;
+    box-shadow: $shadow-sm;
+  }
+  
+  &:focus {
+    border-color: $color-lime;
+    box-shadow: 0 0 0 0.25rem $focus-ring-color;
+  }
+  
+  @media screen and (max-width: 820px) {
+    width: 100%;
+    min-width: auto;
+  }
+}
+
+// Modern gradient text effect
 .animate-charcter {
-  text-transform: uppercase;
-  background-image: linear-gradient(-225deg,
-      #231557 0%,
-      #44107a 29%,
-      #ff1361 67%,
-      #fff800 100%);
-  background-size: auto auto;
-  background-clip: border-box;
-  // background-size: 200% auto;
-  color: #fff;
+  background: linear-gradient(
+    135deg,
+    $color-navy 0%,
+    $color-indigo 30%,
+    $color-lime 70%,
+    $color-amber 100%
+  );
+  background-size: 200% auto;
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: textclip 2s linear infinite;
+  animation: gradientShift 3s ease infinite;
   display: inline-block;
+  font-weight: 600;
 }
 
-@keyframes textclip {
-  to {
-    background-position: 200% center;
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% center;
   }
-}
-.lineUp {
-  animation: 10s anim-lineUp ease-out infinite;
-}
-
-@keyframes anim-lineUp {
-  0% {
-    opacity: 0;
-    transform: translateY(80%);
-  }
-
-  20% {
-    opacity: 0;
-  }
-
   50% {
-    opacity: 1;
-    transform: translateY(0%);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0%);
+    background-position: 100% center;
   }
 }
-.prd-figure{
-  color: rgb(216, 216, 216);
-  font-size: 30px;
-  @media screen and (max-width:820px){
-    font-size:18px;
+
+.lineUp {
+  animation: slideUpFade $transition-slow $ease-out-expo forwards;
+  opacity: 0;
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

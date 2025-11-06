@@ -65,32 +65,45 @@ body {
 }
 
 .elevated-card {
-  border-radius: 1.5rem;
-  box-shadow: $card-shadow;
-  background: #fff;
+  @include product-card;
+  padding: $spacing-xl;
 }
 
 .bck-to-top {
   position: fixed;
-  bottom: 1.5rem;
-  right: 1.5rem;
-  height: 3.25rem;
-  width: 3.25rem;
+  bottom: $spacing-xl;
+  right: $spacing-xl;
+  height: 3.5rem;
+  width: 3.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
   background: $color-lime;
   color: #fff;
-  font-size: 1.75rem;
+  font-size: $font-size-2xl;
   z-index: 100;
-  box-shadow: 0 12px 24px color.change($color-lime, $alpha: 0.35);
+  box-shadow: $shadow-xl;
+  transition: all $transition-base;
+  cursor: pointer;
+  @include scale-on-hover(1.1);
 
   a {
     color: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
   }
 
   &:hover {
     background: $color-lime-dark;
+    box-shadow: $shadow-2xl;
+    transform: translateY(-4px) scale(1.1);
+  }
+  
+  &:active {
+    transform: translateY(-2px) scale(1.05);
   }
 }

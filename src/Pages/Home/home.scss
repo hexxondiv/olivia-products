@@ -70,14 +70,14 @@
   }
 
   &__cta-link {
-    @include pill-button("success");
+    @include modern-button("success", "md");
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    font-size: 1rem;
+    gap: $spacing-sm;
+    font-size: $font-size-base;
 
     svg {
-      transition: transform 0.2s ease;
+      transition: transform $transition-base;
     }
 
     &:hover svg {
@@ -91,11 +91,14 @@
   }
 
   &__press-card {
-    border: none;
-    border-radius: 1.5rem;
-    box-shadow: 0 15px 35px rgba($color-navy, 0.08);
-    padding: 1.5rem;
-    background: #fff;
+    @include product-card;
+    padding: $spacing-xl;
+    text-align: left;
+    @include slide-up;
+    
+    &:nth-child(1) { animation-delay: 0ms; }
+    &:nth-child(2) { animation-delay: 100ms; }
+    &:nth-child(3) { animation-delay: 200ms; }
   }
 
   &__press-quote {
