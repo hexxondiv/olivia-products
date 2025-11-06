@@ -14,6 +14,7 @@ export const Collections: React.FC = () => {
   const categoryLC = rawCategory.toLowerCase();
 
   const [sortType, setSortType] = useState("price-asc");
+  const [searchQuery, setSearchQuery] = useState("");
 
   // useMemo to avoid recomputing on every render
   const filteredProducts = useMemo(() => {
@@ -47,12 +48,46 @@ export const Collections: React.FC = () => {
 
       <p className="col-md-5 animate-charcter lineUp">{categoryIntro}</p>
 
-      <div className="d-md-flex">
+      <div className="d-md-flex align-items-center">
         <p style={{ flexGrow: 1 }} className="prd-figure">
           {itemCount} Item{itemCount !== 1 ? "s" : ""}
         </p>
 
-        <div className="d-flex">
+        <div className="d-flex align-items-center">
+          <div
+            className="sort-bar col-md-"
+            style={{
+              borderRight: "solid 1px #e7e7e7",
+              marginRight: "10px",
+              paddingRight: "10px",
+            }}
+          >
+            <div style={{ position: "relative" }}>
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="form-control"
+                style={{
+                  paddingLeft: "35px",
+                  minWidth: "200px",
+                }}
+              />
+              <span
+                style={{
+                  position: "absolute",
+                  left: "10px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  color: "#6c757d",
+                }}
+              >
+                🔍
+              </span>
+            </div>
+          </div>
+
           <div
             className="sort-bar col-md-"
             style={{
@@ -94,6 +129,7 @@ export const Collections: React.FC = () => {
         category={rawCategory}
         viewType="grid"
         sortType={sortType}
+        searchQuery={searchQuery}
       />
     </div>
   );

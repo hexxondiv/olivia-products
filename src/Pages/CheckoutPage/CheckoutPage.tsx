@@ -66,9 +66,10 @@ export const CheckoutPage: React.FC = () => {
     return `ORD-${dateStr}-${randomStr}`;
   };
 
-  const formatOrderForWhatsApp = () => {
-    const salesWhatsAppNumber = "+2348068122576";
-    const orderId = generateOrderId();
+  const formatOrderForWhatsApp = (orderId?: string) => {
+    const salesWhatsAppNumber = process.env.REACT_APP_SALES_WHATSAPP_NUMBER || "+2348068122576";
+    // Use provided orderId or generate a new one (for backwards compatibility)
+    const orderIdToUse = orderId || generateOrderId();
     const orderDate = new Date().toLocaleString("en-NG", {
       year: "numeric",
       month: "long",
@@ -77,10 +78,10 @@ export const CheckoutPage: React.FC = () => {
       minute: "2-digit",
     });
     
-    let message = "*###NEW ORDER###* \n\n Hello, Olivia Products!\n";
+    let message = "*NEW ORDER PLACED*\n================== \n Hello, Olivia Products!\n";
     message += "I'd like to place a _new order_. Here are the details:\n\n";
     
-    message += "*Order ID:* `" + orderId + "`\n";
+    message += "*Order ID:* `" + orderIdToUse + "`\n";
     message += "*Order Date:* " + orderDate + "\n\n";
     
     message += "*CUSTOMER INFORMATION*\n";
@@ -135,17 +136,17 @@ export const CheckoutPage: React.FC = () => {
       return;
     }
 
-    // Open WhatsApp with pre-filled message
-    const whatsappUrl = formatOrderForWhatsApp();
+    // Generate order ID once and reuse it for both WhatsApp message and success page
+    const orderId = generateOrderId();
+    
+    // Open WhatsApp with pre-filled message (using the same orderId)
+    const whatsappUrl = formatOrderForWhatsApp(orderId);
     window.open(whatsappUrl, "_blank");
     
     // Clear cart after opening WhatsApp
     clearCart();
     
-    // Generate order ID for WhatsApp submission
-    const orderId = generateOrderId();
-    
-    // Navigate to success page
+    // Navigate to success page with the same orderId
     navigate("/order-success", {
       state: {
         customer: formData,

@@ -118,6 +118,11 @@ export const Home = () => {
         <h1>Our Bestsellers</h1>
       </center>
       <ProductsHolder showOnlyBestSellers={true} />
+      <center style={{ marginTop: "30px", marginBottom: "50px" }}>
+        <Link to={"/collections?category=*"}>
+          <button className="view-more-btn">View more</button>
+        </Link>
+      </center>
 
       <div className=" col-md-10 offset-md-1 d-md-flex mt-5">
         <div className="col-md-6 mission-vision">

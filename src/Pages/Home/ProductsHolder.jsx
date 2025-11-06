@@ -14,6 +14,7 @@ export const ProductsHolder = ({
   viewType = "slide",
   sortType = "",
   showOnlyBestSellers = false,  // <-- new prop
+  searchQuery = "",  // <-- new prop for search
 
 }) => {
   const [startIndex, setStartIndex] = useState(0);
@@ -38,39 +39,62 @@ if (showOnlyBestSellers) {
 }
 
 // Step 2: Category filtering
-const filteredProducts =
-  categoryFromQuery === "*" || categoryFromQuery === ""
-    ? productsToDisplay
-    : productsToDisplay.filter((product) =>
-        product.category.some(
-          (cat) => cat.toLowerCase() === categoryFromQuery.toLowerCase()
-        )
-      );
+let categoryFiltered = categoryFromQuery === "*" || categoryFromQuery === ""
+  ? productsToDisplay
+  : productsToDisplay.filter((product) =>
+      product.category.some(
+        (cat) => cat.toLowerCase() === categoryFromQuery.toLowerCase()
+      )
+    );
+
+// Step 3: Search filtering
+const filteredProducts = searchQuery.trim()
+  ? categoryFiltered.filter((product) => {
+      const query = searchQuery.toLowerCase().trim();
+      const searchableText = [
+        product.name || "",
+        product.heading || "",
+        product.detail || "",
+        product.moreDetail || "",
+        product.sufix || "",
+        ...(product.category || []),
+      ]
+        .join(" ")
+        .toLowerCase();
+      return searchableText.includes(query);
+    })
+  : categoryFiltered;
 
 
 
 
-  // Sorting logic based on sortOrder
+  // Sorting logic based on sortType
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     switch (sortType) {
+      // Old format support
       case "low-high-price":
+      case "price-asc":
         return a.price - b.price;
       case "high-low-price":
+      case "price-desc":
         return b.price - a.price;
       case "high-low-rating":
-        return b.rating - a.rating;
+      case "rating-desc":
+        return (b.rating || 0) - (a.rating || 0);
       case "low-high-rating":
-        return a.rating - b.rating;
+      case "rating-asc":
+        return (a.rating || 0) - (b.rating || 0);
       default:
         return 0;
     }
   });
 
-  // For sliding view
+  // For sliding view - use sorted products if sortType is provided, otherwise use filtered
+  const productsForSliding = sortType ? sortedProducts : filteredProducts;
   const extendedProducts = [
-    ...filteredProducts.slice(-visibleItems),
-    ...filteredProducts,
-    ...filteredProducts.slice(0, visibleItems),
+    ...productsForSliding.slice(-visibleItems),
+    ...productsForSliding,
+    ...productsForSliding.slice(0, visibleItems),
   ];
   const actualStartIndex = startIndex + visibleItems;
 
@@ -218,6 +242,7 @@ const filteredProducts =
                       productPrice={product.price}
                       firstImg={product.firstImg}
                       hoverImg={product.hoverImg}
+                      rating={product.rating}
                       id={product.id}
                       onAddToCart={addToCart}
                     />
@@ -307,6 +332,7 @@ const filteredProducts =
                       productPrice={product.price}
                       firstImg={product.firstImg}
                       hoverImg={product.hoverImg}
+                      rating={product.rating}
                       id={product.id}
                       onAddToCart={addToCart}
                     />
@@ -332,6 +358,7 @@ const filteredProducts =
                     productPrice={product.price}
                     firstImg={product.firstImg}
                     hoverImg={product.hoverImg}
+                    rating={product.rating}
                     id={product.id}
                     onAddToCart={addToCart}
                   />

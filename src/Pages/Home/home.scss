@@ -68,6 +68,20 @@
     }
     p{color: #4b3d97!important}
   }
+  .view-more-btn {
+    background: #fff;
+    border: solid 3px #7bbd21;
+    font-family: sailecBold;
+    color: #7bbd21;
+    padding: 10px 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background: #203602;
+      color: #fff;
+    }
+  }
 }
 .video {
   position: relative;
