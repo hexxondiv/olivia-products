@@ -94,8 +94,8 @@
       border: none;
       border-radius: 1rem;
       box-shadow: $shadow-lg;
-      padding: $spacing-md;
-      min-width: 16rem;
+      padding: $spacing-sm;
+      min-width: 200px;
       margin-top: $spacing-sm;
       @include fade-in;
       backdrop-filter: blur(10px);
@@ -103,7 +103,7 @@
 
       // Adjust dropdown on tablet/iPad
       @media (min-width: 768px) and (max-width: 1024px) {
-        min-width: 14rem;
+        min-width: 180px;
         padding: $spacing-sm;
       }
 
@@ -113,12 +113,18 @@
         padding: $spacing-sm $spacing-md;
         color: $color-slate;
         transition: all $transition-fast;
+        font-size: $font-size-sm;
 
         &:hover,
         &:focus {
           background: rgba($color-lime, 0.12);
           color: $color-lime-dark;
           transform: translateX(4px);
+        }
+
+        &:active {
+          background: rgba($color-lime, 0.2);
+          color: $color-lime-dark;
         }
       }
     }
@@ -231,5 +237,54 @@
   }
   50% {
     transform: scale(1.1);
+  }
+}
+
+// Global override to ensure products-dropdown styling is consistent across all pages
+// This matches the SelectDrop component styling used on Home and Collections pages
+// Bootstrap renders dropdown menus in portals, so we need to target them globally
+// Using :global to ensure these styles apply even when rendered outside the component
+// More specific selectors to override SelectDrop's global styles on Collections page
+:global {
+  .top-nav .navbar-nav .dropdown-menu,
+  .top-nav [id="products-dropdown"] ~ .dropdown-menu,
+  .top-nav [id="products-dropdown"] + .dropdown-menu,
+  .navbar .top-nav .dropdown-menu,
+  .collection-section ~ .top-nav .dropdown-menu,
+  body .top-nav .navbar-nav .dropdown-menu {
+    border: none !important;
+    border-radius: 1rem !important;
+    box-shadow: $shadow-lg !important;
+    padding: $spacing-sm !important;
+    min-width: 200px !important;
+    margin-top: $spacing-sm !important;
+    backdrop-filter: blur(10px) !important;
+    background: rgba(255, 255, 255, 0.98) !important;
+
+    @media (min-width: 768px) and (max-width: 1024px) {
+      min-width: 180px !important;
+      padding: $spacing-sm !important;
+    }
+
+    .dropdown-item {
+      font-family: $font-sans !important;
+      border-radius: 0.75rem !important;
+      padding: $spacing-sm $spacing-md !important;
+      color: $color-slate !important;
+      transition: all $transition-fast !important;
+      font-size: $font-size-sm !important;
+
+      &:hover,
+      &:focus {
+        background: rgba($color-lime, 0.12) !important;
+        color: $color-lime-dark !important;
+        transform: translateX(4px) !important;
+      }
+
+      &:active {
+        background: rgba($color-lime, 0.2) !important;
+        color: $color-lime !important;
+      }
+    }
   }
 }

@@ -11,6 +11,8 @@ $color-blush: #ffe7e7;
 $color-forest: #1b2e00;
 $color-slate: #374151;
 $color-charcoal: #1f2933;
+$color-dropdown-active: #7bbd21;
+$bs-dropdown-link-active-bg: $color-lime !important;
 
 // Extended palette helpers
 $color-lime-dark: color.scale($color-lime, $lightness: -20%);

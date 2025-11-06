@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState, useMemo } from "react";
 import { Offcanvas } from "react-bootstrap";
+import { Link } from "react-router-dom";
 import { useCart } from "../../CartContext";
 import "./cart-list.scss";
 import { MdDelete } from "react-icons/md";
+import { BiSearch } from "react-icons/bi";
 
 const CartOffcanvas: React.FC = () => {
   const {
@@ -15,13 +17,44 @@ const CartOffcanvas: React.FC = () => {
     decrementQuantity,
   } = useCart();
 
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredCart = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return cart;
+    }
+    const query = searchQuery.toLowerCase().trim();
+    return cart.filter((item) =>
+      item.productName.toLowerCase().includes(query)
+    );
+  }, [cart, searchQuery]);
+
   const calculateTotalPrice = () =>
-    cart.reduce((total, item) => total + item.productPrice * item.quantity, 0);
+    filteredCart.reduce((total, item) => total + item.productPrice * item.quantity, 0);
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-NG', {
+      style: 'currency',
+      currency: 'NGN',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  };
+
+  const handleClose = () => {
+    setIsOffCanvasOpen(false);
+    setSearchQuery(""); // Clear search when cart closes
+  };
+
+  const handleItemClick = () => {
+    setIsOffCanvasOpen(false); // Close cart when navigating to product page
+    setSearchQuery(""); // Clear search
+  };
 
   return (
     <Offcanvas
       show={isOffCanvasOpen}
-      onHide={() => setIsOffCanvasOpen(false)}
+      onHide={handleClose}
       placement="end"
     >
       <Offcanvas.Header closeButton>
@@ -30,54 +63,95 @@ const CartOffcanvas: React.FC = () => {
         </Offcanvas.Title>
       </Offcanvas.Header>
       <Offcanvas.Body>
-        {cart.length === 0 ? (
-          <h5>Your cart is empty!</h5>
-        ) : (
-          cart.map((item) => (
-            <div
-              key={item.id}
-              style={{ marginBottom: "1rem" }}
-              className="d-flex item-list"
-            >
-              <img
-                className="col-md-2 col-4"
-                src={item.firstImg}
-                alt={item.productName}
-                width="100%"
-                style={{ marginRight: "1rem" }}
-              />
-              <div style={{ flexGrow: 1 }} className="mt-2">
-                <p>{item.productName}</p>
-
-                <div style={{}} className="mt-4 increments">
-                  <span onClick={() => incrementQuantity(item.id)}>+</span>
-                  <span>{item.quantity}</span>
-                  <span onClick={() => decrementQuantity(item.id)}>-</span>
-                </div>
-              </div>
-
-              <div className="qty-d">
-                {" "}
+        {cart.length > 0 && (
+          <div className="cart-search-container">
+            <BiSearch className="search-icon" />
+            <input
+              type="text"
+              className="cart-search-input"
+              placeholder="Search cart items..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              aria-label="Search cart items"
+            />
+          </div>
+        )}
+        <div className="cart-items-container">
+          {cart.length === 0 ? (
+            <h5>Your cart is empty!</h5>
+          ) : filteredCart.length === 0 ? (
+            <h5>No items found matching "{searchQuery}"</h5>
+          ) : (
+            filteredCart.map((item) => (
+              <div
+                key={item.id}
+                className="item-list"
+              >
                 <MdDelete
                   onClick={() => removeFromCart(item.id)}
-                  className="remove-btn "
+                  className="remove-btn"
                   title="remove"
+                  aria-label="Remove item"
                 />
-                <p>${(item.productPrice * item.quantity).toFixed(2)}</p>
+                <Link
+                  to={`/product/${item.id}`}
+                  onClick={handleItemClick}
+                  className="item-list-content"
+                  style={{ textDecoration: "none", color: "inherit" }}
+                >
+                  <img
+                    className="item-image"
+                    src={item.firstImg}
+                    alt={item.productName}
+                  />
+                  <div className="item-details">
+                    <p className="item-name">{item.productName}</p>
+                  </div>
+                </Link>
+                <div className="item-actions">
+                  <p className="item-price">{formatCurrency(item.productPrice * item.quantity)}</p>
+                  <div className="increments">
+                    <button
+                      type="button"
+                      className="increment-btn"
+                      onClick={() => incrementQuantity(item.id)}
+                      aria-label="Increase quantity"
+                    >
+                      +
+                    </button>
+                    <span className="quantity-value">{item.quantity}</span>
+                    <button
+                      type="button"
+                      className="increment-btn"
+                      onClick={() => decrementQuantity(item.id)}
+                      aria-label="Decrease quantity"
+                    >
+                      -
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
-          ))
-        )}
-
-        <div>
-          <h5>Total: ${calculateTotalPrice().toFixed(2)}</h5>
+            ))
+          )}
         </div>
-        {cart.length > 1 && (
-          <button onClick={clearCart} className="clear-all">
-            Clear All
-          </button>
-        )}
-        {cart.length > 0 && <button className="checkout-btn">Checkout</button>}
+
+        <div className="cart-footer">
+          <div className="cart-total-row">
+            <div className="cart-total">
+              <h5>Total: {formatCurrency(calculateTotalPrice())}</h5>
+            </div>
+            {cart.length > 1 && (
+              <button onClick={clearCart} className="clear-all" type="button">
+                Clear All
+              </button>
+            )}
+          </div>
+          {filteredCart.length > 0 && (
+            <button className="checkout-btn" type="button">
+              Checkout
+            </button>
+          )}
+        </div>
       </Offcanvas.Body>
     </Offcanvas>
   );

@@ -15,7 +15,7 @@ export const ViewProductPage: React.FC = () => {
   const [activeImage, setActiveImage] = useState(0);
   const [transitionDirection, setTransitionDirection] = useState<"left" | "right">("right");
   const [quantity, setQuantity] = useState(1);
-  const { addToCart } = useCart();
+  const { addToCart, cart, updateQuantity } = useCart();
 
   // Always call hooks before any early returns
   const product = useMemo(() => {
@@ -51,9 +51,15 @@ export const ViewProductPage: React.FC = () => {
 
   useEffect(() => {
     setActiveImage(0);
-    setQuantity(1);
+    // Sync quantity with cart item if it exists
+    if (product) {
+      const cartItem = cart.find((item) => item.id === product.id);
+      setQuantity(cartItem ? cartItem.quantity : 1);
+    } else {
+      setQuantity(1);
+    }
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [id]);
+  }, [id, product, cart]);
 
   const primaryCategory = cleanCats[0] || "";
 
@@ -78,8 +84,33 @@ export const ViewProductPage: React.FC = () => {
       quantity,
     });
 
-  const dec = () => setQuantity((q) => (q > 1 ? q - 1 : q));
-  const inc = () => setQuantity((q) => q + 1);
+  const dec = () => {
+    setQuantity((q) => {
+      const newQty = q > 1 ? q - 1 : q;
+      // Update cart if item exists
+      if (product) {
+        const cartItem = cart.find((item) => item.id === product.id);
+        if (cartItem) {
+          updateQuantity(product.id, newQty);
+        }
+      }
+      return newQty;
+    });
+  };
+
+  const inc = () => {
+    setQuantity((q) => {
+      const newQty = q + 1;
+      // Update cart if item exists
+      if (product) {
+        const cartItem = cart.find((item) => item.id === product.id);
+        if (cartItem) {
+          updateQuantity(product.id, newQty);
+        }
+      }
+      return newQty;
+    });
+  };
 
   return (
     <>

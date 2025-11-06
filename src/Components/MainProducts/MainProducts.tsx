@@ -117,7 +117,6 @@ const MainProduct: React.FC<ProductProps> = ({
             />
           </Link>
         </div>
-
         <Desktop>
           {isHovered && (
             <button onClick={handleAddToCart} className="cart-btn">

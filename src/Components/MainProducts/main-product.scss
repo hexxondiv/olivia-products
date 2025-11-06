@@ -45,23 +45,32 @@
 
 // Modern cart button
 .cart-btn {
-  @include modern-button("primary", "md");
+  @include modern-button("success", "sm");
   position: absolute;
-  bottom: $spacing-md;
-  left: 50%;
-  transform: translateX(-50%);
-  min-width: 160px;
+  bottom: $spacing-sm;
+  right: $spacing-sm;
+  padding: 0.5rem 1rem;
+  font-size: $font-size-sm;
+  font-weight: 600;
   opacity: 0;
   pointer-events: none;
-  transition: opacity $transition-base, transform $transition-base;
+  z-index: 10;
+  transition: opacity $transition-base, transform $transition-base, box-shadow $transition-base;
+  box-shadow: $shadow-md;
   
   .product-container:hover & {
     opacity: 1;
     pointer-events: all;
+    transform: translateY(0);
   }
   
   &:hover {
-    transform: translateX(-50%) translateY(-2px);
+    transform: translateY(-2px);
+    box-shadow: $shadow-lg;
+  }
+  
+  &:active {
+    transform: translateY(0);
   }
 }
 

@@ -63,13 +63,13 @@
       
       &:hover,
       &:focus {
-        background: rgba($color-lime, 0.12);
+        background: rgba($color-lime, 0.12) !important;
         color: $color-lime-dark;
         transform: translateX(4px);
       }
       
       &:active {
-        background: rgba($color-lime, 0.2);
+        background: rgba($color-lime, 0.2) !important;
         color: $color-lime-dark;
       }
     }
