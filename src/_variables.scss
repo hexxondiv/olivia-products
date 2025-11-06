@@ -46,7 +46,8 @@ $focus-ring-color: color.change($color-lime, $alpha: 0.35);
 @mixin pill-button($variant: "primary") {
   $bg: map.get($theme-colors-map, $variant);
   background-color: $bg;
-  color: if(color.contrast($bg) > 4.5, #fff, $color-charcoal);
+  // Use lightness to determine text color: light backgrounds get dark text, dark backgrounds get white text
+  color: if(color.lightness($bg) > 50%, $color-charcoal, #fff);
   border-radius: 50rem;
   border: none;
   padding: 0.75rem 1.75rem;
