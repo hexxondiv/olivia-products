@@ -76,8 +76,6 @@ export const Collections: React.FC = () => {
         </div>
       </div>
 
-      <hr />
-
       <ProductsHolder
         category={rawCategory}
         viewType="grid"

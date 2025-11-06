@@ -213,6 +213,7 @@ const filteredProducts =
                     productPrice={product.price}
                     firstImg={product.firstImg}
                     hoverImg={product.hoverImg}
+                    rating={product.rating}
                     id={product.id}
                     onAddToCart={addToCart}
                   />

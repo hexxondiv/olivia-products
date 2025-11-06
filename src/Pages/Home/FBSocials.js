@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
+import "./fb-socials.scss";
 
 const FBSocials = () => {
-  const [inViewHeading, setInViewHeading] = useState(false); // Track if the heading is in view
-  const headingRef = useRef(null); // Reference for the heading
+  const [isVisible, setIsVisible] = useState(false);
+  const containerRef = useRef(null);
 
+  // Load Facebook SDK
   useEffect(() => {
     if (!window.FB) {
       const script = document.createElement("script");
@@ -12,61 +14,60 @@ const FBSocials = () => {
       script.async = true;
       script.crossOrigin = "anonymous";
       document.body.appendChild(script);
+
+      script.onload = () => {
+        if (window.FB) {
+          window.FB.XFBML.parse();
+        }
+      };
     } else {
       window.FB.XFBML.parse();
     }
   }, []);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      // Heading
-      if (headingRef.current) {
-        const rect = headingRef.current.getBoundingClientRect();
-        const windowHeight = window.innerHeight;
-        if (rect.top <= windowHeight && rect.bottom >= 0) {
-          setInViewHeading(true);
-        } else {
-          setInViewHeading(false);
-        }
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    handleScroll(); // Run once on load to check initial position
-    return () => window.removeEventListener("scroll", handleScroll);
+  // Handle scroll animation
+  const handleScroll = useCallback(() => {
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      const isInView = rect.top <= windowHeight && rect.bottom >= 0;
+      setIsVisible(isInView);
+    }
   }, []);
 
+  useEffect(() => {
+    handleScroll(); // Check initial position
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
+
   return (
-    <div ref={headingRef}>
-      {" "}
+    <div ref={containerRef} className="fb-socials">
       <div
-        className="ig-social"
-        style={{
-          width: "100%",
-          transform: inViewHeading ? "translateX(0)" : "translateX(-100px)",
-          opacity: inViewHeading ? 1 : 0,
-          transition: "transform 2s ease, opacity 2s ease",
-        }}
+        className={`fb-socials__container ig-social ${
+          isVisible ? "fb-socials__container--visible" : ""
+        }`}
       >
-        <div
-          className="fb-page"
-          data-href="https://www.facebook.com/britishspringawka"
-          data-tabs="timeline"
-          data-height=""
-          data-small-header="false"
-          data-adapt-container-width="true"
-          data-hide-cover="false"
-          data-show-facepile="true"
-        >
-          <blockquote
-            cite="https://www.facebook.com/britishspringawka"
-            className="fb-xfbml-parse-ignore"
-            style={{ width: "100%", margin: "20px auto" }}
+        <div className="fb-socials__embed">
+          <div
+            className="fb-page"
+            data-href="https://www.facebook.com/britishspringawka"
+            data-tabs="timeline"
+            data-height=""
+            data-small-header="false"
+            data-adapt-container-width="true"
+            data-hide-cover="false"
+            data-show-facepile="true"
           >
-            <a href="https://www.facebook.com/britishspringawka">
-              British Spring College
-            </a>
-          </blockquote>
+            <blockquote
+              cite="https://www.facebook.com/britishspringawka"
+              className="fb-xfbml-parse-ignore"
+            >
+              <a href="https://www.facebook.com/britishspringawka">
+                British Spring College
+              </a>
+            </blockquote>
+          </div>
         </div>
       </div>
     </div>

@@ -48,13 +48,15 @@ const YouTube = () => {
 
   return (
     <>
-      <div ref={headingRef} style={{ overflow: "hidden" }}>
-        {" "}
+      <div ref={headingRef} style={{ overflow: "hidden", width: "100%", height: "100%", display: "flex", flexDirection: "column" }}>
         <div
           className="ig-social twitter"
           style={{
             width: "100%",
-
+            height: "100%",
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
             transform: inViewHeading ? "translateX(0)" : "translateX(100px)",
             opacity: inViewHeading ? 1 : 0,
             transition: "transform 2s ease, opacity 2s ease",
@@ -62,18 +64,52 @@ const YouTube = () => {
         >
           {featuredPost && (
             <div>
-              <iframe
-                width="100%"
-                height="350"
-                src={getYouTubeEmbedUrl(featuredPost.url)}
-                title={`Featured YouTube video ${featuredPost.id}`}
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
+              <div
+                style={{
+                  position: "relative",
+                  width: "100%",
+                  paddingBottom: "56.25%", // 16:9 aspect ratio
+                  height: 0,
+                  overflow: "hidden",
+                  borderRadius: "12px",
+                }}
+              >
+                <iframe
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    border: "none",
+                  }}
+                  src={getYouTubeEmbedUrl(featuredPost.url)}
+                  title={`Featured YouTube video ${featuredPost.id}`}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              </div>
 
-              <p>{featuredPost.caption}</p>
-              <p style={{ fontSize: "12px" }}>{featuredPost.description}</p>
+              <p
+                style={{
+                  marginTop: "1rem",
+                  marginBottom: "0.5rem",
+                  fontSize: "clamp(0.875rem, 2vw, 1rem)",
+                  fontWeight: 600,
+                  color: "#003057",
+                }}
+              >
+                {featuredPost.caption}
+              </p>
+              <p
+                style={{
+                  fontSize: "clamp(0.75rem, 1.5vw, 0.875rem)",
+                  color: "#374151",
+                  margin: 0,
+                }}
+              >
+                {featuredPost.description}
+              </p>
             </div>
           )}
         </div>

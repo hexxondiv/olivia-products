@@ -8,6 +8,29 @@
   box-shadow: $shadow-sm;
   transition: all $transition-base;
 
+  // Container adjustments for tablet/iPad
+  .container-fluid {
+    @media (min-width: 768px) and (max-width: 1024px) {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+  }
+
+  // Navbar collapse adjustments for tablet
+  .navbar-collapse {
+    @media (min-width: 768px) and (max-width: 1024px) {
+      flex-basis: auto;
+      flex-grow: 0;
+      overflow: visible;
+    }
+  }
+
+  // Ensure navbar doesn't overflow on tablet
+  @media (min-width: 768px) and (max-width: 1024px) {
+    overflow: visible;
+    flex-wrap: nowrap;
+  }
+
   .navbar-toggler {
     border: none;
     padding: $spacing-sm $spacing-md;
@@ -27,6 +50,11 @@
   }
 
   .navbar-nav {
+    // Adjust navbar nav on tablet/iPad
+    @media (min-width: 768px) and (max-width: 1024px) {
+      gap: 0.5rem !important;
+    }
+
     .nav-link {
       font-family: $font-heading;
       font-size: $font-size-base;
@@ -35,6 +63,13 @@
       position: relative;
       transition: all $transition-base;
       font-weight: 500;
+
+      // Reduce font size and padding on tablet/iPad
+      @media (min-width: 768px) and (max-width: 1024px) {
+        font-size: $font-size-sm;
+        padding: $spacing-xs $spacing-xs;
+        white-space: nowrap;
+      }
 
       &.active,
       &:hover {
@@ -66,6 +101,12 @@
       backdrop-filter: blur(10px);
       background: rgba(255, 255, 255, 0.98);
 
+      // Adjust dropdown on tablet/iPad
+      @media (min-width: 768px) and (max-width: 1024px) {
+        min-width: 14rem;
+        padding: $spacing-sm;
+      }
+
       .dropdown-item {
         font-family: $font-sans;
         border-radius: 0.75rem;
@@ -81,15 +122,43 @@
         }
       }
     }
+
+    // Adjust NavDropdown toggle on tablet/iPad
+    .dropdown-toggle {
+      @media (min-width: 768px) and (max-width: 1024px) {
+        font-size: $font-size-sm;
+        padding: $spacing-xs $spacing-xs;
+        white-space: nowrap;
+      }
+    }
+  }
+
+  // Navbar brand adjustments
+  .navbar-brand {
+    @media (min-width: 768px) and (max-width: 1024px) {
+      margin-right: 0.5rem;
+      flex-shrink: 0;
+    }
   }
 
   &__logo {
     width: clamp(120px, 18vw, 152px);
     height: auto;
+
+    // Reduce logo size on tablet/iPad
+    @media (min-width: 768px) and (max-width: 1024px) {
+      width: clamp(100px, 12vw, 130px);
+    }
   }
 
   &__links {
     gap: 1.25rem;
+
+    // Tablet/iPad Pro adjustments
+    @media (min-width: 768px) and (max-width: 1024px) {
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
 
     @media (max-width: 991.98px) {
       padding-top: 1.5rem;
@@ -107,6 +176,21 @@
     min-width: 3rem;
     min-height: 3rem;
     position: relative;
+    flex-shrink: 0;
+
+    // Reduce cart button size on tablet/iPad
+    @media (min-width: 768px) and (max-width: 1024px) {
+      min-width: 2.5rem;
+      min-height: 2.5rem;
+      padding: 0.5rem;
+      margin-left: 0.5rem;
+
+      // Reduce icon size in cart button
+      svg {
+        width: 18px;
+        height: 18px;
+      }
+    }
 
     .btn-check:focus + &,
     &:focus {

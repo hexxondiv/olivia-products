@@ -36,18 +36,21 @@ const TwitterHandle = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
   return (
-    <div ref={paragraphRef}>
-      {" "}
+    <div ref={paragraphRef} style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column" }}>
       <div
         className="ig-social twitter"
         style={{
           transform: inViewParagraph ? "translateY(0)" : "translateY(100px)",
           opacity: inViewParagraph ? 1 : 0,
           transition: "transform 1s ease, opacity 1s ease",
+          width: "100%",
+          height: "100%",
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
         }}
       >
-        {" "}
-        <div className="instagram-embed col-md-12">
+        <div className="instagram-embed col-md-12" style={{ flex: 1, minHeight: 0 }}>
           {IgPosts.map((post) => (
             <blockquote
               key={post.id}

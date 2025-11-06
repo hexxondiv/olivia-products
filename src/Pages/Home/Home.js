@@ -165,19 +165,19 @@ export const Home = () => {
           <h2 className="home__headline">
             Get to know more about us from the media
           </h2>
-          <p className="home__description mx-auto col-lg-7">
+          <p className="home__description home__description--media mx-auto">
             Discover how Olivia Products is shaping better homes across
             Nigeria—from community spotlights to innovation features, stay in
             the loop with our latest stories and updates.
           </p>
-          <Row className="g-4 mt-4">
-            <Col md={4}>
+          <Row className="g-4 mt-4 home__media-row">
+            <Col md={4} className="home__media-col">
               <FBSocials />
             </Col>
-            <Col md={4}>
+            <Col md={4} className="home__media-col">
               <TwitterHandle />
             </Col>
-            <Col md={4}>
+            <Col md={4} className="home__media-col">
               <YouTube />
             </Col>
           </Row>

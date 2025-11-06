@@ -1,28 +1,28 @@
 @use "../../_variables" as *;
 
 .collection-section {
-  margin-top: $spacing-2xl;
-  padding: $spacing-lg $spacing-3xl;
+  margin-top: $spacing-xl;
+  padding: $spacing-md $spacing-3xl;
   max-width: 1400px;
   margin-left: auto;
   margin-right: auto;
   @include fade-in;
   
   @media screen and (max-width: 991.98px) {
-    padding: $spacing-md $spacing-lg;
-    margin-top: $spacing-xl;
+    padding: $spacing-sm $spacing-lg;
+    margin-top: $spacing-lg;
   }
   
   @media screen and (max-width: 820px) {
-    padding: $spacing-md;
-    margin-top: $spacing-lg;
+    padding: $spacing-sm;
+    margin-top: $spacing-md;
   }
   
   h2 {
     font-size: $font-size-4xl;
     font-weight: 700;
     color: $color-charcoal;
-    margin-bottom: $spacing-sm;
+    margin-bottom: $spacing-xs;
     line-height: $line-height-tight;
     @include slide-up;
     
@@ -48,14 +48,14 @@
   font-size: $font-size-base;
   line-height: $line-height-normal;
   color: $color-slate;
-  margin-bottom: $spacing-md;
+  margin-bottom: $spacing-sm;
   max-width: 600px;
   @include slide-up;
   animation-delay: 100ms;
   
   @media screen and (max-width: 820px) {
     font-size: $font-size-sm;
-    margin-bottom: $spacing-sm;
+    margin-bottom: $spacing-xs;
   }
 }
 
@@ -65,8 +65,8 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: $spacing-md;
-  margin-bottom: $spacing-lg;
-  padding: $spacing-md $spacing-lg;
+  margin-bottom: $spacing-md;
+  padding: $spacing-sm $spacing-lg;
   background: linear-gradient(135deg, rgba($color-sky, 0.5), rgba($color-blush, 0.3));
   border-radius: 1rem;
   backdrop-filter: blur(10px);
@@ -75,7 +75,7 @@
     flex-direction: column;
     align-items: stretch;
     gap: $spacing-sm;
-    padding: $spacing-sm $spacing-md;
+    padding: $spacing-xs $spacing-md;
   }
 }
 
