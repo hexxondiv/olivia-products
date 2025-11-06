@@ -49,9 +49,9 @@ export const CheckoutPage: React.FC = () => {
     // Look up the full product data to get name and sufix
     const product = allProductsData.find((p) => p.id === item.id);
     if (product) {
-      // Format as "Olivia {name}{sufix}" - trim any trailing spaces from name
+      // Format as "Olivia {name} {sufix}" - trim both name and sufix, ensure proper spacing
       const name = (product.name || "").trim();
-      const sufix = product.sufix || "";
+      const sufix = (product.sufix || "").trim();
       return `Olivia ${name}${sufix ? ` ${sufix}` : ""}`;
     }
     // Fallback to cart item name if product not found
@@ -77,7 +77,7 @@ export const CheckoutPage: React.FC = () => {
       minute: "2-digit",
     });
     
-    let message = "Hello! 👋\n\n";
+    let message = "*###NEW ORDER###* \n\n Hello, Olivia Products!\n";
     message += "I'd like to place a _new order_. Here are the details:\n\n";
     
     message += "*Order ID:* `" + orderId + "`\n";

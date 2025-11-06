@@ -32,6 +32,7 @@ interface OrderData {
   orderId?: string;
   salesEmailSent?: boolean;
   customerEmailSent?: boolean;
+  submittedVia?: "email" | "whatsapp";
 }
 
 export const SuccessPage: React.FC = () => {
@@ -74,9 +75,9 @@ export const SuccessPage: React.FC = () => {
     // Look up the full product data to get name and sufix
     const product = allProductsData.find((p) => p.id === item.id);
     if (product) {
-      // Format as "Olivia {name}{sufix}" - trim any trailing spaces from name
+      // Format as "Olivia {name} {sufix}" - trim both name and sufix, ensure proper spacing
       const name = (product.name || "").trim();
-      const sufix = product.sufix || "";
+      const sufix = (product.sufix || "").trim();
       return `Olivia ${name}${sufix ? ` ${sufix}` : ""}`;
     }
     // Fallback to cart item name if product not found
@@ -96,23 +97,34 @@ export const SuccessPage: React.FC = () => {
             Thank you for your order, <strong>{orderData.customer.fullName}</strong>! We've received
             your order and will contact you shortly to confirm the details.
           </p>
-          {orderData.customerEmailSent !== false && (
-            <div className="email-notification">
+          {orderData.submittedVia === "whatsapp" ? (
+            <div className="whatsapp-notification">
               <p>
-                <strong>📧 Confirmation Email Sent!</strong> We've sent a confirmation email to{" "}
-                <strong>{orderData.customer.email}</strong>. Please check your inbox (and spam folder) 
-                for order details.
+                <strong>📱 Order Submitted via WhatsApp!</strong> Your order has been sent to our sales team via WhatsApp. 
+                We'll respond to your message shortly to confirm your order details.
               </p>
             </div>
-          )}
-          {orderData.customerEmailSent === false && (
-            <div className="email-warning">
-              <p>
-                <strong>⚠️ Email Notice:</strong> We were unable to send a confirmation email to{" "}
-                <strong>{orderData.customer.email}</strong>. Don't worry - your order has been received 
-                and we'll contact you via phone to confirm the details.
-              </p>
-            </div>
+          ) : (
+            <>
+              {orderData.customerEmailSent !== false && (
+                <div className="email-notification">
+                  <p>
+                    <strong>📧 Confirmation Email Sent!</strong> We've sent a confirmation email to{" "}
+                    <strong>{orderData.customer.email}</strong>. Please check your inbox (and spam folder) 
+                    for order details.
+                  </p>
+                </div>
+              )}
+              {orderData.customerEmailSent === false && (
+                <div className="email-warning">
+                  <p>
+                    <strong>⚠️ Email Notice:</strong> We were unable to send a confirmation email to{" "}
+                    <strong>{orderData.customer.email}</strong>. Don't worry - your order has been received 
+                    and we'll contact you via phone to confirm the details.
+                  </p>
+                </div>
+              )}
+            </>
           )}
 
           <div className="order-details-card">
@@ -207,10 +219,21 @@ export const SuccessPage: React.FC = () => {
             <div className="next-steps">
               <h3>What's Next?</h3>
               <ul>
-                <li>You will receive an email confirmation shortly - please check your inbox and spam folder</li>
-                <li>Our team will contact you within 24 hours to confirm your order</li>
-                <li>We'll process your order and prepare it for shipping</li>
-                <li>You'll receive tracking information once your order ships</li>
+                {orderData.submittedVia === "whatsapp" ? (
+                  <>
+                    <li>Our team will respond to your WhatsApp message within 24 hours to confirm your order</li>
+                    <li>We'll process your order and prepare it for shipping</li>
+                    <li>You'll receive tracking information once your order ships</li>
+                    <li>Keep an eye on your WhatsApp for order updates and confirmation</li>
+                  </>
+                ) : (
+                  <>
+                    <li>You will receive an email confirmation shortly - please check your inbox and spam folder</li>
+                    <li>Our team will contact you within 24 hours to confirm your order</li>
+                    <li>We'll process your order and prepare it for shipping</li>
+                    <li>You'll receive tracking information once your order ships</li>
+                  </>
+                )}
               </ul>
             </div>
         </div>

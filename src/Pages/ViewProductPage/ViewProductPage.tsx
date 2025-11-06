@@ -75,10 +75,17 @@ export const ViewProductPage: React.FC = () => {
     );
   }
 
+  const formatProductName = () => {
+    // Format as "Olivia {name} {sufix}" - trim both name and sufix, ensure proper spacing
+    const name = (product.name || "").trim();
+    const sufix = (product.sufix || "").trim();
+    return `Olivia ${name}${sufix ? ` ${sufix}` : ""}`;
+  };
+
   const handleAddToCart = () =>
     addToCart({
       id: product.id,
-      productName: product.name,
+      productName: formatProductName(),
       productPrice: product.price,
       firstImg: product.firstImg,
       quantity,
@@ -179,8 +186,8 @@ export const ViewProductPage: React.FC = () => {
         {/* Details */}
         <div className="product-info col-md-5 offset-md-0 col-12">
           <h1>
-            Olivia <span style={{ color: product.color }}>{product.name}</span>
-            {product.sufix}
+            Olivia <span style={{ color: product.color }}>{(product.name || "").trim()}</span>
+            {(product.sufix || "").trim() ? ` ${(product.sufix || "").trim()}` : ""}
           </h1>
 
         <em>  {product.tagline && <p>{product.tagline}</p>}</em>
