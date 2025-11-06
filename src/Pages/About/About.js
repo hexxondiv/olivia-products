@@ -178,21 +178,21 @@ export const About = () => {
             <IoPerson className="icon" />
             <div>
               <h6>Mrs Olivia Mbaeme</h6>
-              <p>Chairman, Lee Group of Companies</p>
+              <p>Chairman, Olivia Products Limited</p>
             </div>
           </div>
           <div className="director d-flex">
             <IoPerson className="icon" />
             <div>
-              <h6>Mrs Olivia Mbaeme</h6>
-              <p>Chairman, Lee Group of Companies</p>
+              <h6>Mr. Chinedu Okafor</h6>
+              <p>Sales and Marketing Director, Olivia Products Limited</p>
             </div>
           </div>
           <div className="director d-flex">
             <IoPerson className="icon" />
             <div>
-              <h6>Mrs Olivia Mbaeme</h6>
-              <p>Chairman, Lee Group of Companies</p>
+              <h6>Engr. Emmanuel Okafor</h6>
+              <p>Managing Director, Olivia Products Limited</p>
             </div>
           </div>
         </div>{" "}

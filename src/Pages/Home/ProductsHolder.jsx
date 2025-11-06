@@ -147,49 +147,112 @@ const filteredProducts =
       <div className="prod-slide col-md-11">
         {" "}
         <Desktop>
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <MdNavigateBefore
-              onClick={handlePrev}
-              style={{ color: "#003057 ", fontSize: "38px" }}
-            />
-
-            <MdNavigateNext
-              onClick={handleNext}
-              style={{ color: "#003057 ", fontSize: "38px" }}
-            />
-          </div>{" "}
-          <div
-            className="carousel"
-            style={{
-              display: "flex",
-              transition: isTransitioning ? "transform 1s ease-in-out" : "none",
-              transform: `translateX(-${
-                (100 / visibleItems) * actualStartIndex
-              }%)`,
-              width: `${(extendedProducts.length / visibleItems) * 25}%`,
-            }}
-          >
-            {extendedProducts.map((product, index) => (
-              <div
-                key={index}
+          {showOnlyBestSellers ? (
+            <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+              <MdNavigateBefore
+                onClick={handlePrev}
                 style={{
-                  flex: `0 0 ${100 / visibleItems}%`,
-                  boxSizing: "border-box",
-                  padding: "10px",
+                  position: "absolute",
+                  left: "-50px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  color: "#003057",
+                  fontSize: "38px",
+                  cursor: "pointer",
+                  zIndex: 10,
+                }}
+              />
+              <div
+                className="carousel"
+                style={{
+                  display: "flex",
+                  transition: isTransitioning ? "transform 1s ease-in-out" : "none",
+                  transform: `translateX(-${
+                    (100 / visibleItems) * actualStartIndex
+                  }%)`,
+                  width: `${(extendedProducts.length / visibleItems) * 25}%`,
                 }}
               >
-                  <MainProduct
-                  productName={product.name}
-                  productPrice={product.price}
-                  firstImg={product.firstImg}
-                  hoverImg={product.hoverImg}
-                  id={product.id}
-                  onAddToCart={addToCart}
-                />
-              
+                {extendedProducts.map((product, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      flex: `0 0 ${100 / visibleItems}%`,
+                      boxSizing: "border-box",
+                      padding: "10px",
+                    }}
+                  >
+                    <MainProduct
+                      productName={product.name}
+                      productPrice={product.price}
+                      firstImg={product.firstImg}
+                      hoverImg={product.hoverImg}
+                      id={product.id}
+                      onAddToCart={addToCart}
+                    />
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+              <MdNavigateNext
+                onClick={handleNext}
+                style={{
+                  position: "absolute",
+                  right: "-50px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  color: "#003057",
+                  fontSize: "38px",
+                  cursor: "pointer",
+                  zIndex: 10,
+                }}
+              />
+            </div>
+          ) : (
+            <>
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <MdNavigateBefore
+                  onClick={handlePrev}
+                  style={{ color: "#003057 ", fontSize: "38px" }}
+                />
+
+                <MdNavigateNext
+                  onClick={handleNext}
+                  style={{ color: "#003057 ", fontSize: "38px" }}
+                />
+              </div>{" "}
+              <div
+                className="carousel"
+                style={{
+                  display: "flex",
+                  transition: isTransitioning ? "transform 1s ease-in-out" : "none",
+                  transform: `translateX(-${
+                    (100 / visibleItems) * actualStartIndex
+                  }%)`,
+                  width: `${(extendedProducts.length / visibleItems) * 25}%`,
+                }}
+              >
+                {extendedProducts.map((product, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      flex: `0 0 ${100 / visibleItems}%`,
+                      boxSizing: "border-box",
+                      padding: "10px",
+                    }}
+                  >
+                    <MainProduct
+                      productName={product.name}
+                      productPrice={product.price}
+                      firstImg={product.firstImg}
+                      hoverImg={product.hoverImg}
+                      id={product.id}
+                      onAddToCart={addToCart}
+                    />
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
         </Desktop>
         <TabletAndBelow>
           <Carousel>
