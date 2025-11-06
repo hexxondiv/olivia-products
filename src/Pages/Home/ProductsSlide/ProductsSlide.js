@@ -11,6 +11,7 @@ import Bg3 from "../../../assets/images/flower4.webp";
 import Bg4 from "../../../assets/images/flower-bg.jpg";
 import "./products-slide.scss";
 const backgrounds = [Bg4, Bg2, Bg, Bg3, Bg2];
+// const backgrounds = [];
 const images = [Product1, Product2, Product3, Product4, Product5];
 const ProductsSlide = () => {
   const [current, setCurrent] = useState(0);

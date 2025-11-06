@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
-import "./testimonials.scss";
+import React, { useState, useEffect } from "react";
 
 interface Testimonial {
   name: string;
@@ -20,10 +19,6 @@ const TestimonialCarousel: React.FC = () => {
       .catch((error) => console.error("Error fetching testimonials:", error));
   }, []);
 
-  const nextSlide = useCallback(() => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonials.length);
-  }, [testimonials.length]);
-
   useEffect(() => {
     if (testimonials.length > 0) {
       const interval = setInterval(() => {
@@ -31,7 +26,11 @@ const TestimonialCarousel: React.FC = () => {
       }, autoPlayInterval);
       return () => clearInterval(interval);
     }
-  }, [nextSlide, testimonials.length]);
+  }, [currentIndex, testimonials]);
+
+  const nextSlide = () => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonials.length);
+  };
 
   const prevSlide = () => {
     setCurrentIndex(
@@ -55,15 +54,7 @@ const TestimonialCarousel: React.FC = () => {
   };
 
   if (testimonials.length === 0) {
-    return (
-      <div className="testimonial-div">
-        <div className="testimonial-carousel">
-          <div style={{ textAlign: "center", padding: "3rem", color: "#374151" }}>
-            Loading testimonials...
-          </div>
-        </div>
-      </div>
-    );
+    return <div>Loading testimonials...</div>;
   }
 
   return (
@@ -76,10 +67,18 @@ const TestimonialCarousel: React.FC = () => {
               className={`testimonial-slide ${index === 1 ? "active" : ""}`}
               style={{
                 backgroundColor: testimonial.backgroundColor,
+                width: index === 1 ? "70%" : "15%", // Middle one takes 70%, others take 15%
+                opacity: index === 1 ? 1 : 0.4,
+                transform: index === 1 ? "scale(1.1)" : "scale(0.9)",
+                zIndex: index === 1 ? 2 : 1, // Middle one is on top
               }}
             >
-              <h3>{testimonial.name}</h3>
-              <p>{testimonial.comment}</p>
+              <h3 style={{ fontSize: index == 1 ? "24px" : "14px" }}>
+                {testimonial.name}
+              </h3>
+              <p style={{ fontSize: index == 1 ? "18px" : "11px" }}>
+                {testimonial.comment}
+              </p>
               <div className="rating">
                 {Array(testimonial.rating).fill("⭐").join("")}
               </div>
