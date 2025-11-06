@@ -1,12 +1,13 @@
 import React, { useState, useMemo } from "react";
 import { Offcanvas } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../../CartContext";
 import "./cart-list.scss";
 import { MdDelete } from "react-icons/md";
 import { BiSearch } from "react-icons/bi";
 
 const CartOffcanvas: React.FC = () => {
+  const navigate = useNavigate();
   const {
     cart,
     isOffCanvasOpen,
@@ -49,6 +50,12 @@ const CartOffcanvas: React.FC = () => {
   const handleItemClick = () => {
     setIsOffCanvasOpen(false); // Close cart when navigating to product page
     setSearchQuery(""); // Clear search
+  };
+
+  const handleCheckout = () => {
+    setIsOffCanvasOpen(false); // Close cart
+    setSearchQuery(""); // Clear search
+    navigate("/checkout"); // Navigate to checkout page
   };
 
   return (
@@ -147,7 +154,7 @@ const CartOffcanvas: React.FC = () => {
             )}
           </div>
           {filteredCart.length > 0 && (
-            <button className="checkout-btn" type="button">
+            <button className="checkout-btn" type="button" onClick={handleCheckout}>
               Checkout
             </button>
           )}

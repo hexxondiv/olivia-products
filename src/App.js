@@ -13,6 +13,8 @@ import { OurMission } from "./Pages/OurMission/OurMission";
 import { Collections } from "./Pages/Collections/Collections";
 import { About } from "./Pages/About/About";
 import { FAQPage } from "./Pages/FAQPage/FAQPage";
+import { CheckoutPage } from "./Pages/CheckoutPage/CheckoutPage";
+import { SuccessPage } from "./Pages/SuccessPage/SuccessPage";
 import { TopNav } from "./Components/TopNav/TopNav";
 import { MdOutlineVerticalAlignTop } from "react-icons/md";
 import CartOffcanvas from "./Components/CartList/CartList";
@@ -59,6 +61,8 @@ function App() {
           <Route path="/our-mission" element={<OurMission />} />{" "}
           <Route path="/collections" element={<Collections />} />{" "}
           <Route path="/faqs" element={<FAQPage />} />{" "}
+          <Route path="/checkout" element={<CheckoutPage />} />{" "}
+          <Route path="/order-success" element={<SuccessPage />} />{" "}
         </Routes>
         <Footer />
       </CartProvider>{" "}

@@ -1,5 +1,6 @@
 import { Badge, Button, Container, Nav, NavDropdown, Navbar } from "react-bootstrap";
 import { Link, NavLink } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { useCart } from "../../CartContext";
 import Logo from "../../assets/images/logo.png";
 import { GrCart } from "react-icons/gr";
@@ -32,8 +33,25 @@ const primaryLinks = [
 
 export const TopNav = () => {
   const { cart, openCart } = useCart();
+  const [isOpen, setIsOpen] = useState(false);
 
   const cartCount = cart.reduce((total, item) => total + (item.quantity ?? 1), 0);
+
+  const handleNavClick = () => {
+    setIsOpen(false);
+  };
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
 
   const CartButton = () => (
     <Button
@@ -52,37 +70,69 @@ export const TopNav = () => {
   );
 
   return (
-    <Navbar expand="lg" bg="light" sticky="top" className="top-nav shadow-sm">
-      <Container fluid="lg">
-        <Navbar.Brand as={Link} to="/" className="d-flex align-items-center gap-2">
-          <img src={Logo} alt="Olivia Products" className="top-nav__logo" />
-        </Navbar.Brand>
-        <div className="d-flex align-items-center gap-2">
-          <div className="d-lg-none">
-            <CartButton />
+    <>
+      {isOpen && (
+        <div 
+          className="top-nav__backdrop d-lg-none"
+          onClick={handleNavClick}
+          aria-hidden="true"
+        />
+      )}
+      <Navbar expand="lg" bg="light" sticky="top" className="top-nav shadow-sm" expanded={isOpen}>
+        <Container fluid="lg">
+          <Navbar.Brand as={Link} to="/" className="d-flex align-items-center gap-2">
+            <img src={Logo} alt="Olivia Products" className="top-nav__logo" />
+          </Navbar.Brand>
+          <div className="d-flex align-items-center gap-2">
+            <div className="d-lg-none">
+              <CartButton />
+            </div>
+            <Navbar.Toggle 
+              aria-controls="main-navbar" 
+              onClick={() => setIsOpen(!isOpen)}
+              aria-expanded={isOpen}
+            />
           </div>
-          <Navbar.Toggle aria-controls="main-navbar" />
-        </div>
-        <Navbar.Collapse id="main-navbar" className="justify-content-lg-end">
-          <Nav className="align-items-lg-center gap-lg-3 top-nav__links">
-            {primaryLinks.map((link) => (
-              <Nav.Link key={link.label} as={NavLink} to={link.to} end>
-                {link.label}
-              </Nav.Link>
-            ))}
-            <NavDropdown title="Our Products" id="products-dropdown" menuVariant="light">
-              {productLinks.map((link) => (
-                <NavDropdown.Item key={link.label} as={NavLink} to={link.to}>
+          <Navbar.Collapse 
+            id="main-navbar" 
+            className={`justify-content-lg-end ${isOpen ? 'show' : ''}`}
+          >
+            <Nav className="align-items-lg-center gap-lg-3 top-nav__links">
+              {primaryLinks.map((link) => (
+                <Nav.Link 
+                  key={link.label} 
+                  as={NavLink} 
+                  to={link.to} 
+                  end
+                  onClick={handleNavClick}
+                >
                   {link.label}
-                </NavDropdown.Item>
+                </Nav.Link>
               ))}
-            </NavDropdown>
-          </Nav>
-          <div className="d-none d-lg-inline-block ms-lg-4">
-            <CartButton />
-          </div>
-        </Navbar.Collapse>
-      </Container>
-    </Navbar>
+              <NavDropdown 
+                title="Our Products" 
+                id="products-dropdown" 
+                menuVariant="light"
+                onSelect={handleNavClick}
+              >
+                {productLinks.map((link) => (
+                  <NavDropdown.Item 
+                    key={link.label} 
+                    as={NavLink} 
+                    to={link.to}
+                    onClick={handleNavClick}
+                  >
+                    {link.label}
+                  </NavDropdown.Item>
+                ))}
+              </NavDropdown>
+            </Nav>
+            <div className="d-none d-lg-inline-block ms-lg-4">
+              <CartButton />
+            </div>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
+    </>
   );
 };

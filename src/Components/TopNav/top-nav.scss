@@ -7,6 +7,16 @@
   backdrop-filter: blur(20px);
   box-shadow: $shadow-sm;
   transition: all $transition-base;
+  position: sticky;
+  top: 0;
+  z-index: 1052;
+
+  // Ensure sticky works on mobile
+  @media (max-width: 991.98px) {
+    position: sticky;
+    top: 0;
+    width: 100%;
+  }
 
   // Container adjustments for tablet/iPad
   .container-fluid {
@@ -22,6 +32,58 @@
       flex-basis: auto;
       flex-grow: 0;
       overflow: visible;
+    }
+
+    // Mobile slide-in animation from left
+    @media (max-width: 991.98px) {
+      position: fixed !important;
+      top: 0;
+      left: 0;
+      width: 85%;
+      max-width: 320px;
+      height: 100vh !important;
+      min-height: 100vh !important;
+      max-height: 100vh !important;
+      background: linear-gradient(180deg, rgba($color-sky, 0.98), rgba($color-blush, 0.98));
+      backdrop-filter: blur(20px);
+      box-shadow: $shadow-lg;
+      z-index: 1051;
+      padding: $spacing-md;
+      overflow-y: auto;
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      transform: translateX(-100%) !important;
+      transition: transform 400ms $ease-out-expo !important;
+      border-right: 1px solid rgba($color-navy, 0.1);
+      pointer-events: none;
+      will-change: transform;
+      box-sizing: border-box;
+
+      // Override Bootstrap's height animation
+      &.collapsing {
+        height: 100vh !important;
+        min-height: 100vh !important;
+        max-height: 100vh !important;
+        transition: transform 400ms $ease-out-expo !important;
+      }
+
+      &.show,
+      &.collapsing {
+        transform: translateX(0) !important;
+        pointer-events: auto;
+        height: 100vh !important;
+        min-height: 100vh !important;
+        max-height: 100vh !important;
+      }
+
+      // Ensure smooth animation when closed
+      &:not(.show):not(.collapsing) {
+        transform: translateX(-100%) !important;
+        height: 100vh !important;
+        min-height: 100vh !important;
+        max-height: 100vh !important;
+      }
     }
   }
 
@@ -107,6 +169,20 @@
         padding: $spacing-sm;
       }
 
+      // Mobile dropdown styling
+      @media (max-width: 991.98px) {
+        position: static !important;
+        transform: none !important;
+        box-shadow: none;
+        background: transparent;
+        padding: $spacing-sm 0;
+        margin-top: $spacing-xs;
+        border-radius: 0;
+        border-left: 2px solid rgba($color-lime, 0.3);
+        padding-left: $spacing-md;
+        margin-left: $spacing-md;
+      }
+
       .dropdown-item {
         font-family: $font-sans;
         border-radius: 0.75rem;
@@ -125,6 +201,20 @@
         &:active {
           background: rgba($color-lime, 0.2);
           color: $color-lime-dark;
+        }
+
+        // Mobile dropdown item styling
+        @media (max-width: 991.98px) {
+          padding: $spacing-sm $spacing-md;
+          font-size: $font-size-sm;
+          border-radius: 0.5rem;
+          margin-bottom: $spacing-xs;
+
+          &:hover,
+          &:focus {
+            background: rgba($color-lime, 0.15);
+            transform: translateX(6px);
+          }
         }
       }
     }
@@ -167,9 +257,47 @@
     }
 
     @media (max-width: 991.98px) {
-      padding-top: 1.5rem;
+      padding-top: 2rem;
       align-items: flex-start !important;
-      gap: 0.5rem;
+      gap: 0.75rem;
+      flex-direction: column;
+      width: 100%;
+
+      .nav-link {
+        width: 100%;
+        padding: $spacing-md;
+        border-radius: 0.75rem;
+        font-size: $font-size-base;
+        transition: all $transition-fast;
+
+        &:hover {
+          background: rgba($color-lime, 0.1);
+          transform: translateX(4px);
+        }
+
+        &.active {
+          background: rgba($color-lime, 0.15);
+          color: $color-lime-dark;
+          font-weight: 600;
+
+          &::after {
+            display: none;
+          }
+        }
+      }
+
+      .dropdown-toggle {
+        width: 100%;
+        padding: $spacing-md;
+        border-radius: 0.75rem;
+        font-size: $font-size-base;
+        transition: all $transition-fast;
+
+        &:hover {
+          background: rgba($color-lime, 0.1);
+          transform: translateX(4px);
+        }
+      }
     }
   }
 
@@ -238,6 +366,20 @@
   50% {
     transform: scale(1.1);
   }
+}
+
+// Backdrop overlay for mobile menu
+.top-nav__backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba($color-navy, 0.5);
+  backdrop-filter: blur(2px);
+  z-index: 1049;
+  animation: fadeIn $transition-base $ease-out-expo;
+  cursor: pointer;
 }
 
 // Global override to ensure products-dropdown styling is consistent across all pages

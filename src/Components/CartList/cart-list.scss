@@ -358,7 +358,7 @@
   }
   
   .checkout-btn {
-    @include modern-button("primary", "lg");
+    @include modern-button("success", "lg");
     width: 100%;
     margin-top: $spacing-md;
     
