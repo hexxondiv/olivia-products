@@ -1,5 +1,5 @@
 // ProductsHolder.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
 // import CartOffcanvas from "../../Components/CartList/CartList";
 import MainProduct from "../../Components/MainProducts/MainProducts";
@@ -9,6 +9,8 @@ import { allProductsData } from "../../TestData/allProductsData";
 import { useCart } from "../../CartContext";
 import { MdNavigateBefore, MdNavigateNext } from "react-icons/md";
 import { Desktop, TabletAndBelow } from "../../Utils/mediaQueries";
+import "./products-holder.scss";
+
 export const ProductsHolder = ({
   category = "",
   viewType = "slide",
@@ -19,17 +21,37 @@ export const ProductsHolder = ({
   const [startIndex, setStartIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [sortOrder, setSortOrder] = useState(""); // New state for sorting
-  const [visibleItems, setVisibleItems] = useState(
-    window.innerWidth < 768 ? 1 : 4
-  ); // Initial visibleItems based on screen size
+  
+  // Calculate visible items based on screen width with proper breakpoints
+  const getVisibleItems = useCallback(() => {
+    const width = window.innerWidth;
+    if (width < 576) return 1;      // Mobile: 1 item
+    if (width < 768) return 1;       // Small tablet: 1 item
+    if (width < 992) return 2;      // Tablet: 2 items
+    if (width < 1200) return 3;     // Small desktop: 3 items
+    return 4;                        // Large desktop: 4 items
+  }, []);
+
+  const [visibleItems, setVisibleItems] = useState(getVisibleItems);
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const categoryFromQuery = queryParams.get("category") || "";
 
-  
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      const newVisibleItems = getVisibleItems();
+      if (newVisibleItems !== visibleItems) {
+        setVisibleItems(newVisibleItems);
+        // Reset to first item when breakpoint changes
+        setStartIndex(0);
+      }
+    };
 
-  
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [visibleItems, getVisibleItems]);
 
 // Step 1: Optionally filter for best sellers
 let productsToDisplay = allProductsData;
@@ -47,9 +69,6 @@ const filteredProducts =
         )
       );
 
-
-
-
   // Sorting logic based on sortOrder
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     switch (sortType) {
@@ -66,25 +85,33 @@ const filteredProducts =
     }
   });
 
-  // For sliding view
-  const extendedProducts = [
-    ...filteredProducts.slice(-visibleItems),
-    ...filteredProducts,
-    ...filteredProducts.slice(0, visibleItems),
-  ];
+  // For sliding view - only create extended products if we have items
+  const extendedProducts = filteredProducts.length > 0
+    ? [
+        ...filteredProducts.slice(-visibleItems),
+        ...filteredProducts,
+        ...filteredProducts.slice(0, visibleItems),
+      ]
+    : [];
   const actualStartIndex = startIndex + visibleItems;
 
   const handleNext = () => {
-    if (!isTransitioning) {
+    if (!isTransitioning && filteredProducts.length > 0) {
       setIsTransitioning(true);
-      setStartIndex((prevIndex) => prevIndex + 1);
+      setStartIndex((prevIndex) => {
+        const nextIndex = prevIndex + 1;
+        return nextIndex >= filteredProducts.length ? 0 : nextIndex;
+      });
     }
   };
 
   const handlePrev = () => {
-    if (!isTransitioning) {
+    if (!isTransitioning && filteredProducts.length > 0) {
       setIsTransitioning(true);
-      setStartIndex((prevIndex) => prevIndex - 1);
+      setStartIndex((prevIndex) => {
+        const prevIndexValue = prevIndex - 1;
+        return prevIndexValue < 0 ? filteredProducts.length - 1 : prevIndexValue;
+      });
     }
   };
 
@@ -94,10 +121,10 @@ const filteredProducts =
         setIsTransitioning(false);
         if (startIndex === -1) {
           setStartIndex(filteredProducts.length - 1);
-        } else if (startIndex === filteredProducts.length) {
+        } else if (startIndex >= filteredProducts.length) {
           setStartIndex(0);
         }
-      }, 1000);
+      }, 600); // Reduced transition time for better UX
       return () => clearTimeout(timeout);
     }
   }, [isTransitioning, startIndex, filteredProducts.length]);
@@ -142,64 +169,43 @@ const filteredProducts =
   }
 
   // Sliding view (default)
-  return (
-    <center>
-      <div className="prod-slide col-md-11">
-        {" "}
-        <Desktop>
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <MdNavigateBefore
-              onClick={handlePrev}
-              style={{ color: "#003057 ", fontSize: "38px" }}
-            />
+  if (filteredProducts.length === 0) {
+    return (
+      <div className="products-holder">
+        <div className="products-holder__empty">
+          <p>No products found.</p>
+        </div>
+      </div>
+    );
+  }
 
-            <MdNavigateNext
-              onClick={handleNext}
-              style={{ color: "#003057 ", fontSize: "38px" }}
-            />
-          </div>{" "}
-          <div
-            className="carousel"
-            style={{
-              display: "flex",
-              transition: isTransitioning ? "transform 1s ease-in-out" : "none",
-              transform: `translateX(-${
-                (100 / visibleItems) * actualStartIndex
-              }%)`,
-              width: `${(extendedProducts.length / visibleItems) * 25}%`,
-            }}
-          >
-            {extendedProducts.map((product, index) => (
-              <div
-                key={index}
-                style={{
-                  flex: `0 0 ${100 / visibleItems}%`,
-                  boxSizing: "border-box",
-                  padding: "10px",
-                }}
-              >
-                  <MainProduct
-                  productName={product.name}
-                  productPrice={product.price}
-                  firstImg={product.firstImg}
-                  hoverImg={product.hoverImg}
-                  id={product.id}
-                  onAddToCart={addToCart}
-                />
-              
-              </div>
-            ))}
-          </div>
-        </Desktop>
-        <TabletAndBelow>
-          <Carousel>
-            {extendedProducts.map((product, index) => (
-              <Carousel.Item key={index}>
+  return (
+    <div className="products-holder">
+      <div className="products-holder__container">
+        <Desktop>
+          <div className="products-holder__carousel-wrapper">
+            <button
+              type="button"
+              className="products-holder__nav-btn products-holder__nav-btn--prev"
+              onClick={handlePrev}
+              aria-label="Previous products"
+              disabled={isTransitioning}
+            >
+              <MdNavigateBefore />
+            </button>
+            <div
+              className={`products-holder__carousel ${isTransitioning ? "products-holder__carousel--transitioning" : ""}`}
+              style={{
+                transform: `translateX(-${(100 / visibleItems) * actualStartIndex}%)`,
+              }}
+            >
+              {extendedProducts.map((product, index) => (
                 <div
+                  key={`${product.id}-${index}`}
+                  className="products-holder__item"
                   style={{
-                    flex: "0 0 100%",
-                    boxSizing: "border-box",
-                    padding: "10px",
+                    flexBasis: `${100 / visibleItems}%`,
+                    maxWidth: `${100 / visibleItems}%`,
                   }}
                 >
                   <MainProduct
@@ -211,9 +217,43 @@ const filteredProducts =
                     onAddToCart={addToCart}
                   />
                 </div>
-              </Carousel.Item>
-            ))}
-          </Carousel>
+              ))}
+            </div>
+            <button
+              type="button"
+              className="products-holder__nav-btn products-holder__nav-btn--next"
+              onClick={handleNext}
+              aria-label="Next products"
+              disabled={isTransitioning}
+            >
+              <MdNavigateNext />
+            </button>
+          </div>
+        </Desktop>
+        <TabletAndBelow>
+          <div className="products-holder__mobile-carousel">
+            <Carousel
+              indicators={false}
+              controls={true}
+              interval={null}
+              touch={true}
+            >
+              {filteredProducts.map((product, index) => (
+                <Carousel.Item key={`${product.id}-${index}`}>
+                  <div className="products-holder__mobile-item">
+                    <MainProduct
+                      productName={product.name}
+                      productPrice={product.price}
+                      firstImg={product.firstImg}
+                      hoverImg={product.hoverImg}
+                      id={product.id}
+                      onAddToCart={addToCart}
+                    />
+                  </div>
+                </Carousel.Item>
+              ))}
+            </Carousel>
+          </div>
         </TabletAndBelow>
         {/* Cart Offcanvas */}
         {/* <CartOffcanvas
@@ -226,6 +266,6 @@ const filteredProducts =
           onDecrementQuantity={decrementQuantity}
         /> */}
       </div>
-    </center>
+    </div>
   );
 };

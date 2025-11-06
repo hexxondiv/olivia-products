@@ -1,7 +1,7 @@
 export const YoutubePosts = [
   {
     id: 1,
-    url: "https://www.youtube.com/watch?v=rZYZCTBdGqw&ab_channel=BritishSpringCollegeAwka",
+    url: "https://youtube.com/shorts/6AHIDaDFey4?si=ykvbhUBjsems6JzS",
     caption: "Campus Tour of British Spring College",
     description:
       "This video shows the landmax of B.S.C , it's aesthetically pleasing view and the ambience that surrounds the learning environment",
@@ -15,14 +15,14 @@ export const YoutubePosts = [
   },
   {
     id: 3,
-    url: "https://www.youtube.com/watch?v=R5pBi4SOJyE&ab_channel=BritishSpringCollegeAwka",
+    url: "https://youtube.com/shorts/?v=6AHIDaDFey4&si=ykvbhUBjsems6JzS",
     caption: "Celebrating Our Graduates!",
     description:
       "We are grateful to have been part of your journey and will fondly remember the Class of 2024 for the character of patience and discipline. Though you will be missed at BSC, your presence is needed beyond our walls. Stay focused, positive, and remember that God is your strength.",
   },
   {
     id: 4,
-    url: "https://www.youtube.com/watch?v=x7xabKvTWJQ&ab_channel=BritishSpringCollegeAwka",
+    url: "https://youtube.com/shorts/6AHIDaDFey4?si=ykvbhUBjsems6JzS",
     caption: "Celebrate Excellence, Inspire Tomorrow:",
     description: "BSC showcasing the values that define our institution.",
   },

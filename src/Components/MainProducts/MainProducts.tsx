@@ -36,6 +36,16 @@ const MainProduct: React.FC<ProductProps> = ({
     onAddToCart({ id, firstImg, hoverImg, productPrice, productName, rating });
   };
 
+  // Format price as currency
+  const formatCurrency = (price: number): string => {
+    return new Intl.NumberFormat('en-NG', {
+      style: 'currency',
+      currency: 'NGN',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(price);
+  };
+
 
 
 
@@ -74,9 +84,7 @@ const MainProduct: React.FC<ProductProps> = ({
             </button>
           )}
         </Desktop>
-      </div>
-
-      <div
+    <div
         className="d-flex prd-details"
         style={{ textAlign: "left", padding: "5px" }}
       >
@@ -86,8 +94,10 @@ const MainProduct: React.FC<ProductProps> = ({
         <h6 style={{color:"grey"}}>{rating}</h6>
         </div>
 
-        <h6 style={{color:"grey"}}>${productPrice.toFixed(2)}</h6>
-      </div>
+        <h6 style={{color:"grey"}}>{formatCurrency(productPrice)}</h6>
+      </div>  </div>
+
+      
     </>
   );
 };
