@@ -565,7 +565,7 @@ function getContactAcknowledgementEmailTemplate($contactData) {
                 <p style="margin: 5px 0;"><strong>Phone (Lagos):</strong> +234 901 419 6902</p>
                 <p style="margin: 5px 0;"><strong>WhatsApp:</strong> +234 912 350 9090</p>
                 <p style="margin: 5px 0;"><strong>Business Hours:</strong> Monday - Friday, 8am - 5pm</p>
-                <p style="margin: 5px 0;"><strong>Location:</strong> KM 8 Hadejia Road, Kano, Nigeria</p>
+                <p style="margin: 5px 0;"><strong>Location:</strong> Okaka plaza suite 1 first Avenue festac town, Lagos State</p>
             </div>
             
             <div style="text-align: center; margin-top: 30px;">
@@ -609,7 +609,7 @@ function getContactAcknowledgementEmailTextTemplate($contactData) {
     $text .= "Phone (Lagos): +234 901 419 6902\n";
     $text .= "WhatsApp: +234 912 350 9090\n";
     $text .= "Business Hours: Monday - Friday, 8am - 5pm\n";
-    $text .= "Location: KM 8 Hadejia Road, Kano, Nigeria\n\n";
+    $text .= "Location: Okaka plaza suite 1 first Avenue festac town, Lagos State\n\n";
     
     $text .= "We appreciate your interest in our products!\n\n";
     $text .= "Olivia Products\n";
@@ -864,7 +864,7 @@ function getWholesaleAcknowledgementEmailTemplate($wholesaleData) {
                 <p style="margin: 5px 0;"><strong>Phone (Lagos):</strong> +234 901 419 6902</p>
                 <p style="margin: 5px 0;"><strong>WhatsApp:</strong> +234 912 350 9090</p>
                 <p style="margin: 5px 0;"><strong>Business Hours:</strong> Monday - Friday, 8am - 5pm</p>
-                <p style="margin: 5px 0;"><strong>Location:</strong> KM 8 Hadejia Road, Kano, Nigeria</p>
+                <p style="margin: 5px 0;"><strong>Location:</strong> Okaka plaza suite 1 first Avenue festac town, Lagos State</p>
             </div>
             
             <div style="text-align: center; margin-top: 30px;">
@@ -910,7 +910,7 @@ function getWholesaleAcknowledgementEmailTextTemplate($wholesaleData) {
     $text .= "Phone (Lagos): +234 901 419 6902\n";
     $text .= "WhatsApp: +234 912 350 9090\n";
     $text .= "Business Hours: Monday - Friday, 8am - 5pm\n";
-    $text .= "Location: KM 8 Hadejia Road, Kano, Nigeria\n\n";
+    $text .= "Location: Okaka plaza suite 1 first Avenue festac town, Lagos State\n\n";
     
     $text .= "We look forward to the possibility of partnering with you!\n\n";
     $text .= "Olivia Products\n";

@@ -218,7 +218,7 @@ export const TermsAndConditions: React.FC = () => {
             <p>For questions about these Terms or partnership inquiries, please contact:</p>
             <div className="contact-info">
               <p><strong>Olivia Products Nigeria Ltd</strong></p>
-              <p>KM 8 Hadejia Road, Kano, Nigeria</p>
+              <p>Okaka plaza suite 1 first Avenue festac town, Lagos State</p>
               <p><strong>Email:</strong> <a href="mailto:Info@oliviaproducts.com">Info@oliviaproducts.com</a></p>
               <p><strong>Phone (Lagos):</strong> +234 901 419 6902</p>
               <p><strong>WhatsApp:</strong> +234 912 350 9090</p>

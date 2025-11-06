@@ -296,7 +296,7 @@ export const ContactUs = () => {
         <div className="col-md-5 gf-cova" >
           <div className="general-info">
             <h4>Olivia Products Nigeria Ltd</h4>
-            <p>Location:KM 8 Hadejia Road, Kano, Nigeria
+            <p>Location: Okaka plaza suite 1 first Avenue festac town, Lagos State
 
 </p>
 <p>Contact:
@@ -317,12 +317,12 @@ export const ContactUs = () => {
       </div>
       <div className="col-md-12">
         <iframe
-          src="https://www.google.com/maps/embed?pb=!1m23!1m12!1m3!1d126860.31946982247!2d3.5211543544462436!3d6.47282276268744!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m8!3e6!4m0!4m5!1s0x103bf73e807b9625%3A0x196ba6c7ae623509!2sLekki%20-%20Epe%20Expy%2C%20Ajah%2C%20Lagos%20106104%2C%20Lagos!3m2!1d6.472829399999999!2d3.6035562999999997!5e0!3m2!1sen!2sng!4v1745976278173!5m2!1sen!2sng"
+          src="https://www.google.com/maps?q=Okaka+plaza+suite+1+first+Avenue+festac+town+Lagos+State&output=embed"
           height="450"
           width="100%"
-          allowfullscreen=""
+          allowFullScreen=""
           loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade"
+          referrerPolicy="no-referrer-when-downgrade"
         ></iframe>
       </div>
     </div>

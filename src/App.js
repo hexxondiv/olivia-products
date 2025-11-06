@@ -10,6 +10,7 @@ import { ContactUs } from "./Pages/ContactUs/ContactUs";
 import { OrderForm } from "./Pages/ContactUs/OrderForm";
 import { WholeSalePage } from "./Pages/WholeSalePage/WholeSalePage";
 import { OurMission } from "./Pages/OurMission/OurMission";
+import { Careers } from "./Pages/Careers/Careers";
 import { Collections } from "./Pages/Collections/Collections";
 import { About } from "./Pages/About/About";
 import { FAQPage } from "./Pages/FAQPage/FAQPage";
@@ -60,6 +61,7 @@ function App() {
           <Route path="/wholesale-page" element={<WholeSalePage />} />{" "}
           <Route path="/about-us" element={<About />} />{" "}
           <Route path="/our-mission" element={<OurMission />} />{" "}
+          <Route path="/careers" element={<Careers />} />{" "}
           <Route path="/collections" element={<Collections />} />{" "}
           <Route path="/faqs" element={<FAQPage />} />{" "}
           <Route path="/checkout" element={<CheckoutPage />} />{" "}

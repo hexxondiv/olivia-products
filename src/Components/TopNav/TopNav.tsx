@@ -27,7 +27,7 @@ const primaryLinks = [
   { to: "/wholesale-page", label: "Retail" },
   { to: "/about-us", label: "About" },
   { to: "/our-mission", label: "OliviaCare" },
-  { to: "/our-mission", label: "Careers" },
+  { to: "/careers", label: "Careers" },
   { to: "/contact-us", label: "Contact" },
 ];
 

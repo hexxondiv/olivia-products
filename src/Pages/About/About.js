@@ -7,7 +7,7 @@ import Product4 from "../../assets/images/product4.avif";
 import Product5 from "../../assets/images/product5.avif";
 import Product6 from "../../assets/images/product6.avif";
 import Product7 from "../../assets/images/product7.avif";
-import VidBg from "../../assets/images/landscape.png";
+import VidBg from "../../assets/images/vid.png";
 import Fac1 from "../../assets/images/fac1.jpeg";
 import Fac2 from "../../assets/images/fac2.jpeg";
 import Fac3 from "../../assets/images/fac3.jpeg";
@@ -31,36 +31,36 @@ import VideoModal from "./VideoModal";
 
 const tabs = [
   {
-    label: "Tab 1",
+    label: "Our Journey",
     content: {
       image: Abt1,
-      heading: "DID YOU KNOW?",
-      heading2: "OUR SOLUTION",
-      description: "Only 5% of plastic actually gets recycled.",
+      heading: "15 YEARS OF EXCELLENCE",
+      heading2: "OUR COMMITMENT",
+      description: "Since 2009, Olivia Products has grown to become one of Nigeria's leading manufacturers of consumer care products.",
       description2:
-        "We made sure our bottles would be the last ones you'd ever need - made to be reused and refilled forever with plastic-free tablets.",
+        "With over 15 years of operations, we've built a reputation for quality, innovation, and trust. Our state-of-the-art manufacturing facility in Lagos produces world-class products that touch millions of lives daily across Nigeria.",
     },
   },
   {
-    label: "Tab 2",
+    label: "Product Quality",
     content: {
       image: Abt2,
-      heading: "DID YOU KNOW?",
-      heading2: "OUR SOLUTION",
-      description: "Only 5% of plastic actually gets recycled.",
+      heading: "RIGOROUS QUALITY STANDARDS",
+      heading2: "OUR PROMISE",
+      description: "Every product undergoes strict quality control and testing before reaching our customers.",
       description2:
-        "We made sure our bottles would be the last ones you'd ever need - made to be reused and refilled forever with plastic-free tablets.",
+        "From formulation to packaging, we ensure purity, safety, and exceptional performance. Our commitment to excellence has made Olivia Products a trusted household name, with products ranging from hair care and personal hygiene to household cleaning solutions.",
     },
   },
   {
-    label: "Tab 3",
+    label: "Market Leadership",
     content: {
       image: Abt3,
-      heading: "DID YOU KNOW?",
-      heading2: "OUR SOLUTION",
-      description: "Only 5% of plastic actually gets recycled.",
+      heading: "LEADING THE INDUSTRY",
+      heading2: "OUR IMPACT",
+      description: "We are the leading manufacturer of petroleum jelly in Nigeria, with a diverse portfolio of premium brands.",
       description2:
-        "We made sure our bottles would be the last ones you'd ever need - made to be reused and refilled forever with plastic-free tablets.",
+        "Our brands including Viva, Siri, Fizz, Oracare, Biotol, Sabil, Family Care, Baby & Me, Manuka & MP3 are trusted by millions. We continue to raise consumer satisfaction and market standards through innovation and world-class manufacturing practices.",
     },
   },
 ];
@@ -259,7 +259,7 @@ export const About = () => {
         }}
       >
         <center>
-          <h1>We Reimagined Everything</h1>
+          <h1>Our Story & Impact</h1>
         </center>
         <FactTab tabs={tabs} />
       </div>
