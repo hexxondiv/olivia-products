@@ -1,6 +1,21 @@
 <?php
 
 /**
+ * Format product name for display
+ * Ensures "Olivia" prefix and proper formatting
+ */
+function formatProductName($productName) {
+    $name = trim($productName);
+    
+    // If name doesn't start with "Olivia", add it
+    if (stripos($name, 'Olivia') !== 0) {
+        $name = 'Olivia ' . $name;
+    }
+    
+    return $name;
+}
+
+/**
  * Get sales team order email template (HTML with Bootstrap)
  */
 function getSalesOrderEmailTemplate($orderData) {
@@ -13,13 +28,14 @@ function getSalesOrderEmailTemplate($orderData) {
     $itemsHtml = '';
     foreach ($items as $item) {
         $itemTotal = number_format($item['productPrice'] * $item['quantity'], 2);
+        $formattedName = formatProductName($item['productName']);
         $itemsHtml .= '
         <tr>
             <td style="padding: 12px; border-bottom: 1px solid #e0e0e0;">
-                <img src="' . htmlspecialchars($item['firstImg']) . '" alt="' . htmlspecialchars($item['productName']) . '" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 2px solid #e0e0e0;">
+                <img src="' . htmlspecialchars($item['firstImg']) . '" alt="' . htmlspecialchars($formattedName) . '" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 2px solid #e0e0e0;">
             </td>
             <td style="padding: 12px; border-bottom: 1px solid #e0e0e0;">
-                <strong>' . htmlspecialchars($item['productName']) . '</strong>
+                <strong>' . htmlspecialchars($formattedName) . '</strong>
             </td>
             <td style="padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: center;">
                 ' . htmlspecialchars($item['quantity']) . '
@@ -160,7 +176,8 @@ function getSalesOrderEmailTextTemplate($orderData) {
     $text .= "-----------\n";
     foreach ($items as $item) {
         $itemTotal = number_format($item['productPrice'] * $item['quantity'], 2);
-        $text .= "- {$item['productName']} (Qty: {$item['quantity']}) - ₦{$itemTotal}\n";
+        $formattedName = formatProductName($item['productName']);
+        $text .= "- {$formattedName} (Qty: {$item['quantity']}) - ₦{$itemTotal}\n";
     }
     $text .= "\n";
     $text .= "TOTAL: ₦$total\n\n";
@@ -187,13 +204,14 @@ function getCustomerOrderEmailTemplate($orderData) {
     $itemsHtml = '';
     foreach ($items as $item) {
         $itemTotal = number_format($item['productPrice'] * $item['quantity'], 2);
+        $formattedName = formatProductName($item['productName']);
         $itemsHtml .= '
         <tr>
             <td style="padding: 12px; border-bottom: 1px solid #e0e0e0;">
-                <img src="' . htmlspecialchars($item['firstImg']) . '" alt="' . htmlspecialchars($item['productName']) . '" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 2px solid #e0e0e0;">
+                <img src="' . htmlspecialchars($item['firstImg']) . '" alt="' . htmlspecialchars($formattedName) . '" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 2px solid #e0e0e0;">
             </td>
             <td style="padding: 12px; border-bottom: 1px solid #e0e0e0;">
-                <strong>' . htmlspecialchars($item['productName']) . '</strong>
+                <strong>' . htmlspecialchars($formattedName) . '</strong>
             </td>
             <td style="padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: center;">
                 ' . htmlspecialchars($item['quantity']) . '
@@ -333,7 +351,8 @@ function getCustomerOrderEmailTextTemplate($orderData) {
     $text .= "-----------\n";
     foreach ($items as $item) {
         $itemTotal = number_format($item['productPrice'] * $item['quantity'], 2);
-        $text .= "- {$item['productName']} (Qty: {$item['quantity']}) - ₦{$itemTotal}\n";
+        $formattedName = formatProductName($item['productName']);
+        $text .= "- {$formattedName} (Qty: {$item['quantity']}) - ₦{$itemTotal}\n";
     }
     $text .= "\n";
     $text .= "TOTAL: ₦$total\n\n";

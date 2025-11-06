@@ -146,10 +146,14 @@
         margin-top: $spacing-2xl;
         padding-top: $spacing-xl;
         border-top: 2px solid rgba($color-navy, 0.1);
+        display: flex;
+        gap: $spacing-md;
+        flex-wrap: wrap;
 
         .submit-order-btn {
           @include modern-button("success", "lg");
-          width: 100%;
+          flex: 1;
+          min-width: 200px;
           font-size: $font-size-lg;
           padding: $spacing-lg $spacing-2xl;
 
@@ -162,6 +166,24 @@
           @media screen and (max-width: 576px) {
             padding: $spacing-md $spacing-lg;
             font-size: $font-size-base;
+            min-width: 100%;
+          }
+
+          &.whatsapp-btn {
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            border-color: #25D366;
+            color: #fff;
+
+            &:hover:not(:disabled) {
+              background: linear-gradient(135deg, #20BA5A 0%, #0F7A6D 100%);
+              border-color: #20BA5A;
+              transform: translateY(-2px);
+              box-shadow: 0 8px 20px rgba(37, 211, 102, 0.3);
+            }
+
+            &:active:not(:disabled) {
+              transform: translateY(0);
+            }
           }
         }
       }

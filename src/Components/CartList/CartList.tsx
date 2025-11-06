@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import { Offcanvas } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../../CartContext";
+import { allProductsData } from "../../TestData/allProductsData";
 import "./cart-list.scss";
 import { MdDelete } from "react-icons/md";
 import { BiSearch } from "react-icons/bi";
@@ -20,14 +21,28 @@ const CartOffcanvas: React.FC = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
 
+  const formatProductName = (item: any): string => {
+    // Look up the full product data to get name and sufix
+    const product = allProductsData.find((p) => p.id === item.id);
+    if (product) {
+      // Format as "Olivia {name}{sufix}" - trim any trailing spaces from name
+      const name = (product.name || "").trim();
+      const sufix = product.sufix || "";
+      return `Olivia ${name}${sufix ? ` ${sufix}` : ""}`;
+    }
+    // Fallback to cart item name if product not found
+    return item.productName.trim();
+  };
+
   const filteredCart = useMemo(() => {
     if (!searchQuery.trim()) {
       return cart;
     }
     const query = searchQuery.toLowerCase().trim();
-    return cart.filter((item) =>
-      item.productName.toLowerCase().includes(query)
-    );
+    return cart.filter((item) => {
+      const formattedName = formatProductName(item);
+      return formattedName.toLowerCase().includes(query);
+    });
   }, [cart, searchQuery]);
 
   const calculateTotalPrice = () =>
@@ -109,10 +124,10 @@ const CartOffcanvas: React.FC = () => {
                   <img
                     className="item-image"
                     src={item.firstImg}
-                    alt={item.productName}
+                    alt={formatProductName(item)}
                   />
                   <div className="item-details">
-                    <p className="item-name">{item.productName}</p>
+                    <p className="item-name">{formatProductName(item)}</p>
                   </div>
                 </Link>
                 <div className="item-actions">

@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import { useNavigate, useLocation, Link } from "react-router-dom";
+import { allProductsData } from "../../TestData/allProductsData";
 import "./success-page.scss";
 import { MdCheckCircle, MdShoppingBag, MdHome } from "react-icons/md";
 
@@ -67,6 +68,19 @@ export const SuccessPage: React.FC = () => {
       hour: "2-digit",
       minute: "2-digit",
     });
+  };
+
+  const formatProductName = (item: OrderItem): string => {
+    // Look up the full product data to get name and sufix
+    const product = allProductsData.find((p) => p.id === item.id);
+    if (product) {
+      // Format as "Olivia {name}{sufix}" - trim any trailing spaces from name
+      const name = (product.name || "").trim();
+      const sufix = product.sufix || "";
+      return `Olivia ${name}${sufix ? ` ${sufix}` : ""}`;
+    }
+    // Fallback to cart item name if product not found
+    return item.productName.trim();
   };
 
   return (
@@ -159,9 +173,9 @@ export const SuccessPage: React.FC = () => {
               <div className="order-items-list">
                 {orderData.items.map((item) => (
                   <div key={item.id} className="order-item-card">
-                    <img src={item.firstImg} alt={item.productName} className="item-image" />
+                    <img src={item.firstImg} alt={formatProductName(item)} className="item-image" />
                     <div className="item-info">
-                      <h4 className="item-name">{item.productName}</h4>
+                      <h4 className="item-name">{formatProductName(item)}</h4>
                       <div className="item-details">
                         <span className="item-quantity">Quantity: {item.quantity}</span>
                         <span className="item-price">{formatCurrency(item.productPrice * item.quantity)}</span>

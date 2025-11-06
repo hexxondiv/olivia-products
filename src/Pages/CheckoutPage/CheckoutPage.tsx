@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import { useNavigate, Link } from "react-router-dom";
 import { useCart } from "../../CartContext";
+import { allProductsData } from "../../TestData/allProductsData";
 import "./checkout-page.scss";
 import { MdDelete } from "react-icons/md";
 
@@ -41,6 +42,119 @@ export const CheckoutPage: React.FC = () => {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(amount);
+  };
+
+  const formatProductName = (item: any): string => {
+    // Look up the full product data to get name and sufix
+    const product = allProductsData.find((p) => p.id === item.id);
+    if (product) {
+      // Format as "Olivia {name}{sufix}" - trim any trailing spaces from name
+      const name = (product.name || "").trim();
+      const sufix = product.sufix || "";
+      return `Olivia ${name}${sufix ? ` ${sufix}` : ""}`;
+    }
+    // Fallback to cart item name if product not found
+    return item.productName.trim();
+  };
+
+  const generateOrderId = () => {
+    // Generate Order ID similar to PHP backend: ORD-YYYYMMDD-XXXXXXXX
+    const date = new Date();
+    const dateStr = date.toISOString().slice(0, 10).replace(/-/g, ''); // YYYYMMDD
+    const randomStr = Math.random().toString(36).substring(2, 10).toUpperCase(); // 8 random chars
+    return `ORD-${dateStr}-${randomStr}`;
+  };
+
+  const formatOrderForWhatsApp = () => {
+    const salesWhatsAppNumber = "+2348068122576";
+    const orderId = generateOrderId();
+    const orderDate = new Date().toLocaleString("en-NG", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    
+    let message = "Hello! 👋\n\n";
+    message += "I'd like to place a _new order_. Here are the details:\n\n";
+    
+    message += "🆔 *Order ID:* `" + orderId + "`\n";
+    message += "📆 *Order Date:* " + orderDate + "\n\n";
+    
+    message += "*👤 CUSTOMER INFORMATION*\n";
+    message += `*Name:* ${formData.fullName}\n`;
+    message += `*Email:* ${formData.email}\n`;
+    message += `*Phone:* ${formData.phone}\n\n`;
+    
+    message += "*🏠 SHIPPING ADDRESS*\n";
+    message += `${formData.address}\n`;
+    message += `${formData.city}, ${formData.state}`;
+    if (formData.postalCode) {
+      message += ` ${formData.postalCode}`;
+    }
+    message += "\n\n";
+    
+    message += "*🛒 ORDER ITEMS*\n";
+    cart.forEach((item, index) => {
+      const formattedName = formatProductName(item);
+      message += `*${index + 1}. ${formattedName}*\n`;
+      message += `   Qty: *${item.quantity}* × ${formatCurrency(item.productPrice)} = *${formatCurrency(item.productPrice * item.quantity)}*\n\n`;
+    });
+    
+    message += `*💵 TOTAL AMOUNT: ${formatCurrency(calculateTotalPrice())}*\n\n`;
+    
+    if (formData.notes) {
+      message += "*📄 SPECIAL NOTES:*\n";
+      message += `_${formData.notes}_\n\n`;
+    }
+    
+    message += "Thank you! Looking forward to your confirmation. 😊";
+    
+    // Encode message for URL
+    const encodedMessage = encodeURIComponent(message);
+    
+    // Create WhatsApp URL
+    const whatsappUrl = `https://wa.me/${salesWhatsAppNumber.replace(/[^0-9]/g, "")}?text=${encodedMessage}`;
+    
+    return whatsappUrl;
+  };
+
+  const handleWhatsAppSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitError(null);
+
+    if (cart.length === 0) {
+      alert("Your cart is empty. Please add items to your cart before checkout.");
+      navigate("/collections");
+      return;
+    }
+
+    if (!validateForm()) {
+      return;
+    }
+
+    // Open WhatsApp with pre-filled message
+    const whatsappUrl = formatOrderForWhatsApp();
+    window.open(whatsappUrl, "_blank");
+    
+    // Clear cart after opening WhatsApp
+    clearCart();
+    
+    // Generate order ID for WhatsApp submission
+    const orderId = generateOrderId();
+    
+    // Navigate to success page
+    navigate("/order-success", {
+      state: {
+        customer: formData,
+        items: cart,
+        total: calculateTotalPrice(),
+        orderDate: new Date().toISOString(),
+        orderId: orderId,
+        submittedVia: "whatsapp",
+      },
+    });
   };
 
   const handleInputChange = (
@@ -213,7 +327,7 @@ export const CheckoutPage: React.FC = () => {
         </div>
 
         <Row className="checkout-content">
-          <Col lg={7} className="checkout-form-section">
+          <Col lg={6} className="checkout-form-section">
             <form onSubmit={handleSubmit} className="checkout-form">
               <div className="form-section">
                 <h2>Shipping Information</h2>
@@ -378,11 +492,19 @@ export const CheckoutPage: React.FC = () => {
                 >
                   {isSubmitting ? "Processing Order..." : "Place Order"}
                 </button>
+                <button 
+                  type="button" 
+                  className="submit-order-btn whatsapp-btn"
+                  onClick={handleWhatsAppSubmit}
+                  disabled={isSubmitting}
+                >
+                  📱 Submit via WhatsApp
+                </button>
               </div>
             </form>
           </Col>
 
-          <Col lg={4} className="order-summary-section">
+          <Col lg={5} className="order-summary-section">
             <div className="order-summary">
               <h2>Order Summary</h2>
 
@@ -392,12 +514,12 @@ export const CheckoutPage: React.FC = () => {
                     <div className="item-image-wrapper">
                       <img
                         src={item.firstImg}
-                        alt={item.productName}
+                        alt={formatProductName(item)}
                         className="item-image"
                       />
                     </div>
                     <div className="item-details">
-                      <h4 className="item-name">{item.productName}</h4>
+                      <h4 className="item-name">{formatProductName(item)}</h4>
                       <div className="item-meta">
                         <div className="quantity-controls">
                           <button
