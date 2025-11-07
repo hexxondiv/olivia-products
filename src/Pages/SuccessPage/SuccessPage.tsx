@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { allProductsData } from "../../TestData/allProductsData";
+import { useProducts } from "../../ProductsContext";
 import "./success-page.scss";
 import { MdCheckCircle, MdShoppingBag, MdHome } from "react-icons/md";
 
@@ -39,6 +39,7 @@ export const SuccessPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const orderData = location.state as OrderData | null;
+  const { getProductById } = useProducts();
 
   useEffect(() => {
     // Redirect to home if no order data (direct access)
@@ -73,7 +74,7 @@ export const SuccessPage: React.FC = () => {
 
   const formatProductName = (item: OrderItem): string => {
     // Look up the full product data to get name and sufix
-    const product = allProductsData.find((p) => p.id === item.id);
+    const product = getProductById(item.id);
     if (product) {
       // Format as "Olivia {name} {sufix}" - trim both name and sufix, ensure proper spacing
       const name = (product.name || "").trim();

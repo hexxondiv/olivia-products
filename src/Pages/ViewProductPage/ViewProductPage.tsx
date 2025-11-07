@@ -1,10 +1,11 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { allProductsData } from "../../TestData/allProductsData";
+import { useProducts } from "../../ProductsContext";
 import { useCart } from "../../CartContext";
 import "./view-product.scss";
 import { Desktop, TabletAndBelow } from "../../Utils/mediaQueries";
+import { Spinner, Alert } from "react-bootstrap";
 
 const PRODUCT_DETAIL_BASE = "/product";
 
@@ -16,13 +17,14 @@ export const ViewProductPage: React.FC = () => {
   const [transitionDirection, setTransitionDirection] = useState<"left" | "right">("right");
   const [quantity, setQuantity] = useState(1);
   const { addToCart, cart, updateQuantity } = useCart();
+  const { getProductById, products: allProductsData, loading, error } = useProducts();
 
   // Always call hooks before any early returns
   const product = useMemo(() => {
     const pid = Number(id);
     if (Number.isNaN(pid)) return undefined;
-    return allProductsData.find((p) => p.id === pid);
-  }, [id]);
+    return getProductById(pid);
+  }, [id, getProductById]);
 
   const images = useMemo(() => {
     if (!product) return [];
@@ -47,7 +49,7 @@ export const ViewProductPage: React.FC = () => {
           .some((c) => set.has(c))
       )
       .slice(0, 8);
-  }, [product, cleanCats]);
+  }, [product, cleanCats, allProductsData]);
 
   useEffect(() => {
     setActiveImage(0);
@@ -63,11 +65,36 @@ export const ViewProductPage: React.FC = () => {
 
   const primaryCategory = cleanCats[0] || "";
 
+  // Handle loading state
+  if (loading) {
+    return (
+      <div className="container py-5 text-center">
+        <Spinner animation="border" variant="primary" />
+        <p className="mt-3">Loading product...</p>
+      </div>
+    );
+  }
+
+  // Handle error state
+  if (error) {
+    return (
+      <div className="container py-5">
+        <Alert variant="danger">
+          <Alert.Heading>Error loading product</Alert.Heading>
+          <p>{error}</p>
+          <button className="btn btn-outline-secondary" onClick={() => navigate(-1)}>
+            Go back
+          </button>
+        </Alert>
+      </div>
+    );
+  }
+
   // EARLY RETURN — make sure we return JSX or null
   if (!product) {
     return (
       <div className="container py-5">
-        <p>That product wasn’t found.</p>
+        <p>That product wasn't found.</p>
         <button className="btn btn-outline-secondary" onClick={() => navigate(-1)}>
           Go back
         </button>

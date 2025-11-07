@@ -1,0 +1,281 @@
+import React, { useState, useEffect } from 'react';
+import { CMSLayout } from './CMSLayout';
+import { Table, Button, Badge, Form, Alert, Spinner, Modal } from 'react-bootstrap';
+import { useSearchParams } from 'react-router-dom';
+import { FaEye, FaTrash } from 'react-icons/fa';
+import { getApiUrl } from '../../Utils/apiConfig';
+import './cms-modals.scss';
+
+interface Wholesale {
+  id: number;
+  formType: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  businessName: string;
+  city: string;
+  state: string;
+  country: string;
+  aboutBusiness: string;
+  businessTypes: string[];
+  status: string;
+  createdAt: string;
+}
+
+export const CMSWholesale: React.FC = () => {
+  const [wholesale, setWholesale] = useState<Wholesale[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [selectedWholesale, setSelectedWholesale] = useState<Wholesale | null>(null);
+  const statusFilter = searchParams.get('status') || '';
+  const typeFilter = searchParams.get('formType') || '';
+
+  useEffect(() => {
+    fetchWholesale();
+  }, [statusFilter, typeFilter]);
+
+  const fetchWholesale = async () => {
+    try {
+      const apiUrl = getApiUrl();
+      let url = `${apiUrl}/wholesale.php`;
+      const params = new URLSearchParams();
+      if (statusFilter) params.append('status', statusFilter);
+      if (typeFilter) params.append('formType', typeFilter);
+      if (params.toString()) url += '?' + params.toString();
+      
+      const response = await fetch(url);
+      const data = await response.json();
+      
+      if (data.success) {
+        setWholesale(data.data || []);
+      } else {
+        setError('Failed to load wholesale applications');
+      }
+    } catch (err) {
+      setError('Failed to load wholesale applications');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStatusChange = async (id: number, newStatus: string) => {
+    try {
+      const token = localStorage.getItem('cms_token');
+      const apiUrl = getApiUrl();
+      const response = await fetch(`${apiUrl}/wholesale.php?id=${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (response.ok) {
+        fetchWholesale();
+      } else {
+        alert('Failed to update application status');
+      }
+    } catch (err) {
+      alert('Failed to update application status');
+      console.error(err);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!window.confirm('Are you sure you want to delete this application?')) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('cms_token');
+      const apiUrl = getApiUrl();
+      const response = await fetch(`${apiUrl}/wholesale.php?id=${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        fetchWholesale();
+      } else {
+        alert('Failed to delete application');
+      }
+    } catch (err) {
+      alert('Failed to delete application');
+      console.error(err);
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    const variants: { [key: string]: string } = {
+      new: 'primary',
+      reviewing: 'info',
+      approved: 'success',
+      rejected: 'danger',
+      archived: 'secondary',
+    };
+    return variants[status] || 'secondary';
+  };
+
+  if (loading) {
+    return (
+      <CMSLayout>
+        <div className="text-center py-5">
+          <Spinner animation="border" />
+        </div>
+      </CMSLayout>
+    );
+  }
+
+  return (
+    <CMSLayout>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h1>Wholesale Applications</h1>
+        <div className="cms-btn-group">
+          <Button
+            variant={statusFilter === '' ? 'primary' : 'outline-primary'}
+            onClick={() => setSearchParams({})}
+          >
+            All
+          </Button>
+          <Button
+            variant={statusFilter === 'new' ? 'primary' : 'outline-primary'}
+            onClick={() => setSearchParams({ status: 'new' })}
+          >
+            New
+          </Button>
+          <Button
+            variant={statusFilter === 'reviewing' ? 'info' : 'outline-info'}
+            onClick={() => setSearchParams({ status: 'reviewing' })}
+          >
+            Reviewing
+          </Button>
+          <Button
+            variant={statusFilter === 'approved' ? 'success' : 'outline-success'}
+            onClick={() => setSearchParams({ status: 'approved' })}
+          >
+            Approved
+          </Button>
+        </div>
+      </div>
+
+      {error && <Alert variant="danger">{error}</Alert>}
+
+      <div className="cms-table">
+        <Table striped bordered hover>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Type</th>
+              <th>Name</th>
+              <th>Business</th>
+              <th>Email</th>
+              <th>Location</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {wholesale.map((app) => (
+              <tr key={app.id}>
+                <td>{app.id}</td>
+                <td>
+                  <Badge bg="secondary">{app.formType}</Badge>
+                </td>
+                <td>{app.firstName} {app.lastName}</td>
+                <td>{app.businessName}</td>
+                <td>{app.email}</td>
+                <td>{app.city}, {app.state}</td>
+                <td>
+                  <Badge bg={getStatusBadge(app.status)}>
+                    {app.status}
+                  </Badge>
+                </td>
+                <td>{new Date(app.createdAt).toLocaleDateString()}</td>
+                <td>
+                  <Form.Select
+                    size="sm"
+                    value={app.status}
+                    onChange={(e) => handleStatusChange(app.id, e.target.value)}
+                    style={{ width: 'auto', display: 'inline-block' }}
+                  >
+                    <option value="new">New</option>
+                    <option value="reviewing">Reviewing</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
+                    <option value="archived">Archived</option>
+                  </Form.Select>
+                  <Button
+                    variant="outline-info"
+                    size="sm"
+                    className="ms-2"
+                    onClick={() => setSelectedWholesale(app)}
+                  >
+                    <FaEye />
+                  </Button>
+                  <Button
+                    variant="outline-danger"
+                    size="sm"
+                    className="ms-2"
+                    onClick={() => handleDelete(app.id)}
+                  >
+                    <FaTrash />
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </div>
+
+      {wholesale.length === 0 && (
+        <div className="text-center py-5">
+          <p>No applications found</p>
+        </div>
+      )}
+
+      {selectedWholesale && (
+        <Modal show={!!selectedWholesale} onHide={() => setSelectedWholesale(null)} size="lg" className="cms-modal-wholesale-details">
+          <Modal.Header closeButton>
+            <Modal.Title>Application Details - {selectedWholesale.formType}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p><strong>Name:</strong> {selectedWholesale.firstName} {selectedWholesale.lastName}</p>
+            <p><strong>Email:</strong> {selectedWholesale.email}</p>
+            <p><strong>Phone:</strong> {selectedWholesale.phone}</p>
+            <p><strong>Business Name:</strong> {selectedWholesale.businessName}</p>
+            <p><strong>Location:</strong> {selectedWholesale.city}, {selectedWholesale.state}, {selectedWholesale.country}</p>
+            <p><strong>Status:</strong> <Badge bg={getStatusBadge(selectedWholesale.status)}>{selectedWholesale.status}</Badge></p>
+            <p><strong>Date:</strong> {new Date(selectedWholesale.createdAt).toLocaleString()}</p>
+            {selectedWholesale.businessTypes && selectedWholesale.businessTypes.length > 0 && (
+              <div className="mt-2">
+                <strong>Business Types:</strong>
+                <div className="business-types">
+                  {selectedWholesale.businessTypes.map((type, idx) => (
+                    <Badge key={idx} bg="warning" text="dark">{type}</Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+            <div className="mt-3">
+              <strong>About Business:</strong>
+              <div className="business-info">{selectedWholesale.aboutBusiness}</div>
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setSelectedWholesale(null)}>
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      )}
+    </CMSLayout>
+  );
+};
+

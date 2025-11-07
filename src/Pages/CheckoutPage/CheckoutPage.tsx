@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import { useNavigate, Link } from "react-router-dom";
 import { useCart } from "../../CartContext";
-import { allProductsData } from "../../TestData/allProductsData";
+import { useProducts } from "../../ProductsContext";
 import "./checkout-page.scss";
 import { MdDelete, MdEmail } from "react-icons/md";
 import { FaWhatsapp } from "react-icons/fa";
@@ -16,6 +16,7 @@ export const CheckoutPage: React.FC = () => {
     decrementQuantity,
     clearCart,
   } = useCart();
+  const { getProductById } = useProducts();
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -47,7 +48,7 @@ export const CheckoutPage: React.FC = () => {
 
   const formatProductName = (item: any): string => {
     // Look up the full product data to get name and sufix
-    const product = allProductsData.find((p) => p.id === item.id);
+    const product = getProductById(item.id);
     if (product) {
       // Format as "Olivia {name} {sufix}" - trim both name and sufix, ensure proper spacing
       const name = (product.name || "").trim();
@@ -122,41 +123,105 @@ export const CheckoutPage: React.FC = () => {
     return whatsappUrl;
   };
 
-  const handleWhatsAppSubmit = (e: React.FormEvent) => {
+  const handleWhatsAppSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitError(null);
+    setIsSubmitting(true);
 
     if (cart.length === 0) {
       alert("Your cart is empty. Please add items to your cart before checkout.");
       navigate("/collections");
+      setIsSubmitting(false);
       return;
     }
 
     if (!validateForm()) {
+      setIsSubmitting(false);
       return;
     }
 
-    // Generate order ID once and reuse it for both WhatsApp message and success page
-    const orderId = generateOrderId();
-    
-    // Open WhatsApp with pre-filled message (using the same orderId)
-    const whatsappUrl = formatOrderForWhatsApp(orderId);
-    window.open(whatsappUrl, "_blank");
-    
-    // Clear cart after opening WhatsApp
-    clearCart();
-    
-    // Navigate to success page with the same orderId
-    navigate("/order-success", {
-      state: {
-        customer: formData,
-        items: cart,
-        total: calculateTotalPrice(),
-        orderDate: new Date().toISOString(),
-        orderId: orderId,
-        submittedVia: "whatsapp",
-      },
-    });
+    // Prepare order data
+    const orderData = {
+      customer: formData,
+      items: cart,
+      total: calculateTotalPrice(),
+      orderDate: new Date().toISOString(),
+      submittedVia: "whatsapp",
+    };
+
+    try {
+      // Determine API endpoint URL
+      // For submit-order.php, we need the full endpoint URL, not just the base
+      const baseApiUrl = process.env.REACT_APP_API_URL || '/api';
+      // If it's already a full URL with submit-order.php, use it; otherwise append
+      const submitUrl = baseApiUrl.includes('submit-order.php') 
+        ? baseApiUrl 
+        : baseApiUrl.includes('.php')
+          ? baseApiUrl.replace(/[^/]+\.php$/, 'submit-order.php')
+          : `${baseApiUrl}/submit-order.php`;
+      
+      // Send order to PHP backend to save to database
+      const response = await fetch(submitUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData),
+      });
+
+      // Check if response is JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('Non-JSON response:', text);
+        throw new Error('Server returned an invalid response. Please try again or contact support.');
+      }
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || 'Failed to submit order. Please try again.');
+      }
+
+      // Order saved to database successfully
+      console.log("Order saved to database:", result);
+      
+      // Generate order ID from result or create one
+      const orderId = result.orderId || generateOrderId();
+      
+      // Open WhatsApp with pre-filled message (using the orderId from database)
+      const whatsappUrl = formatOrderForWhatsApp(orderId);
+      window.open(whatsappUrl, "_blank");
+      
+      // Clear cart after opening WhatsApp
+      clearCart();
+      
+      // Navigate to success page with order data (including orderId from server)
+      navigate("/order-success", {
+        state: {
+          ...orderData,
+          orderId: orderId,
+          submittedVia: "whatsapp",
+          salesEmailSent: result.salesEmailSent,
+          customerEmailSent: result.customerEmailSent,
+        },
+      });
+    } catch (error) {
+      console.error("Error submitting WhatsApp order:", error);
+      
+      let errorMessage = 'Failed to submit order. Please try again or contact support.';
+      
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        errorMessage = 'Network error: Unable to connect to server. Please check your connection and try again.';
+      } else if (error instanceof SyntaxError) {
+        errorMessage = 'Server response error. Please try again or contact support.';
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
+      setSubmitError(errorMessage);
+      setIsSubmitting(false);
+    }
   };
 
   const handleInputChange = (

@@ -2,7 +2,7 @@ import React, { useState, useMemo } from "react";
 import { Offcanvas } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../../CartContext";
-import { allProductsData } from "../../TestData/allProductsData";
+import { useProducts } from "../../ProductsContext";
 import "./cart-list.scss";
 import { MdDelete } from "react-icons/md";
 import { BiSearch } from "react-icons/bi";
@@ -18,12 +18,13 @@ const CartOffcanvas: React.FC = () => {
     incrementQuantity,
     decrementQuantity,
   } = useCart();
+  const { getProductById } = useProducts();
 
   const [searchQuery, setSearchQuery] = useState("");
 
   const formatProductName = (item: any): string => {
     // Look up the full product data to get name and sufix
-    const product = allProductsData.find((p) => p.id === item.id);
+    const product = getProductById(item.id);
     if (product) {
       // Format as "Olivia {name} {sufix}" - trim both name and sufix, ensure proper spacing
       const name = (product.name || "").trim();

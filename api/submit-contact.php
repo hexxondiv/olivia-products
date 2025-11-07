@@ -43,6 +43,11 @@ try {
         throw new Exception('Mailgun helper file not found');
     }
     require_once __DIR__ . '/mailgun-helper.php';
+    
+    if (!file_exists(__DIR__ . '/database.php')) {
+        throw new Exception('Database helper file not found');
+    }
+    require_once __DIR__ . '/database.php';
 } catch (Exception $e) {
     ob_clean();
     http_response_code(500);
@@ -134,6 +139,34 @@ try {
     
     if (!empty($warnings)) {
         $message .= '. Note: ' . implode(', ', $warnings);
+    }
+    
+    // Save contact submission to database
+    try {
+        $contactSql = "INSERT INTO contact_submissions (fullName, email, phone, address, message, 
+                       status, submittedVia, contactEmailSent, acknowledgementEmailSent) 
+                       VALUES (?, ?, ?, ?, ?, 'new', ?, ?, ?)";
+        
+        $contactParams = [
+            $contactData['fullName'],
+            $contactData['email'] ?? null,
+            $contactData['phone'],
+            $contactData['address'] ?? null,
+            $contactData['message'],
+            $contactData['submittedVia'] ?? 'email',
+            $contactEmailResult ? 1 : 0,
+            $acknowledgementEmailResult ? 1 : 0
+        ];
+        
+        $contactId = dbExecute($contactSql, $contactParams);
+        if ($contactId) {
+            error_log("Contact submission saved to database with ID: $contactId");
+        } else {
+            error_log("Failed to save contact submission to database");
+        }
+    } catch (Exception $e) {
+        error_log("Error saving contact submission to database: " . $e->getMessage());
+        // Continue even if database save fails
     }
     
     // Return success response

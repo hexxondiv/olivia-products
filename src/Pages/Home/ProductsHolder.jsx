@@ -4,8 +4,9 @@ import { Link, useLocation } from "react-router-dom";
 // import CartOffcanvas from "../../Components/CartList/CartList";
 import MainProduct from "../../Components/MainProducts/MainProducts";
 import Carousel from "react-bootstrap/Carousel";
+import { Spinner } from "react-bootstrap";
 
-import { allProductsData } from "../../TestData/allProductsData";
+import { useProducts } from "../../ProductsContext";
 import { useCart } from "../../CartContext";
 import { MdNavigateBefore, MdNavigateNext } from "react-icons/md";
 import { Desktop, TabletAndBelow } from "../../Utils/mediaQueries";
@@ -28,45 +29,52 @@ export const ProductsHolder = ({
   const queryParams = new URLSearchParams(location.search);
   const categoryFromQuery = queryParams.get("category") || "";
 
+  // Get products from context - MUST be called before any early returns
+  const { products: allProductsData, loading, error } = useProducts();
   
+  // Get cart context - MUST be called before any early returns
+  const {
+    cart,
+    setIsOffCanvasOpen,
+    addToCart,
+    removeFromCart,
+    clearCart,
+    incrementQuantity,
+    decrementQuantity,
+  } = useCart();
 
-  
+  // Step 1: Optionally filter for best sellers
+  let productsToDisplay = allProductsData;
+  if (showOnlyBestSellers) {
+    productsToDisplay = allProductsData.filter(product => product.bestSeller);
+  }
 
-// Step 1: Optionally filter for best sellers
-let productsToDisplay = allProductsData;
-if (showOnlyBestSellers) {
-  productsToDisplay = allProductsData.filter(product => product.bestSeller);
-}
+  // Step 2: Category filtering
+  let categoryFiltered = categoryFromQuery === "*" || categoryFromQuery === ""
+    ? productsToDisplay
+    : productsToDisplay.filter((product) =>
+        product.category.some(
+          (cat) => cat.toLowerCase() === categoryFromQuery.toLowerCase()
+        )
+      );
 
-// Step 2: Category filtering
-let categoryFiltered = categoryFromQuery === "*" || categoryFromQuery === ""
-  ? productsToDisplay
-  : productsToDisplay.filter((product) =>
-      product.category.some(
-        (cat) => cat.toLowerCase() === categoryFromQuery.toLowerCase()
-      )
-    );
-
-// Step 3: Search filtering
-const filteredProducts = searchQuery.trim()
-  ? categoryFiltered.filter((product) => {
-      const query = searchQuery.toLowerCase().trim();
-      const searchableText = [
-        product.name || "",
-        product.heading || "",
-        product.detail || "",
-        product.moreDetail || "",
-        product.sufix || "",
-        ...(product.category || []),
-      ]
-        .join(" ")
-        .toLowerCase();
-      return searchableText.includes(query);
-    })
-  : categoryFiltered;
-
-
-
+  // Step 3: Search filtering
+  const filteredProducts = searchQuery.trim()
+    ? categoryFiltered.filter((product) => {
+        const query = searchQuery.toLowerCase().trim();
+        const searchableText = [
+          product.name || "",
+          product.heading || "",
+          product.detail || "",
+          product.moreDetail || "",
+          product.sufix || "",
+          ...(product.category || []),
+        ]
+          .join(" ")
+          .toLowerCase();
+        return searchableText.includes(query);
+      })
+    : categoryFiltered;
 
   // Sorting logic based on sortType
   const sortedProducts = [...filteredProducts].sort((a, b) => {
@@ -98,20 +106,7 @@ const filteredProducts = searchQuery.trim()
   ];
   const actualStartIndex = startIndex + visibleItems;
 
-  const handleNext = () => {
-    if (!isTransitioning) {
-      setIsTransitioning(true);
-      setStartIndex((prevIndex) => prevIndex + 1);
-    }
-  };
-
-  const handlePrev = () => {
-    if (!isTransitioning) {
-      setIsTransitioning(true);
-      setStartIndex((prevIndex) => prevIndex - 1);
-    }
-  };
-
+  // useEffect MUST be called before any early returns
   useEffect(() => {
     if (isTransitioning) {
       const timeout = setTimeout(() => {
@@ -126,16 +121,39 @@ const filteredProducts = searchQuery.trim()
     }
   }, [isTransitioning, startIndex, filteredProducts.length]);
 
-  const {
-   
-  cart,
-  setIsOffCanvasOpen,
-  addToCart,
-  removeFromCart,
-  clearCart,
-  incrementQuantity,
-  decrementQuantity,
-} = useCart();
+  const handleNext = () => {
+    if (!isTransitioning) {
+      setIsTransitioning(true);
+      setStartIndex((prevIndex) => prevIndex + 1);
+    }
+  };
+
+  const handlePrev = () => {
+    if (!isTransitioning) {
+      setIsTransitioning(true);
+      setStartIndex((prevIndex) => prevIndex - 1);
+    }
+  };
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="text-center py-5">
+        <Spinner animation="border" variant="primary" />
+        <p className="mt-3">Loading products...</p>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="text-center py-5">
+        <p className="text-danger">Error loading products: {error}</p>
+        <p className="text-muted">Please refresh the page or contact support.</p>
+      </div>
+    );
+  }
 
 
   // Render logic based on viewType

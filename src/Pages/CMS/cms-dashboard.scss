@@ -1,0 +1,355 @@
+// CMS Dashboard Styles with Bootstrap and Sass
+
+// Import Sass color module
+@use "sass:color";
+
+// Import Bootstrap variables and mixins
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/mixins";
+
+// Dashboard Container
+.cms-dashboard {
+  padding: 2rem 0;
+
+  h1 {
+    font-weight: 600;
+    color: $gray-800;
+    margin-bottom: 2rem;
+  }
+}
+
+// Stat Cards Container
+.cms-stats {
+  margin-bottom: 2.5rem;
+  gap: 1.5rem;
+
+  @include media-breakpoint-up(lg) {
+    gap: 2rem;
+  }
+
+  @include media-breakpoint-down(md) {
+    gap: 1rem;
+  }
+}
+
+// Individual Stat Card
+.cms-stat-card {
+  background: $white;
+  border: none;
+  border-radius: $border-radius-lg;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  overflow: hidden;
+  position: relative;
+  height: 100%;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+
+  // Hover effect
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    text-decoration: none;
+  }
+
+  // Colored left border with gradient
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, var(--card-color), var(--card-color-dark));
+    transition: width 0.3s ease;
+  }
+
+  &:hover::before {
+    width: 6px;
+  }
+
+  // Icon container
+  .stat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: $border-radius;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--card-color), var(--card-color-dark));
+    color: $white;
+    font-size: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  // Card body
+  .card-body {
+    padding: 1.75rem;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  // Stat number
+  h3 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    color: $gray-900;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  // Stat label
+  p {
+    font-size: 0.95rem;
+    color: $gray-600;
+    margin: 0 0 1rem 0;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: normal;
+    word-wrap: break-word;
+    line-height: 1.4;
+  }
+
+  // Badge for secondary info
+  .stat-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: $border-radius-pill;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    background-color: var(--card-badge-bg);
+    color: var(--card-color);
+  }
+
+  // Link styling
+  .stat-link {
+    color: var(--card-color);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    margin-top: auto;
+    white-space: nowrap;
+
+    &::after {
+      content: '→';
+      transition: transform 0.2s ease;
+    }
+  }
+
+}
+
+// When card is wrapped in a link, apply hover effects
+a:hover .cms-stat-card {
+  .stat-link {
+    color: var(--card-color-dark);
+    gap: 0.75rem;
+
+    &::after {
+      transform: translateX(4px);
+    }
+  }
+}
+
+// Color variants for stat cards
+.cms-stat-card {
+  // Products card - Blue
+  &.stat-products {
+    --card-color: #{$primary};
+    --card-color-dark: #{color.adjust($primary, $lightness: -10%)};
+    --card-badge-bg: #{color.change($primary, $alpha: 0.1)};
+  }
+
+  // Orders card - Green
+  &.stat-orders {
+    --card-color: #{$success};
+    --card-color-dark: #{color.adjust($success, $lightness: -10%)};
+    --card-badge-bg: #{color.change($success, $alpha: 0.1)};
+  }
+
+  // Contacts card - Yellow/Orange
+  &.stat-contacts {
+    --card-color: #{$warning};
+    --card-color-dark: #{color.adjust($warning, $lightness: -10%)};
+    --card-badge-bg: #{color.change($warning, $alpha: 0.1)};
+  }
+
+  // Wholesale card - Red/Pink
+  &.stat-wholesale {
+    --card-color: #{$danger};
+    --card-color-dark: #{color.adjust($danger, $lightness: -10%)};
+    --card-badge-bg: #{color.change($danger, $alpha: 0.1)};
+  }
+}
+
+// Quick Actions Card
+.cms-quick-actions {
+  .card {
+    border: none;
+    border-radius: $border-radius-lg;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+  }
+
+  .card-header {
+    background: linear-gradient(135deg, $gray-800, $gray-900);
+    color: $white;
+    border: none;
+    padding: 1.25rem 1.75rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+  }
+
+  .card-body {
+    padding: 1.75rem;
+    background: $white;
+  }
+
+  .cms-btn-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+
+    @include media-breakpoint-down(sm) {
+      grid-template-columns: 1fr;
+    }
+
+    .btn {
+      padding: 0.875rem 1.5rem;
+      font-weight: 600;
+      border-radius: $border-radius;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      border: none;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      svg {
+        font-size: 1.1rem;
+      }
+    }
+  }
+}
+
+// Loading and Error States
+.cms-dashboard {
+  .spinner-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+  }
+
+  .alert {
+    border-radius: $border-radius-lg;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+}
+
+// Desktop optimizations
+@include media-breakpoint-up(lg) {
+  .cms-stat-card {
+    min-height: 220px;
+    
+    .card-body {
+      padding: 2rem;
+    }
+
+    h3 {
+      font-size: 3rem;
+    }
+
+    .stat-icon {
+      width: 64px;
+      height: 64px;
+      font-size: 1.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    p {
+      font-size: 1rem;
+      margin-bottom: 1.25rem;
+    }
+  }
+}
+
+// Responsive adjustments
+@include media-breakpoint-down(lg) {
+  .cms-stat-card {
+    min-height: 180px;
+    
+    .card-body {
+      padding: 1.5rem;
+    }
+
+    h3 {
+      font-size: 2rem;
+    }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      font-size: 1.25rem;
+    }
+  }
+}
+
+@include media-breakpoint-down(sm) {
+  .cms-dashboard {
+    padding: 1rem 0;
+
+    h1 {
+      font-size: 1.75rem;
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  .cms-stat-card {
+    .card-body {
+      padding: 1.25rem;
+    }
+
+    h3 {
+      font-size: 1.75rem;
+    }
+  }
+}
+
+// Animation for stat numbers
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cms-stat-card h3 {
+  animation: countUp 0.5s ease-out;
+}
+

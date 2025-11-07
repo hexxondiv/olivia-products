@@ -1,0 +1,32 @@
+.cms-login-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cms-login-card {
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  border: none;
+  border-radius: 10px;
+}
+
+.cms-login-card .card-body {
+  padding: 2.5rem;
+}
+
+.cms-login-card h2 {
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.cms-login-card .form-label {
+  font-weight: 500;
+  color: #555;
+  display: flex;
+  align-items: center;
+}
+

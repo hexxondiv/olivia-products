@@ -5,7 +5,7 @@ import { useLocation } from "react-router-dom";
 import "./collection.scss";
 import SelectDrop from "../../Components/SelectDrop/SelectDrop";
 import PurchaseType from "../../Components/PurchaseType/PurchaseType";
-import { allProductsData } from "../../TestData/allProductsData";
+import { useProducts } from "../../ProductsContext";
 
 export const Collections: React.FC = () => {
   const location = useLocation();
@@ -16,20 +16,23 @@ export const Collections: React.FC = () => {
   const [sortType, setSortType] = useState("price-asc");
   const [searchQuery, setSearchQuery] = useState("");
 
+  // Get products from context
+  const { products: allProductsData } = useProducts();
+
   // useMemo to avoid recomputing on every render
   const filteredProducts = useMemo(() => {
     if (rawCategory === "" || rawCategory === "*") return allProductsData;
     return allProductsData.filter(p =>
       (p.category || []).some(c => c.toLowerCase() === categoryLC)
     );
-  }, [rawCategory, categoryLC]);
+  }, [rawCategory, categoryLC, allProductsData]);
 
   const matchingProduct = useMemo(
     () =>
       allProductsData.find(p =>
         (p.category || []).some(c => c.toLowerCase() === categoryLC)
       ),
-    [categoryLC]
+    [categoryLC, allProductsData]
   );
 
   const categoryHeading =

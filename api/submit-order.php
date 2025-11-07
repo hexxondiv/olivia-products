@@ -43,6 +43,11 @@ try {
         throw new Exception('Mailgun helper file not found');
     }
     require_once __DIR__ . '/mailgun-helper.php';
+    
+    if (!file_exists(__DIR__ . '/database.php')) {
+        throw new Exception('Database helper file not found');
+    }
+    require_once __DIR__ . '/database.php';
 } catch (Exception $e) {
     ob_clean();
     http_response_code(500);
@@ -135,8 +140,58 @@ try {
         // Continue processing even if customer email fails
     }
     
-    // Log the order (optional - you can save to database here)
-    // saveOrderToDatabase($orderData);
+    // Save order to database
+    try {
+        $customer = $orderData['customer'];
+        $items = $orderData['items'];
+        
+        // Insert order
+        $orderSql = "INSERT INTO orders (orderId, customerName, customerEmail, customerPhone, 
+                    customerAddress, customerCity, customerState, customerPostalCode, customerNotes, 
+                    totalAmount, status, submittedVia, salesEmailSent, customerEmailSent) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?)";
+        
+        $orderParams = [
+            $orderId,
+            $customer['fullName'],
+            $customer['email'],
+            $customer['phone'],
+            $customer['address'],
+            $customer['city'],
+            $customer['state'],
+            $customer['postalCode'] ?? null,
+            $customer['notes'] ?? null,
+            $orderData['total'],
+            $orderData['submittedVia'] ?? 'email',
+            $salesEmailResult ? 1 : 0,
+            $customerEmailResult ? 1 : 0
+        ];
+        
+        $orderInserted = dbExecute($orderSql, $orderParams);
+        
+        if ($orderInserted) {
+            // Insert order items
+            foreach ($items as $item) {
+                $itemSql = "INSERT INTO order_items (orderId, productId, productName, productPrice, 
+                           quantity, productImage) VALUES (?, ?, ?, ?, ?, ?)";
+                $itemParams = [
+                    $orderId,
+                    $item['id'] ?? null,
+                    $item['productName'] ?? 'Unknown Product',
+                    $item['productPrice'] ?? 0,
+                    $item['quantity'] ?? 1,
+                    $item['firstImg'] ?? null
+                ];
+                dbExecute($itemSql, $itemParams);
+            }
+            error_log("Order saved to database: $orderId");
+        } else {
+            error_log("Failed to save order to database: $orderId");
+        }
+    } catch (Exception $e) {
+        error_log("Error saving order to database: " . $e->getMessage());
+        // Continue even if database save fails
+    }
     
     // Prepare response message
     $message = 'Order submitted successfully';

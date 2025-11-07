@@ -43,6 +43,11 @@ try {
         throw new Exception('Mailgun helper file not found');
     }
     require_once __DIR__ . '/mailgun-helper.php';
+    
+    if (!file_exists(__DIR__ . '/database.php')) {
+        throw new Exception('Database helper file not found');
+    }
+    require_once __DIR__ . '/database.php';
 } catch (Exception $e) {
     ob_clean();
     http_response_code(500);
@@ -142,6 +147,42 @@ try {
     
     if (!empty($warnings)) {
         $message .= '. Note: ' . implode(', ', $warnings);
+    }
+    
+    // Save wholesale submission to database
+    try {
+        $wholesaleSql = "INSERT INTO wholesale_submissions (formType, firstName, lastName, email, phone, 
+                        businessName, website, city, state, country, aboutBusiness, businessTypes, 
+                        status, submittedVia, wholesaleEmailSent, acknowledgementEmailSent) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', ?, ?, ?)";
+        
+        $wholesaleParams = [
+            strtolower($wholesaleData['formType']),
+            $wholesaleData['firstName'],
+            $wholesaleData['lastName'] ?? null,
+            $wholesaleData['email'],
+            $wholesaleData['phone'],
+            $wholesaleData['businessName'],
+            $wholesaleData['website'] ?? null,
+            $wholesaleData['city'],
+            $wholesaleData['state'],
+            $wholesaleData['country'],
+            $wholesaleData['aboutBusiness'],
+            json_encode($wholesaleData['businessTypes'] ?? []),
+            $wholesaleData['submittedVia'] ?? 'email',
+            $wholesaleEmailResult ? 1 : 0,
+            $acknowledgementEmailResult ? 1 : 0
+        ];
+        
+        $wholesaleId = dbExecute($wholesaleSql, $wholesaleParams);
+        if ($wholesaleId) {
+            error_log("Wholesale submission saved to database with ID: $wholesaleId");
+        } else {
+            error_log("Failed to save wholesale submission to database");
+        }
+    } catch (Exception $e) {
+        error_log("Error saving wholesale submission to database: " . $e->getMessage());
+        // Continue even if database save fails
     }
     
     // Return success response
