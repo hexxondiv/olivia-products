@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CMSLayout } from './CMSLayout';
-import { Table, Button, Badge, Form, Alert, Spinner, Modal, Card, Row, Col, InputGroup, Nav, Tab } from 'react-bootstrap';
+import { Table, Button, Badge, Form, Alert, Spinner, Modal, Card, Row, Col, InputGroup, Nav, Tab, Pagination } from 'react-bootstrap';
 import { FaExclamationTriangle, FaCheckCircle, FaTimes, FaBox, FaChartLine, FaFileExport, FaChartBar, FaDollarSign, FaList } from 'react-icons/fa';
 import { getApiUrl } from '../../Utils/apiConfig';
 import './cms-modals.scss';
@@ -108,6 +108,13 @@ export const CMSStock: React.FC = () => {
     endDate: '',
     movementType: '',
     limit: 100
+  });
+  
+  // Pagination state for movements
+  const [movementPagination, setMovementPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalCount: 0
   });
 
   useEffect(() => {
@@ -284,14 +291,16 @@ export const CMSStock: React.FC = () => {
     }
   };
 
-  const fetchMovementReport = async () => {
+  const fetchMovementReport = async (page?: number) => {
     setReportLoading(true);
     try {
       const token = localStorage.getItem('cms_token');
       const apiUrl = getApiUrl();
+      const currentPage = page !== undefined ? page : movementPagination.currentPage;
       const params = new URLSearchParams({
         type: 'movements',
-        limit: reportFilters.limit.toString()
+        limit: reportFilters.limit.toString(),
+        page: currentPage.toString()
       });
       
       if (reportFilters.startDate) params.append('startDate', reportFilters.startDate);
@@ -309,6 +318,14 @@ export const CMSStock: React.FC = () => {
       if (data.success) {
         setMovements(data.data || []);
         setMovementTotals(data.totals || {});
+        
+        // Update pagination state
+        const totalPages = data.totalCount > 0 ? Math.ceil(data.totalCount / reportFilters.limit) : 1;
+        setMovementPagination({
+          currentPage: currentPage,
+          totalPages: totalPages,
+          totalCount: data.totalCount || 0
+        });
       }
     } catch (err) {
       console.error('Failed to load movement report:', err);
@@ -397,7 +414,9 @@ export const CMSStock: React.FC = () => {
 
   useEffect(() => {
     if (activeTab === 'movements') {
-      fetchMovementReport();
+      // Reset to page 1 when filters change
+      setMovementPagination(prev => ({ ...prev, currentPage: 1 }));
+      fetchMovementReport(1);
     } else if (activeTab === 'low_stock') {
       fetchLowStockReport();
     } else if (activeTab === 'value') {
@@ -765,6 +784,58 @@ export const CMSStock: React.FC = () => {
                         ))}
                       </tbody>
                     </Table>
+                  )}
+                  
+                  {/* Pagination Controls */}
+                  {movementPagination.totalPages > 1 && (
+                    <div className="d-flex justify-content-between align-items-center mt-3">
+                      <div className="text-muted">
+                        Showing {((movementPagination.currentPage - 1) * reportFilters.limit) + 1} to{' '}
+                        {Math.min(movementPagination.currentPage * reportFilters.limit, movementPagination.totalCount)} of{' '}
+                        {movementPagination.totalCount} movements
+                      </div>
+                      <Pagination className="mb-0">
+                        <Pagination.First
+                          onClick={() => fetchMovementReport(1)}
+                          disabled={movementPagination.currentPage === 1 || reportLoading}
+                        />
+                        <Pagination.Prev
+                          onClick={() => fetchMovementReport(movementPagination.currentPage - 1)}
+                          disabled={movementPagination.currentPage === 1 || reportLoading}
+                        />
+                        {Array.from({ length: Math.min(5, movementPagination.totalPages) }, (_, i) => {
+                          let pageNum: number;
+                          if (movementPagination.totalPages <= 5) {
+                            pageNum = i + 1;
+                          } else if (movementPagination.currentPage <= 3) {
+                            pageNum = i + 1;
+                          } else if (movementPagination.currentPage >= movementPagination.totalPages - 2) {
+                            pageNum = movementPagination.totalPages - 4 + i;
+                          } else {
+                            pageNum = movementPagination.currentPage - 2 + i;
+                          }
+                          
+                          return (
+                            <Pagination.Item
+                              key={pageNum}
+                              active={pageNum === movementPagination.currentPage}
+                              onClick={() => fetchMovementReport(pageNum)}
+                              disabled={reportLoading}
+                            >
+                              {pageNum}
+                            </Pagination.Item>
+                          );
+                        })}
+                        <Pagination.Next
+                          onClick={() => fetchMovementReport(movementPagination.currentPage + 1)}
+                          disabled={movementPagination.currentPage >= movementPagination.totalPages || reportLoading}
+                        />
+                        <Pagination.Last
+                          onClick={() => fetchMovementReport(movementPagination.totalPages)}
+                          disabled={movementPagination.currentPage >= movementPagination.totalPages || reportLoading}
+                        />
+                      </Pagination>
+                    </div>
                   )}
                 </Card.Body>
               </Card>

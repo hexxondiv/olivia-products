@@ -72,6 +72,7 @@ function handleGet() {
     $category = isset($_GET['category']) ? $_GET['category'] : null;
     $activeOnly = isset($_GET['activeOnly']) ? filter_var($_GET['activeOnly'], FILTER_VALIDATE_BOOLEAN) : false;
     $stockStatus = isset($_GET['stockStatus']) ? $_GET['stockStatus'] : null;
+    $stockEnabled = isset($_GET['stockEnabled']) ? filter_var($_GET['stockEnabled'], FILTER_VALIDATE_BOOLEAN) : null;
     $includeStockHistory = isset($_GET['includeStockHistory']) ? filter_var($_GET['includeStockHistory'], FILTER_VALIDATE_BOOLEAN) : false;
     
     if ($id) {
@@ -132,6 +133,11 @@ function handleGet() {
         if ($stockStatus) {
             $sql .= " AND stockStatus = ?";
             $params[] = $stockStatus;
+        }
+        
+        if ($stockEnabled !== null) {
+            $sql .= " AND stockEnabled = ?";
+            $params[] = $stockEnabled ? 1 : 0;
         }
         
         $sql .= " ORDER BY createdAt DESC";

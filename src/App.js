@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import ScrollToTop from "./scrollToTop";
 import { CartProvider, useCart } from "./CartContext";
 import { ProductsProvider } from "./ProductsContext";
@@ -40,6 +40,23 @@ function GlobalCart() {
       onIncrementQuantity={incrementQuantity}
       onDecrementQuantity={decrementQuantity}
     />
+  );
+}
+
+function BackToTopButton() {
+  const location = useLocation();
+  const isCMSRoute = location.pathname.startsWith('/cms');
+  
+  if (isCMSRoute) {
+    return null;
+  }
+  
+  return (
+    <div className="bck-to-top">
+      <a href="#top">
+        <MdOutlineVerticalAlignTop />
+      </a>
+    </div>
   );
 }
 
@@ -118,11 +135,7 @@ function App() {
         </Routes>
       </CMSAuthProvider>
       {/* </SmoothScroll> */}
-      <div className="bck-to-top">
-        <a href="#top">
-          <MdOutlineVerticalAlignTop />
-        </a>
-      </div>
+      <BackToTopButton />
     </>
   );
 }

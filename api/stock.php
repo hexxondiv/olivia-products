@@ -274,10 +274,16 @@ function handleGetReports() {
     $movementType = isset($_GET['movementType']) ? $_GET['movementType'] : null;
     $productId = isset($_GET['productId']) ? (int)$_GET['productId'] : null;
     $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 100;
+    $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : null;
     
     switch ($reportType) {
         case 'movements':
-            handleGetMovementReport($startDate, $endDate, $movementType, $productId, $limit);
+            // If page is provided, calculate offset
+            if ($page !== null && $page > 0) {
+                $offset = ($page - 1) * $limit;
+            }
+            handleGetMovementReport($startDate, $endDate, $movementType, $productId, $limit, $offset);
             break;
         case 'low_stock':
             handleGetLowStockReport();
@@ -294,41 +300,50 @@ function handleGetReports() {
     }
 }
 
-function handleGetMovementReport($startDate, $endDate, $movementType, $productId, $limit) {
-    $sql = "SELECT sm.*, p.name as productName, p.price, u.username as createdByName
-            FROM stock_movements sm
-            JOIN products p ON sm.productId = p.id
-            LEFT JOIN admin_users u ON sm.createdBy = u.id
-            WHERE 1=1";
-    
+function handleGetMovementReport($startDate, $endDate, $movementType, $productId, $limit, $offset = 0) {
+    // Build WHERE clause for counting and fetching
+    $whereClause = "WHERE 1=1";
     $params = [];
     
     if ($startDate) {
-        $sql .= " AND sm.createdAt >= ?";
+        $whereClause .= " AND sm.createdAt >= ?";
         $params[] = $startDate . ' 00:00:00';
     }
     
     if ($endDate) {
-        $sql .= " AND sm.createdAt <= ?";
+        $whereClause .= " AND sm.createdAt <= ?";
         $params[] = $endDate . ' 23:59:59';
     }
     
     if ($movementType) {
-        $sql .= " AND sm.movementType = ?";
+        $whereClause .= " AND sm.movementType = ?";
         $params[] = $movementType;
     }
     
     if ($productId) {
-        $sql .= " AND sm.productId = ?";
+        $whereClause .= " AND sm.productId = ?";
         $params[] = $productId;
     }
     
-    $sql .= " ORDER BY sm.createdAt DESC LIMIT ?";
-    $params[] = $limit;
+    // Get total count
+    $countSql = "SELECT COUNT(*) as total
+                 FROM stock_movements sm
+                 JOIN products p ON sm.productId = p.id
+                 LEFT JOIN admin_users u ON sm.createdBy = u.id
+                 $whereClause";
     
-    $movements = dbQuery($sql, $params);
+    $countResult = dbQueryOne($countSql, $params);
+    $totalCount = (int)$countResult['total'];
     
-    // Calculate totals
+    // Calculate totals from ALL matching movements (not just paginated results)
+    $totalsSql = "SELECT sm.movementType, SUM(ABS(sm.quantity)) as total
+                  FROM stock_movements sm
+                  JOIN products p ON sm.productId = p.id
+                  LEFT JOIN admin_users u ON sm.createdBy = u.id
+                  $whereClause
+                  GROUP BY sm.movementType";
+    
+    $totalsResult = dbQuery($totalsSql, $params);
     $totals = [
         'purchase' => 0,
         'sale' => 0,
@@ -338,18 +353,33 @@ function handleGetMovementReport($startDate, $endDate, $movementType, $productId
         'transfer' => 0
     ];
     
-    foreach ($movements as $movement) {
-        $type = $movement['movementType'];
+    foreach ($totalsResult as $row) {
+        $type = $row['movementType'];
         if (isset($totals[$type])) {
-            $totals[$type] += abs((int)$movement['quantity']);
+            $totals[$type] = (int)$row['total'];
         }
     }
+    
+    // Get paginated movements
+    $sql = "SELECT sm.*, p.name as productName, p.price, u.username as createdByName
+            FROM stock_movements sm
+            JOIN products p ON sm.productId = p.id
+            LEFT JOIN admin_users u ON sm.createdBy = u.id
+            $whereClause
+            ORDER BY sm.createdAt DESC
+            LIMIT ? OFFSET ?";
+    
+    $queryParams = array_merge($params, [$limit, $offset]);
+    $movements = dbQuery($sql, $queryParams);
     
     echo json_encode([
         'success' => true,
         'data' => $movements,
         'totals' => $totals,
-        'count' => count($movements)
+        'count' => count($movements),
+        'totalCount' => $totalCount,
+        'limit' => $limit,
+        'offset' => $offset
     ]);
 }
 
