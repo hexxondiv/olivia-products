@@ -8,6 +8,7 @@ import { Spinner } from "react-bootstrap";
 
 import { useProducts } from "../../ProductsContext";
 import { useCart } from "../../CartContext";
+import { calculatePriceForQuantity } from "../../Utils/pricingUtils";
 import { MdNavigateBefore, MdNavigateNext } from "react-icons/md";
 import { Desktop, TabletAndBelow } from "../../Utils/mediaQueries";
 export const ProductsHolder = ({
@@ -36,12 +37,29 @@ export const ProductsHolder = ({
   const {
     cart,
     setIsOffCanvasOpen,
-    addToCart,
+    addToCart: addToCartBase,
     removeFromCart,
     clearCart,
     incrementQuantity,
     decrementQuantity,
   } = useCart();
+
+  // Wrapper for addToCart that calculates price based on quantity
+  const addToCart = (item) => {
+    const product = allProductsData.find(p => p.id === item.id);
+    if (product) {
+      const quantity = item.quantity || 1;
+      const priceForQuantity = calculatePriceForQuantity(product, quantity);
+      addToCartBase({
+        ...item,
+        productPrice: priceForQuantity,
+        quantity: quantity,
+      });
+    } else {
+      // Fallback if product not found
+      addToCartBase(item);
+    }
+  };
 
   // Step 1: Optionally filter for best sellers
   let productsToDisplay = allProductsData;

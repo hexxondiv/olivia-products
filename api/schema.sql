@@ -23,6 +23,13 @@ CREATE TABLE IF NOT EXISTS products (
     flavours JSON,
     bestSeller BOOLEAN DEFAULT FALSE,
     isActive BOOLEAN DEFAULT TRUE,
+    -- Tiered Pricing Fields
+    retailPrice DECIMAL(10, 2) NULL,
+    retailMinQty INT DEFAULT 1,
+    wholesalePrice DECIMAL(10, 2) NULL,
+    wholesaleMinQty INT NULL,
+    distributorPrice DECIMAL(10, 2) NULL,
+    distributorMinQty INT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_bestSeller (bestSeller),
@@ -53,7 +60,8 @@ CREATE TABLE IF NOT EXISTS orders (
     INDEX idx_orderId (orderId),
     INDEX idx_status (status),
     INDEX idx_customerEmail (customerEmail),
-    INDEX idx_createdAt (createdAt)
+    INDEX idx_createdAt (createdAt),
+    INDEX idx_isPaid (isPaid)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Order Items Table

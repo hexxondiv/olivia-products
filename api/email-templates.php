@@ -29,13 +29,20 @@ function getSalesOrderEmailTemplate($orderData) {
     foreach ($items as $item) {
         $itemTotal = number_format($item['productPrice'] * $item['quantity'], 2);
         $formattedName = formatProductName($item['productName']);
+        $pricingTier = isset($item['pricingTierDisplay']) ? $item['pricingTierDisplay'] : 'Standard';
+        $tierInfo = '';
+        if (isset($item['pricingTierMinQty']) && $item['pricingTierMinQty'] !== null) {
+            $tierInfo = '<br><small style="color: #6c757d; font-size: 0.85em;">' . htmlspecialchars($pricingTier) . ' Pricing (Min Qty: ' . $item['pricingTierMinQty'] . ')</small>';
+        } elseif ($pricingTier !== 'Standard') {
+            $tierInfo = '<br><small style="color: #6c757d; font-size: 0.85em;">' . htmlspecialchars($pricingTier) . ' Pricing</small>';
+        }
         $itemsHtml .= '
         <tr>
             <td style="padding: 12px; border-bottom: 1px solid #e0e0e0;">
                 <img src="' . htmlspecialchars($item['firstImg']) . '" alt="' . htmlspecialchars($formattedName) . '" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 2px solid #e0e0e0;">
             </td>
             <td style="padding: 12px; border-bottom: 1px solid #e0e0e0;">
-                <strong>' . htmlspecialchars($formattedName) . '</strong>
+                <strong>' . htmlspecialchars($formattedName) . '</strong>' . $tierInfo . '
             </td>
             <td style="padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: center;">
                 ' . htmlspecialchars($item['quantity']) . '
@@ -177,7 +184,14 @@ function getSalesOrderEmailTextTemplate($orderData) {
     foreach ($items as $item) {
         $itemTotal = number_format($item['productPrice'] * $item['quantity'], 2);
         $formattedName = formatProductName($item['productName']);
-        $text .= "- {$formattedName} (Qty: {$item['quantity']}) - ₦{$itemTotal}\n";
+        $pricingTier = isset($item['pricingTierDisplay']) ? $item['pricingTierDisplay'] : 'Standard';
+        $tierInfo = '';
+        if (isset($item['pricingTierMinQty']) && $item['pricingTierMinQty'] !== null) {
+            $tierInfo = " [{$pricingTier} Pricing - Min Qty: {$item['pricingTierMinQty']}]";
+        } elseif ($pricingTier !== 'Standard') {
+            $tierInfo = " [{$pricingTier} Pricing]";
+        }
+        $text .= "- {$formattedName} (Qty: {$item['quantity']}){$tierInfo} - ₦{$itemTotal}\n";
     }
     $text .= "\n";
     $text .= "TOTAL: ₦$total\n\n";
@@ -205,13 +219,20 @@ function getCustomerOrderEmailTemplate($orderData) {
     foreach ($items as $item) {
         $itemTotal = number_format($item['productPrice'] * $item['quantity'], 2);
         $formattedName = formatProductName($item['productName']);
+        $pricingTier = isset($item['pricingTierDisplay']) ? $item['pricingTierDisplay'] : 'Standard';
+        $tierInfo = '';
+        if (isset($item['pricingTierMinQty']) && $item['pricingTierMinQty'] !== null) {
+            $tierInfo = '<br><small style="color: #6c757d; font-size: 0.85em;">' . htmlspecialchars($pricingTier) . ' Pricing (Min Qty: ' . $item['pricingTierMinQty'] . ')</small>';
+        } elseif ($pricingTier !== 'Standard') {
+            $tierInfo = '<br><small style="color: #6c757d; font-size: 0.85em;">' . htmlspecialchars($pricingTier) . ' Pricing</small>';
+        }
         $itemsHtml .= '
         <tr>
             <td style="padding: 12px; border-bottom: 1px solid #e0e0e0;">
                 <img src="' . htmlspecialchars($item['firstImg']) . '" alt="' . htmlspecialchars($formattedName) . '" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 2px solid #e0e0e0;">
             </td>
             <td style="padding: 12px; border-bottom: 1px solid #e0e0e0;">
-                <strong>' . htmlspecialchars($formattedName) . '</strong>
+                <strong>' . htmlspecialchars($formattedName) . '</strong>' . $tierInfo . '
             </td>
             <td style="padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: center;">
                 ' . htmlspecialchars($item['quantity']) . '
@@ -352,7 +373,14 @@ function getCustomerOrderEmailTextTemplate($orderData) {
     foreach ($items as $item) {
         $itemTotal = number_format($item['productPrice'] * $item['quantity'], 2);
         $formattedName = formatProductName($item['productName']);
-        $text .= "- {$formattedName} (Qty: {$item['quantity']}) - ₦{$itemTotal}\n";
+        $pricingTier = isset($item['pricingTierDisplay']) ? $item['pricingTierDisplay'] : 'Standard';
+        $tierInfo = '';
+        if (isset($item['pricingTierMinQty']) && $item['pricingTierMinQty'] !== null) {
+            $tierInfo = " [{$pricingTier} Pricing - Min Qty: {$item['pricingTierMinQty']}]";
+        } elseif ($pricingTier !== 'Standard') {
+            $tierInfo = " [{$pricingTier} Pricing]";
+        }
+        $text .= "- {$formattedName} (Qty: {$item['quantity']}){$tierInfo} - ₦{$itemTotal}\n";
     }
     $text .= "\n";
     $text .= "TOTAL: ₦$total\n\n";
@@ -996,13 +1024,20 @@ function getCustomerStatusUpdateEmailTemplate($orderData, $newStatus, $oldStatus
     foreach ($items as $item) {
         $itemTotal = number_format($item['productPrice'] * $item['quantity'], 2);
         $formattedName = formatProductName($item['productName']);
+        $pricingTier = isset($item['pricingTierDisplay']) ? $item['pricingTierDisplay'] : 'Standard';
+        $tierInfo = '';
+        if (isset($item['pricingTierMinQty']) && $item['pricingTierMinQty'] !== null) {
+            $tierInfo = '<br><small style="color: #6c757d; font-size: 0.85em;">' . htmlspecialchars($pricingTier) . ' Pricing (Min Qty: ' . $item['pricingTierMinQty'] . ')</small>';
+        } elseif ($pricingTier !== 'Standard') {
+            $tierInfo = '<br><small style="color: #6c757d; font-size: 0.85em;">' . htmlspecialchars($pricingTier) . ' Pricing</small>';
+        }
         $itemsHtml .= '
         <tr>
             <td style="padding: 12px; border-bottom: 1px solid #e0e0e0;">
                 <img src="' . htmlspecialchars($item['firstImg']) . '" alt="' . htmlspecialchars($formattedName) . '" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 2px solid #e0e0e0;">
             </td>
             <td style="padding: 12px; border-bottom: 1px solid #e0e0e0;">
-                <strong>' . htmlspecialchars($formattedName) . '</strong>
+                <strong>' . htmlspecialchars($formattedName) . '</strong>' . $tierInfo . '
             </td>
             <td style="padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: center;">
                 ' . htmlspecialchars($item['quantity']) . '
@@ -1194,7 +1229,14 @@ function getCustomerStatusUpdateEmailTextTemplate($orderData, $newStatus, $oldSt
     foreach ($items as $item) {
         $itemTotal = number_format($item['productPrice'] * $item['quantity'], 2);
         $formattedName = formatProductName($item['productName']);
-        $text .= "- {$formattedName} (Qty: {$item['quantity']}) - ₦{$itemTotal}\n";
+        $pricingTier = isset($item['pricingTierDisplay']) ? $item['pricingTierDisplay'] : 'Standard';
+        $tierInfo = '';
+        if (isset($item['pricingTierMinQty']) && $item['pricingTierMinQty'] !== null) {
+            $tierInfo = " [{$pricingTier} Pricing - Min Qty: {$item['pricingTierMinQty']}]";
+        } elseif ($pricingTier !== 'Standard') {
+            $tierInfo = " [{$pricingTier} Pricing]";
+        }
+        $text .= "- {$formattedName} (Qty: {$item['quantity']}){$tierInfo} - ₦{$itemTotal}\n";
     }
     $text .= "\n";
     $text .= "TOTAL: ₦$total\n\n";
@@ -1268,13 +1310,20 @@ function getCustomerPaymentStatusEmailTemplate($orderData, $isPaid) {
     foreach ($items as $item) {
         $itemTotal = number_format($item['productPrice'] * $item['quantity'], 2);
         $formattedName = formatProductName($item['productName']);
+        $pricingTier = isset($item['pricingTierDisplay']) ? $item['pricingTierDisplay'] : 'Standard';
+        $tierInfo = '';
+        if (isset($item['pricingTierMinQty']) && $item['pricingTierMinQty'] !== null) {
+            $tierInfo = '<br><small style="color: #6c757d; font-size: 0.85em;">' . htmlspecialchars($pricingTier) . ' Pricing (Min Qty: ' . $item['pricingTierMinQty'] . ')</small>';
+        } elseif ($pricingTier !== 'Standard') {
+            $tierInfo = '<br><small style="color: #6c757d; font-size: 0.85em;">' . htmlspecialchars($pricingTier) . ' Pricing</small>';
+        }
         $itemsHtml .= '
         <tr>
             <td style="padding: 12px; border-bottom: 1px solid #e0e0e0;">
                 <img src="' . htmlspecialchars($item['firstImg']) . '" alt="' . htmlspecialchars($formattedName) . '" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 2px solid #e0e0e0;">
             </td>
             <td style="padding: 12px; border-bottom: 1px solid #e0e0e0;">
-                <strong>' . htmlspecialchars($formattedName) . '</strong>
+                <strong>' . htmlspecialchars($formattedName) . '</strong>' . $tierInfo . '
             </td>
             <td style="padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: center;">
                 ' . htmlspecialchars($item['quantity']) . '
@@ -1431,7 +1480,14 @@ function getCustomerPaymentStatusEmailTextTemplate($orderData, $isPaid) {
     foreach ($items as $item) {
         $itemTotal = number_format($item['productPrice'] * $item['quantity'], 2);
         $formattedName = formatProductName($item['productName']);
-        $text .= "- {$formattedName} (Qty: {$item['quantity']}) - ₦{$itemTotal}\n";
+        $pricingTier = isset($item['pricingTierDisplay']) ? $item['pricingTierDisplay'] : 'Standard';
+        $tierInfo = '';
+        if (isset($item['pricingTierMinQty']) && $item['pricingTierMinQty'] !== null) {
+            $tierInfo = " [{$pricingTier} Pricing - Min Qty: {$item['pricingTierMinQty']}]";
+        } elseif ($pricingTier !== 'Standard') {
+            $tierInfo = " [{$pricingTier} Pricing]";
+        }
+        $text .= "- {$formattedName} (Qty: {$item['quantity']}){$tierInfo} - ₦{$itemTotal}\n";
     }
     $text .= "\n";
     $text .= "TOTAL: ₦$total\n\n";

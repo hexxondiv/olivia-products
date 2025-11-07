@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useProducts } from "../../ProductsContext";
+import { calculatePriceForQuantity, getPricingTier } from "../../Utils/pricingUtils";
 import "./success-page.scss";
 import { MdCheckCircle, MdShoppingBag, MdHome } from "react-icons/md";
 
@@ -83,6 +84,33 @@ export const SuccessPage: React.FC = () => {
     }
     // Fallback to cart item name if product not found
     return item.productName.trim();
+  };
+
+  const getItemPrice = (item: OrderItem): number => {
+    const product = getProductById(item.id);
+    if (product) {
+      // Recalculate price based on quantity and tier
+      return calculatePriceForQuantity(product, item.quantity);
+    }
+    // Fallback to stored price if product not found
+    return item.productPrice;
+  };
+
+  const getPricingTierInfo = (item: OrderItem): string => {
+    const product = getProductById(item.id);
+    if (!product) return '';
+
+    const tier = getPricingTier(product, item.quantity);
+    if (tier === 'distributor' && product.distributorMinQty) {
+      return ` (Distributor Pricing - Min Qty: ${product.distributorMinQty})`;
+    } else if (tier === 'wholesale' && product.wholesaleMinQty) {
+      return ` (Wholesale Pricing - Min Qty: ${product.wholesaleMinQty})`;
+    } else if (tier === 'retail' && product.retailMinQty) {
+      return ` (Retail Pricing - Min Qty: ${product.retailMinQty})`;
+    } else if (tier !== 'legacy') {
+      return ` (${tier.charAt(0).toUpperCase() + tier.slice(1)} Pricing)`;
+    }
+    return '';
   };
 
   return (
@@ -184,18 +212,27 @@ export const SuccessPage: React.FC = () => {
             <div className="order-items-section">
               <h3>Order Items</h3>
               <div className="order-items-list">
-                {orderData.items.map((item) => (
-                  <div key={item.id} className="order-item-card">
-                    <img src={item.firstImg} alt={formatProductName(item)} className="item-image" />
-                    <div className="item-info">
-                      <h4 className="item-name">{formatProductName(item)}</h4>
-                      <div className="item-details">
-                        <span className="item-quantity">Quantity: {item.quantity}</span>
-                        <span className="item-price">{formatCurrency(item.productPrice * item.quantity)}</span>
+                {orderData.items.map((item) => {
+                  const pricePerUnit = getItemPrice(item);
+                  const itemTotal = pricePerUnit * item.quantity;
+                  const tierInfo = getPricingTierInfo(item);
+                  
+                  return (
+                    <div key={item.id} className="order-item-card">
+                      <img src={item.firstImg} alt={formatProductName(item)} className="item-image" />
+                      <div className="item-info">
+                        <h4 className="item-name">
+                          {formatProductName(item)}
+                          {tierInfo && <span style={{ fontSize: '0.85rem', color: '#6c757d', fontWeight: 'normal', marginLeft: '0.5rem' }}>{tierInfo}</span>}
+                        </h4>
+                        <div className="item-details">
+                          <span className="item-quantity">Quantity: {item.quantity} × {formatCurrency(pricePerUnit)}</span>
+                          <span className="item-price">{formatCurrency(itemTotal)}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 

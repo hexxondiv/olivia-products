@@ -32,6 +32,7 @@ require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/database.php';
 require_once __DIR__ . '/auth-helper.php';
 require_once __DIR__ . '/mailgun-helper.php';
+require_once __DIR__ . '/pricing-helper.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 $input = file_get_contents('php://input');
@@ -101,6 +102,35 @@ function handleGet() {
         foreach ($order['items'] as &$item) {
             $item['productPrice'] = (float)$item['productPrice'];
             $item['quantity'] = (int)$item['quantity'];
+            
+            // Determine pricing tier if productId exists
+            if (!empty($item['productId'])) {
+                $product = dbQueryOne(
+                    "SELECT * FROM products WHERE id = ?",
+                    [$item['productId']]
+                );
+                
+                if ($product) {
+                    // Decode JSON fields
+                    $product['additionalImgs'] = json_decode($product['additionalImgs'] ?? '[]', true);
+                    $product['category'] = json_decode($product['category'] ?? '[]', true);
+                    $product['flavours'] = json_decode($product['flavours'] ?? '[]', true);
+                    $product['retailPrice'] = isset($product['retailPrice']) ? (float)$product['retailPrice'] : null;
+                    $product['retailMinQty'] = isset($product['retailMinQty']) ? (int)$product['retailMinQty'] : 1;
+                    $product['wholesalePrice'] = isset($product['wholesalePrice']) ? (float)$product['wholesalePrice'] : null;
+                    $product['wholesaleMinQty'] = isset($product['wholesaleMinQty']) ? (int)$product['wholesaleMinQty'] : null;
+                    $product['distributorPrice'] = isset($product['distributorPrice']) ? (float)$product['distributorPrice'] : null;
+                    $product['distributorMinQty'] = isset($product['distributorMinQty']) ? (int)$product['distributorMinQty'] : null;
+                    
+                    // Determine pricing tier
+                    $tierInfo = determinePricingTier($product, $item['quantity'], $item['productPrice']);
+                    $item['pricingTier'] = $tierInfo['tier'];
+                    $item['pricingTierDisplay'] = $tierInfo['tierDisplay'];
+                    $item['pricingTierMinQty'] = $tierInfo['minQty'];
+                    // Update productPrice to match the tier-corrected price for display
+                    $item['productPrice'] = $tierInfo['pricePerUnit'];
+                }
+            }
         }
         
         echo json_encode(['success' => true, 'data' => $order]);
@@ -295,12 +325,39 @@ function handlePut() {
             // Format items for email template
             $emailItems = [];
             foreach ($items as $item) {
-                $emailItems[] = [
+                $emailItem = [
                     'productName' => $item['productName'],
                     'productPrice' => (float)$item['productPrice'],
                     'quantity' => (int)$item['quantity'],
                     'firstImg' => $item['productImage'] ?? ''
                 ];
+                
+                // Add pricing tier information if available
+                if (!empty($item['productId'])) {
+                    $product = dbQueryOne(
+                        "SELECT * FROM products WHERE id = ?",
+                        [$item['productId']]
+                    );
+                    
+                    if ($product) {
+                        // Decode JSON fields
+                        $product['retailPrice'] = isset($product['retailPrice']) ? (float)$product['retailPrice'] : null;
+                        $product['retailMinQty'] = isset($product['retailMinQty']) ? (int)$product['retailMinQty'] : 1;
+                        $product['wholesalePrice'] = isset($product['wholesalePrice']) ? (float)$product['wholesalePrice'] : null;
+                        $product['wholesaleMinQty'] = isset($product['wholesaleMinQty']) ? (int)$product['wholesaleMinQty'] : null;
+                        $product['distributorPrice'] = isset($product['distributorPrice']) ? (float)$product['distributorPrice'] : null;
+                        $product['distributorMinQty'] = isset($product['distributorMinQty']) ? (int)$product['distributorMinQty'] : null;
+                        
+                        $tierInfo = determinePricingTier($product, $emailItem['quantity'], $emailItem['productPrice']);
+                        $emailItem['pricingTier'] = $tierInfo['tier'];
+                        $emailItem['pricingTierDisplay'] = $tierInfo['tierDisplay'];
+                        $emailItem['pricingTierMinQty'] = $tierInfo['minQty'];
+                        // Update productPrice to match the tier-corrected price for display
+                        $emailItem['productPrice'] = $tierInfo['pricePerUnit'];
+                    }
+                }
+                
+                $emailItems[] = $emailItem;
             }
             
             // Format order data for email template

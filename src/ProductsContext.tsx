@@ -19,6 +19,13 @@ export interface Product {
   flavours?: Array<{ id: number; name: string }>;
   bestSeller: boolean;
   isActive: boolean;
+  // Tiered pricing fields
+  retailPrice?: number | null;
+  retailMinQty?: number;
+  wholesalePrice?: number | null;
+  wholesaleMinQty?: number | null;
+  distributorPrice?: number | null;
+  distributorMinQty?: number | null;
 }
 
 interface ProductsContextType {

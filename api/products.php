@@ -92,6 +92,13 @@ function handleGet() {
         $product['isActive'] = (bool)$product['isActive'];
         $product['price'] = (float)$product['price'];
         $product['rating'] = (float)$product['rating'];
+        // Handle tiered pricing fields
+        $product['retailPrice'] = isset($product['retailPrice']) ? (float)$product['retailPrice'] : null;
+        $product['retailMinQty'] = isset($product['retailMinQty']) ? (int)$product['retailMinQty'] : 1;
+        $product['wholesalePrice'] = isset($product['wholesalePrice']) ? (float)$product['wholesalePrice'] : null;
+        $product['wholesaleMinQty'] = isset($product['wholesaleMinQty']) ? (int)$product['wholesaleMinQty'] : null;
+        $product['distributorPrice'] = isset($product['distributorPrice']) ? (float)$product['distributorPrice'] : null;
+        $product['distributorMinQty'] = isset($product['distributorMinQty']) ? (int)$product['distributorMinQty'] : null;
         
         echo json_encode(['success' => true, 'data' => $product]);
     } else {
@@ -121,6 +128,13 @@ function handleGet() {
             $product['isActive'] = (bool)$product['isActive'];
             $product['price'] = (float)$product['price'];
             $product['rating'] = (float)$product['rating'];
+            // Handle tiered pricing fields
+            $product['retailPrice'] = isset($product['retailPrice']) ? (float)$product['retailPrice'] : null;
+            $product['retailMinQty'] = isset($product['retailMinQty']) ? (int)$product['retailMinQty'] : 1;
+            $product['wholesalePrice'] = isset($product['wholesalePrice']) ? (float)$product['wholesalePrice'] : null;
+            $product['wholesaleMinQty'] = isset($product['wholesaleMinQty']) ? (int)$product['wholesaleMinQty'] : null;
+            $product['distributorPrice'] = isset($product['distributorPrice']) ? (float)$product['distributorPrice'] : null;
+            $product['distributorMinQty'] = isset($product['distributorMinQty']) ? (int)$product['distributorMinQty'] : null;
         }
         
         echo json_encode(['success' => true, 'data' => $products, 'count' => count($products)]);
@@ -151,8 +165,9 @@ function handlePost() {
     
     // Prepare data
     $sql = "INSERT INTO products (heading, name, sufix, price, rating, color, detail, moreDetail, tagline, 
-            firstImg, hoverImg, additionalImgs, category, flavours, bestSeller, isActive) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            firstImg, hoverImg, additionalImgs, category, flavours, bestSeller, isActive,
+            retailPrice, retailMinQty, wholesalePrice, wholesaleMinQty, distributorPrice, distributorMinQty) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     
     $params = [
         $data['heading'] ?? '',
@@ -170,7 +185,13 @@ function handlePost() {
         json_encode($data['category'] ?? []),
         json_encode($data['flavours'] ?? []),
         isset($data['bestSeller']) ? (int)$data['bestSeller'] : 0,
-        isset($data['isActive']) ? (int)$data['isActive'] : 1
+        isset($data['isActive']) ? (int)$data['isActive'] : 1,
+        isset($data['retailPrice']) ? (float)$data['retailPrice'] : null,
+        isset($data['retailMinQty']) ? (int)$data['retailMinQty'] : 1,
+        isset($data['wholesalePrice']) ? (float)$data['wholesalePrice'] : null,
+        isset($data['wholesaleMinQty']) ? (int)$data['wholesaleMinQty'] : null,
+        isset($data['distributorPrice']) ? (float)$data['distributorPrice'] : null,
+        isset($data['distributorMinQty']) ? (int)$data['distributorMinQty'] : null
     ];
     
     $id = dbExecute($sql, $params);
@@ -222,16 +243,20 @@ function handlePut() {
     
     $allowedFields = ['heading', 'name', 'sufix', 'price', 'rating', 'color', 'detail', 'moreDetail', 
                       'tagline', 'firstImg', 'hoverImg', 'additionalImgs', 'category', 'flavours', 
-                      'bestSeller', 'isActive'];
+                      'bestSeller', 'isActive', 'retailPrice', 'retailMinQty', 'wholesalePrice', 
+                      'wholesaleMinQty', 'distributorPrice', 'distributorMinQty'];
     
     foreach ($allowedFields as $field) {
         if (isset($data[$field])) {
             if (in_array($field, ['additionalImgs', 'category', 'flavours'])) {
                 $fields[] = "$field = ?";
                 $params[] = json_encode($data[$field]);
-            } elseif (in_array($field, ['bestSeller', 'isActive'])) {
+            } elseif (in_array($field, ['bestSeller', 'isActive', 'retailMinQty', 'wholesaleMinQty', 'distributorMinQty'])) {
                 $fields[] = "$field = ?";
                 $params[] = (int)$data[$field];
+            } elseif (in_array($field, ['price', 'rating', 'retailPrice', 'wholesalePrice', 'distributorPrice'])) {
+                $fields[] = "$field = ?";
+                $params[] = (float)$data[$field];
             } else {
                 $fields[] = "$field = ?";
                 $params[] = $data[$field];

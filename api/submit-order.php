@@ -48,6 +48,11 @@ try {
         throw new Exception('Database helper file not found');
     }
     require_once __DIR__ . '/database.php';
+    
+    if (!file_exists(__DIR__ . '/pricing-helper.php')) {
+        throw new Exception('Pricing helper file not found');
+    }
+    require_once __DIR__ . '/pricing-helper.php';
 } catch (Exception $e) {
     ob_clean();
     http_response_code(500);
@@ -113,6 +118,50 @@ try {
     // Prepare order data with order ID
     $orderData['orderId'] = $orderId;
     
+    // Apply tier-corrected pricing to order items before sending emails
+    // This ensures emails show the correct prices based on quantity and tier
+    $correctedItems = [];
+    $correctedTotal = 0;
+    
+    foreach ($orderData['items'] as $item) {
+        $correctedItem = $item;
+        
+        // Look up product to determine correct pricing tier
+        if (!empty($item['id'])) {
+            $product = dbQueryOne(
+                "SELECT * FROM products WHERE id = ?",
+                [$item['id']]
+            );
+            
+            if ($product) {
+                // Decode JSON fields
+                $product['retailPrice'] = isset($product['retailPrice']) ? (float)$product['retailPrice'] : null;
+                $product['retailMinQty'] = isset($product['retailMinQty']) ? (int)$product['retailMinQty'] : 1;
+                $product['wholesalePrice'] = isset($product['wholesalePrice']) ? (float)$product['wholesalePrice'] : null;
+                $product['wholesaleMinQty'] = isset($product['wholesaleMinQty']) ? (int)$product['wholesaleMinQty'] : null;
+                $product['distributorPrice'] = isset($product['distributorPrice']) ? (float)$product['distributorPrice'] : null;
+                $product['distributorMinQty'] = isset($product['distributorMinQty']) ? (int)$product['distributorMinQty'] : null;
+                
+                // Determine pricing tier and get corrected price
+                $tierInfo = determinePricingTier($product, (int)$item['quantity'], (float)$item['productPrice']);
+                
+                // Update item with tier-corrected price
+                $correctedItem['productPrice'] = $tierInfo['pricePerUnit'];
+                $correctedItem['pricingTier'] = $tierInfo['tier'];
+                $correctedItem['pricingTierDisplay'] = $tierInfo['tierDisplay'];
+                $correctedItem['pricingTierMinQty'] = $tierInfo['minQty'];
+            }
+        }
+        
+        // Calculate item total with corrected price
+        $correctedTotal += $correctedItem['productPrice'] * (int)$correctedItem['quantity'];
+        $correctedItems[] = $correctedItem;
+    }
+    
+    // Update order data with corrected items and total
+    $orderData['items'] = $correctedItems;
+    $orderData['total'] = $correctedTotal;
+    
     // Initialize email results
     $salesEmailResult = false;
     $salesEmailError = null;
@@ -140,10 +189,10 @@ try {
         // Continue processing even if customer email fails
     }
     
-    // Save order to database
+    // Save order to database (using corrected prices)
     try {
         $customer = $orderData['customer'];
-        $items = $orderData['items'];
+        $items = $orderData['items']; // Already corrected above
         
         // Insert order
         $orderSql = "INSERT INTO orders (orderId, customerName, customerEmail, customerPhone, 
@@ -161,7 +210,7 @@ try {
             $customer['state'],
             $customer['postalCode'] ?? null,
             $customer['notes'] ?? null,
-            $orderData['total'],
+            $orderData['total'], // Use corrected total
             $orderData['submittedVia'] ?? 'email',
             $salesEmailResult ? 1 : 0,
             $customerEmailResult ? 1 : 0
@@ -170,7 +219,7 @@ try {
         $orderInserted = dbExecute($orderSql, $orderParams);
         
         if ($orderInserted) {
-            // Insert order items
+            // Insert order items (with corrected prices)
             foreach ($items as $item) {
                 $itemSql = "INSERT INTO order_items (orderId, productId, productName, productPrice, 
                            quantity, productImage) VALUES (?, ?, ?, ?, ?, ?)";
@@ -178,7 +227,7 @@ try {
                     $orderId,
                     $item['id'] ?? null,
                     $item['productName'] ?? 'Unknown Product',
-                    $item['productPrice'] ?? 0,
+                    $item['productPrice'] ?? 0, // Use corrected price
                     $item['quantity'] ?? 1,
                     $item['firstImg'] ?? null
                 ];

@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useProducts } from "../../ProductsContext";
 import { useCart } from "../../CartContext";
+import { calculatePriceForQuantity } from "../../Utils/pricingUtils";
 import "./view-product.scss";
 import { Desktop, TabletAndBelow } from "../../Utils/mediaQueries";
 import { Spinner, Alert } from "react-bootstrap";
@@ -109,14 +110,16 @@ export const ViewProductPage: React.FC = () => {
     return `Olivia ${name}${sufix ? ` ${sufix}` : ""}`;
   };
 
-  const handleAddToCart = () =>
+  const handleAddToCart = () => {
+    const priceForQuantity = calculatePriceForQuantity(product, quantity);
     addToCart({
       id: product.id,
       productName: formatProductName(),
-      productPrice: product.price,
+      productPrice: priceForQuantity,
       firstImg: product.firstImg,
       quantity,
     });
+  };
 
   const dec = () => {
     setQuantity((q) => {
@@ -125,7 +128,16 @@ export const ViewProductPage: React.FC = () => {
       if (product) {
         const cartItem = cart.find((item) => item.id === product.id);
         if (cartItem) {
+          const newPrice = calculatePriceForQuantity(product, newQty);
           updateQuantity(product.id, newQty);
+          // Update price in cart
+          addToCart({
+            id: product.id,
+            productName: formatProductName(),
+            productPrice: newPrice,
+            firstImg: product.firstImg,
+            quantity: newQty,
+          });
         }
       }
       return newQty;
@@ -139,7 +151,16 @@ export const ViewProductPage: React.FC = () => {
       if (product) {
         const cartItem = cart.find((item) => item.id === product.id);
         if (cartItem) {
+          const newPrice = calculatePriceForQuantity(product, newQty);
           updateQuantity(product.id, newQty);
+          // Update price in cart
+          addToCart({
+            id: product.id,
+            productName: formatProductName(),
+            productPrice: newPrice,
+            firstImg: product.firstImg,
+            quantity: newQty,
+          });
         }
       }
       return newQty;
@@ -240,7 +261,7 @@ export const ViewProductPage: React.FC = () => {
           </div></div>
 
           <button className="add-to-cart2" onClick={handleAddToCart}>
-            Add to Cart | ₦{(Number(product.price) * quantity).toLocaleString()}
+            Add to Cart | ₦{(calculatePriceForQuantity(product, quantity) * quantity).toLocaleString()}
           </button>
 
 

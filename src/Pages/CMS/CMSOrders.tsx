@@ -478,16 +478,24 @@ export const CMSOrders: React.FC = () => {
             {selectedOrder.items && selectedOrder.items.length > 0 && (
               <div className="mt-3">
                 <h6>Order Items:</h6>
-                {selectedOrder.items.map((item: any, idx: number) => (
-                  <div key={idx} className="order-item">
-                    <p style={{ marginBottom: '0.5rem' }}>
-                      <strong>{item.productName}</strong>
-                    </p>
-                    <p style={{ marginBottom: 0, fontSize: '0.9rem', color: '#666' }}>
-                      Quantity: {item.quantity} × ₦{item.productPrice.toLocaleString()} = ₦{(item.quantity * item.productPrice).toLocaleString()}
-                    </p>
-                  </div>
-                ))}
+                {selectedOrder.items.map((item: any, idx: number) => {
+                  const tierInfo = item.pricingTierDisplay 
+                    ? (item.pricingTierMinQty !== null && item.pricingTierMinQty !== undefined
+                        ? ` (${item.pricingTierDisplay} Pricing - Min Qty: ${item.pricingTierMinQty})`
+                        : ` (${item.pricingTierDisplay} Pricing)`)
+                    : '';
+                  return (
+                    <div key={idx} className="order-item" style={{ marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid #e0e0e0' }}>
+                      <p style={{ marginBottom: '0.5rem' }}>
+                        <strong>{item.productName}</strong>
+                        {tierInfo && <span style={{ fontSize: '0.85rem', color: '#6c757d', marginLeft: '0.5rem' }}>{tierInfo}</span>}
+                      </p>
+                      <p style={{ marginBottom: 0, fontSize: '0.9rem', color: '#666' }}>
+                        Quantity: {item.quantity} × ₦{item.productPrice.toLocaleString()} = ₦{(item.quantity * item.productPrice).toLocaleString()}
+                      </p>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </Modal.Body>

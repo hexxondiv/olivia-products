@@ -24,6 +24,13 @@ interface Product {
   flavours?: Array<{ id: number; name: string }>;
   bestSeller: boolean;
   isActive: boolean;
+  // Tiered pricing fields
+  retailPrice?: number | null;
+  retailMinQty?: number;
+  wholesalePrice?: number | null;
+  wholesaleMinQty?: number | null;
+  distributorPrice?: number | null;
+  distributorMinQty?: number | null;
 }
 
 const PRODUCT_CATEGORIES = [
@@ -62,7 +69,13 @@ export const CMSProducts: React.FC = () => {
     category: [],
     flavours: [],
     bestSeller: false,
-    isActive: true
+    isActive: true,
+    retailPrice: null,
+    retailMinQty: 1,
+    wholesalePrice: null,
+    wholesaleMinQty: null,
+    distributorPrice: null,
+    distributorMinQty: null
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -162,7 +175,13 @@ export const CMSProducts: React.FC = () => {
         category: product.category || [],
         flavours: product.flavours || [],
         bestSeller: product.bestSeller || false,
-        isActive: product.isActive !== undefined ? product.isActive : true
+        isActive: product.isActive !== undefined ? product.isActive : true,
+        retailPrice: product.retailPrice ?? null,
+        retailMinQty: product.retailMinQty ?? 1,
+        wholesalePrice: product.wholesalePrice ?? null,
+        wholesaleMinQty: product.wholesaleMinQty ?? null,
+        distributorPrice: product.distributorPrice ?? null,
+        distributorMinQty: product.distributorMinQty ?? null
       });
     } else {
       setSelectedProduct(null);
@@ -182,7 +201,13 @@ export const CMSProducts: React.FC = () => {
         category: [],
         flavours: [],
         bestSeller: false,
-        isActive: true
+        isActive: true,
+        retailPrice: null,
+        retailMinQty: 1,
+        wholesalePrice: null,
+        wholesaleMinQty: null,
+        distributorPrice: null,
+        distributorMinQty: null
       });
     }
     setFormErrors({});
@@ -208,7 +233,13 @@ export const CMSProducts: React.FC = () => {
       category: [],
       flavours: [],
       bestSeller: false,
-      isActive: true
+      isActive: true,
+      retailPrice: null,
+      retailMinQty: 1,
+      wholesalePrice: null,
+      wholesaleMinQty: null,
+      distributorPrice: null,
+      distributorMinQty: null
     });
     setFormErrors({});
   };
@@ -672,6 +703,7 @@ export const CMSProducts: React.FC = () => {
                       isInvalid={!!formErrors.price}
                       required
                     />
+                    <Form.Text className="text-muted">Legacy price field (for backward compatibility)</Form.Text>
                     <Form.Control.Feedback type="invalid">
                       {formErrors.price}
                     </Form.Control.Feedback>
@@ -688,6 +720,105 @@ export const CMSProducts: React.FC = () => {
                       value={formData.rating || 0}
                       onChange={(e) => handleInputChange('rating', parseFloat(e.target.value) || 0)}
                     />
+                  </Form.Group>
+                </Col>
+              </Row>
+            </div>
+
+            <div className="form-section">
+              <h6 className="section-title">Tiered Pricing</h6>
+              <p className="text-muted small mb-3">
+                Set up pricing tiers based on minimum purchase quantities. The system will automatically apply the highest tier that the customer's quantity qualifies for.
+              </p>
+              
+              <Row>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Retail Price (₦) *</Form.Label>
+                    <Form.Control
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={formData.retailPrice ?? ''}
+                      onChange={(e) => handleInputChange('retailPrice', e.target.value ? parseFloat(e.target.value) : null)}
+                      placeholder="Enter retail price"
+                    />
+                    <Form.Text className="text-muted">Price for retail customers</Form.Text>
+                  </Form.Group>
+                </Col>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Retail Minimum Quantity *</Form.Label>
+                    <Form.Control
+                      type="number"
+                      step="1"
+                      min="1"
+                      value={formData.retailMinQty ?? 1}
+                      onChange={(e) => handleInputChange('retailMinQty', parseInt(e.target.value) || 1)}
+                    />
+                    <Form.Text className="text-muted">Minimum quantity for retail pricing (default: 1)</Form.Text>
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              <Row>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Wholesale Price (₦)</Form.Label>
+                    <Form.Control
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={formData.wholesalePrice ?? ''}
+                      onChange={(e) => handleInputChange('wholesalePrice', e.target.value ? parseFloat(e.target.value) : null)}
+                      placeholder="Enter wholesale price (optional)"
+                    />
+                    <Form.Text className="text-muted">Price for wholesale customers</Form.Text>
+                  </Form.Group>
+                </Col>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Wholesale Minimum Quantity</Form.Label>
+                    <Form.Control
+                      type="number"
+                      step="1"
+                      min="1"
+                      value={formData.wholesaleMinQty ?? ''}
+                      onChange={(e) => handleInputChange('wholesaleMinQty', e.target.value ? parseInt(e.target.value) : null)}
+                      placeholder="Enter minimum quantity (optional)"
+                    />
+                    <Form.Text className="text-muted">Minimum quantity to qualify for wholesale pricing</Form.Text>
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              <Row>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Distributor Price (₦)</Form.Label>
+                    <Form.Control
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={formData.distributorPrice ?? ''}
+                      onChange={(e) => handleInputChange('distributorPrice', e.target.value ? parseFloat(e.target.value) : null)}
+                      placeholder="Enter distributor price (optional)"
+                    />
+                    <Form.Text className="text-muted">Price for distributor customers</Form.Text>
+                  </Form.Group>
+                </Col>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Distributor Minimum Quantity</Form.Label>
+                    <Form.Control
+                      type="number"
+                      step="1"
+                      min="1"
+                      value={formData.distributorMinQty ?? ''}
+                      onChange={(e) => handleInputChange('distributorMinQty', e.target.value ? parseInt(e.target.value) : null)}
+                      placeholder="Enter minimum quantity (optional)"
+                    />
+                    <Form.Text className="text-muted">Minimum quantity to qualify for distributor pricing</Form.Text>
                   </Form.Group>
                 </Col>
               </Row>

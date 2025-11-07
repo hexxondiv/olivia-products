@@ -3,6 +3,7 @@ import { Offcanvas } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../../CartContext";
 import { useProducts } from "../../ProductsContext";
+import { calculatePriceForQuantity } from "../../Utils/pricingUtils";
 import "./cart-list.scss";
 import { MdDelete } from "react-icons/md";
 import { BiSearch } from "react-icons/bi";
@@ -17,6 +18,7 @@ const CartOffcanvas: React.FC = () => {
     clearCart,
     incrementQuantity,
     decrementQuantity,
+    addToCart,
   } = useCart();
   const { getProductById } = useProducts();
 
@@ -46,8 +48,60 @@ const CartOffcanvas: React.FC = () => {
     });
   }, [cart, searchQuery]);
 
-  const calculateTotalPrice = () =>
-    filteredCart.reduce((total, item) => total + item.productPrice * item.quantity, 0);
+  const calculateTotalPrice = () => {
+    return filteredCart.reduce((total, item) => {
+      const product = getProductById(item.id);
+      if (product) {
+        const pricePerUnit = calculatePriceForQuantity(product, item.quantity);
+        return total + pricePerUnit * item.quantity;
+      }
+      // Fallback to stored price if product not found
+      return total + item.productPrice * item.quantity;
+    }, 0);
+  };
+
+  const getItemPrice = (item: any) => {
+    const product = getProductById(item.id);
+    if (product) {
+      return calculatePriceForQuantity(product, item.quantity);
+    }
+    return item.productPrice;
+  };
+
+  const handleIncrement = (item: any) => {
+    const product = getProductById(item.id);
+    if (product) {
+      const newQuantity = item.quantity + 1;
+      const newPrice = calculatePriceForQuantity(product, newQuantity);
+      addToCart({
+        id: item.id,
+        productName: item.productName,
+        productPrice: newPrice,
+        firstImg: item.firstImg,
+        quantity: newQuantity,
+      });
+    } else {
+      incrementQuantity(item.id);
+    }
+  };
+
+  const handleDecrement = (item: any) => {
+    if (item.quantity <= 1) return;
+    const product = getProductById(item.id);
+    if (product) {
+      const newQuantity = item.quantity - 1;
+      const newPrice = calculatePriceForQuantity(product, newQuantity);
+      addToCart({
+        id: item.id,
+        productName: item.productName,
+        productPrice: newPrice,
+        firstImg: item.firstImg,
+        quantity: newQuantity,
+      });
+    } else {
+      decrementQuantity(item.id);
+    }
+  };
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-NG', {
@@ -132,12 +186,12 @@ const CartOffcanvas: React.FC = () => {
                   </div>
                 </Link>
                 <div className="item-actions">
-                  <p className="item-price">{formatCurrency(item.productPrice * item.quantity)}</p>
+                  <p className="item-price">{formatCurrency(getItemPrice(item) * item.quantity)}</p>
                   <div className="increments">
                     <button
                       type="button"
                       className="increment-btn"
-                      onClick={() => incrementQuantity(item.id)}
+                      onClick={() => handleIncrement(item)}
                       aria-label="Increase quantity"
                     >
                       +
@@ -146,7 +200,7 @@ const CartOffcanvas: React.FC = () => {
                     <button
                       type="button"
                       className="increment-btn"
-                      onClick={() => decrementQuantity(item.id)}
+                      onClick={() => handleDecrement(item)}
                       aria-label="Decrease quantity"
                     >
                       -

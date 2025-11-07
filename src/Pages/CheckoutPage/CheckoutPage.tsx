@@ -3,6 +3,7 @@ import { Container, Row, Col } from "react-bootstrap";
 import { useNavigate, Link } from "react-router-dom";
 import { useCart } from "../../CartContext";
 import { useProducts } from "../../ProductsContext";
+import { calculatePriceForQuantity, getPricingTier } from "../../Utils/pricingUtils";
 import "./checkout-page.scss";
 import { MdDelete, MdEmail } from "react-icons/md";
 import { FaWhatsapp } from "react-icons/fa";
@@ -15,6 +16,7 @@ export const CheckoutPage: React.FC = () => {
     incrementQuantity,
     decrementQuantity,
     clearCart,
+    addToCart,
   } = useCart();
   const { getProductById } = useProducts();
 
@@ -34,7 +36,23 @@ export const CheckoutPage: React.FC = () => {
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const calculateTotalPrice = () => {
-    return cart.reduce((total, item) => total + item.productPrice * item.quantity, 0);
+    return cart.reduce((total, item) => {
+      const product = getProductById(item.id);
+      if (product) {
+        const pricePerUnit = calculatePriceForQuantity(product, item.quantity);
+        return total + pricePerUnit * item.quantity;
+      }
+      // Fallback to stored price if product not found
+      return total + item.productPrice * item.quantity;
+    }, 0);
+  };
+
+  const getItemPrice = (item: any) => {
+    const product = getProductById(item.id);
+    if (product) {
+      return calculatePriceForQuantity(product, item.quantity);
+    }
+    return item.productPrice;
   };
 
   const formatCurrency = (amount: number) => {
@@ -101,8 +119,31 @@ export const CheckoutPage: React.FC = () => {
     message += "*ORDER ITEMS*\n";
     cart.forEach((item, index) => {
       const formattedName = formatProductName(item);
-      message += `*${index + 1}. ${formattedName}*\n`;
-      message += `   Qty: *${item.quantity}* × ${formatCurrency(item.productPrice)} = *${formatCurrency(item.productPrice * item.quantity)}*\n\n`;
+      const product = getProductById(item.id);
+      
+      // Calculate tier-corrected price based on quantity (ensures correct pricing tier is applied)
+      const pricePerUnit = getItemPrice(item); // This recalculates price based on quantity and tier
+      
+      // Determine pricing tier for display
+      let tierInfo = '';
+      if (product) {
+        const tier = getPricingTier(product, item.quantity);
+        if (tier === 'distributor' && product.distributorMinQty) {
+          tierInfo = ` [Distributor Pricing - Min Qty: ${product.distributorMinQty}]`;
+        } else if (tier === 'wholesale' && product.wholesaleMinQty) {
+          tierInfo = ` [Wholesale Pricing - Min Qty: ${product.wholesaleMinQty}]`;
+        } else if (tier === 'retail' && product.retailMinQty) {
+          tierInfo = ` [Retail Pricing - Min Qty: ${product.retailMinQty}]`;
+        } else if (tier !== 'legacy') {
+          tierInfo = ` [${tier.charAt(0).toUpperCase() + tier.slice(1)} Pricing]`;
+        }
+      }
+      
+      // Calculate item total using tier-corrected price
+      const itemTotal = pricePerUnit * item.quantity;
+      
+      message += `*${index + 1}. ${formattedName}*${tierInfo}\n`;
+      message += `   Qty: *${item.quantity}* × ${formatCurrency(pricePerUnit)} = *${formatCurrency(itemTotal)}*\n\n`;
     });
     
     message += `*TOTAL AMOUNT: ${formatCurrency(calculateTotalPrice())}*\n\n`;
@@ -594,7 +635,24 @@ export const CheckoutPage: React.FC = () => {
                           <button
                             type="button"
                             className="qty-btn"
-                            onClick={() => decrementQuantity(item.id)}
+                            onClick={() => {
+                              if (item.quantity > 1) {
+                                const product = getProductById(item.id);
+                                if (product) {
+                                  const newQuantity = item.quantity - 1;
+                                  const newPrice = calculatePriceForQuantity(product, newQuantity);
+                                  addToCart({
+                                    id: item.id,
+                                    productName: item.productName,
+                                    productPrice: newPrice,
+                                    firstImg: item.firstImg,
+                                    quantity: newQuantity,
+                                  });
+                                } else {
+                                  decrementQuantity(item.id);
+                                }
+                              }
+                            }}
                             aria-label="Decrease quantity"
                           >
                             −
@@ -603,14 +661,29 @@ export const CheckoutPage: React.FC = () => {
                           <button
                             type="button"
                             className="qty-btn"
-                            onClick={() => incrementQuantity(item.id)}
+                            onClick={() => {
+                              const product = getProductById(item.id);
+                              if (product) {
+                                const newQuantity = item.quantity + 1;
+                                const newPrice = calculatePriceForQuantity(product, newQuantity);
+                                addToCart({
+                                  id: item.id,
+                                  productName: item.productName,
+                                  productPrice: newPrice,
+                                  firstImg: item.firstImg,
+                                  quantity: newQuantity,
+                                });
+                              } else {
+                                incrementQuantity(item.id);
+                              }
+                            }}
                             aria-label="Increase quantity"
                           >
                             +
                           </button>
                         </div>
                         <div className="item-price">
-                          {formatCurrency(item.productPrice * item.quantity)}
+                          {formatCurrency(getItemPrice(item) * item.quantity)}
                         </div>
                       </div>
                     </div>
