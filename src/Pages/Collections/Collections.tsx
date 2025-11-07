@@ -15,6 +15,7 @@ export const Collections: React.FC = () => {
 
   const [sortType, setSortType] = useState("price-asc");
   const [searchQuery, setSearchQuery] = useState("");
+  const [purchaseType, setPurchaseType] = useState<'distribution' | 'wholesale' | 'retail' | null>(null);
 
   // Get products from context
   const { products: allProductsData } = useProducts();
@@ -51,19 +52,14 @@ export const Collections: React.FC = () => {
 
       <p className="col-md-5 animate-charcter lineUp">{categoryIntro}</p>
 
-      <div className="d-md-flex align-items-center">
+      <div className="filters-container d-md-flex align-items-center">
         <p style={{ flexGrow: 1 }} className="prd-figure">
           {itemCount} Item{itemCount !== 1 ? "s" : ""}
         </p>
 
-        <div className="d-flex align-items-center">
+        <div className="filters-wrapper d-flex align-items-center">
           <div
-            className="sort-bar col-md-"
-            style={{
-              borderRight: "solid 1px #e7e7e7",
-              marginRight: "10px",
-              paddingRight: "10px",
-            }}
+            className="sort-bar search-bar"
           >
             <div style={{ position: "relative" }}>
               <input
@@ -71,20 +67,10 @@ export const Collections: React.FC = () => {
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="form-control"
-                style={{
-                  paddingLeft: "35px",
-                  minWidth: "200px",
-                }}
+                className="form-control search-input"
               />
               <span
-                style={{
-                  position: "absolute",
-                  left: "10px",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  color: "#6c757d",
-                }}
+                className="search-icon"
               >
                 🔍
               </span>
@@ -92,47 +78,41 @@ export const Collections: React.FC = () => {
           </div>
 
           <div
-            className="sort-bar col-md-"
-            style={{
-              borderRight: "solid 1px #e7e7e7",
-              marginRight: "10px",
-            }}
+            className="sort-bar purchase-type-bar"
           >
-            <PurchaseType />
+            <PurchaseType value={purchaseType} onChange={setPurchaseType} />
           </div>
 
           <div
-            className="sort-bar col-md-"
-            style={{
-              borderRight: "solid 1px #e7e7e7",
-              marginRight: "10px",
-            }}
+            className="sort-bar category-bar"
           >
             <SelectDrop />
           </div>
-        </div>
 
-        <div className="sort-bar col-md-2">
-          <select
-            value={sortType}
-            onChange={(e) => setSortType(e.target.value)}
-            className="form-select"
-          >
-            <option value="price-asc">Price: Low to High</option>
-            <option value="price-desc">Price: High to Low</option>
-            <option value="rating-desc">Rating: High to Low</option>
-            <option value="rating-asc">Rating: Low to High</option>
-          </select>
+          <div className="sort-bar sort-select-bar">
+            <select
+              value={sortType}
+              onChange={(e) => setSortType(e.target.value)}
+              className="form-select"
+            >
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+              <option value="rating-desc">Rating: High to Low</option>
+              <option value="rating-asc">Rating: Low to High</option>
+            </select>
+          </div>
         </div>
       </div>
 
       <hr />
 
+      {/* @ts-expect-error - ProductsHolder is a JSX component without TypeScript definitions */}
       <ProductsHolder
         category={rawCategory}
         viewType="grid"
         sortType={sortType}
         searchQuery={searchQuery}
+        purchaseType={purchaseType}
       />
     </div>
   );

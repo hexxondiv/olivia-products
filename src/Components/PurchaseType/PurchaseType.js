@@ -1,32 +1,33 @@
 import Dropdown from "react-bootstrap/Dropdown";
-import { NavLink } from "react-router-dom";
 import "./purchase-type.scss";
-function PurchaseType() {
+
+function PurchaseType({ value, onChange }) {
+  const purchaseTypes = [
+    { label: "Distribution", value: "distribution" },
+    { label: "Wholesale", value: "wholesale" },
+    { label: "Retail", value: "retail" },
+  ];
+
+  const selectedLabel = purchaseTypes.find(type => type.value === value)?.label || "Purchase Type";
+
   return (
     <>
       <div className="select-div">
-        {" "}
         <Dropdown>
           <Dropdown.Toggle id="dropdown-button-dark-example1">
-            Purchase Type
+            {selectedLabel}
           </Dropdown.Toggle>
 
           <Dropdown.Menu>
-            <Dropdown.Item>
-              <NavLink to={"/wholesale-page"}>Distribution</NavLink>
-            </Dropdown.Item>
-            <Dropdown.Item>
-              <NavLink to={"/wholesale-page"}> Wholesale</NavLink>
-            </Dropdown.Item>
-            <Dropdown.Item>
-              <NavLink to={"/collections?category=*"}>DropShipping</NavLink>
-            </Dropdown.Item>
-            <Dropdown.Item>
-              <NavLink to={"/wholesale-page"}>Retailer</NavLink>
-            </Dropdown.Item>{" "}
-            <Dropdown.Item>
-              <NavLink to={"/collections?category=*"}>Consumer</NavLink>
-            </Dropdown.Item>{" "}
+            {purchaseTypes.map((type) => (
+              <Dropdown.Item
+                key={type.value}
+                active={value === type.value}
+                onClick={() => onChange && onChange(type.value)}
+              >
+                {type.label}
+              </Dropdown.Item>
+            ))}
           </Dropdown.Menu>
         </Dropdown>
       </div>

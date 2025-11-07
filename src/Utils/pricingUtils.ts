@@ -83,3 +83,29 @@ export function getPricingTier(product: Product, quantity: number): 'distributor
   return 'legacy';
 }
 
+/**
+ * Get the price for a product based on the selected purchase type.
+ * Returns the price for the specified tier, or falls back to legacy price.
+ * 
+ * @param product - The product object
+ * @param purchaseType - The purchase type: 'distribution', 'wholesale', or 'retail'
+ * @returns The price per unit for the given purchase type
+ */
+export function getPriceByPurchaseType(product: Product, purchaseType: 'distribution' | 'wholesale' | 'retail' | null | undefined): number {
+  if (!purchaseType) {
+    // If no purchase type selected, return retail price or legacy price
+    return product.retailPrice ?? product.price;
+  }
+
+  switch (purchaseType) {
+    case 'distribution':
+      return product.distributorPrice ?? product.price;
+    case 'wholesale':
+      return product.wholesalePrice ?? product.price;
+    case 'retail':
+      return product.retailPrice ?? product.price;
+    default:
+      return product.price;
+  }
+}
+

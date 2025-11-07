@@ -1,23 +1,171 @@
 .collection-section {
-  margin-top: 100px;
+  margin-top: 10px;
   padding-right: 70px;
   padding-left: 70px;
-  @media screen and (max-width:820px){
-    margin-top:50px;
-    padding-right: 10px;
-      padding-left: 10px;
+  box-sizing: border-box;
+  max-width: 100%;
+  width: 100%;
+  overflow-x: hidden;
+  
+  * {
+    box-sizing: border-box;
   }
-    @media screen and (min-width: 820px) and (max-width: 1024px){
-      padding-right: 10px;
-        padding-left: 0px;
-    }
+  
+  @media screen and (max-width: 820px) {
+    margin-top: 5px;
+    padding-right: 15px;
+    padding-left: 15px;
+    overflow-x: visible;
+  }
+  
+  @media screen and (min-width: 820px) and (max-width: 1024px) {
+    padding-right: 15px;
+    padding-left: 15px;
+  }
 }
+.filters-container {
+  box-sizing: border-box;
+  max-width: 100%;
+  
+  @media screen and (max-width: 820px) {
+    flex-wrap: nowrap;
+    gap: 10px;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: visible;
+  }
+}
+
+.filters-wrapper {
+  box-sizing: border-box;
+  max-width: 100%;
+  flex-wrap: wrap;
+  position:sticky;
+  top: 0;
+  z-index: 1000;
+  
+  @media screen and (max-width: 820px) {
+    width: 100%;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+    
+    &::-webkit-scrollbar {
+      height: 4px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: 2px;
+    }
+    
+    &::-webkit-scrollbar-thumb:hover {
+      background-color: rgba(0, 0, 0, 0.3);
+    }
+  }
+}
+
 .sort-bar {
   font-family: sailecMedium;
-  @media screen and (max-width:820px) {
-      margin-top: 30px;
-     
+  box-sizing: border-box;
+  
+  @media screen and (min-width: 821px) {
+    border-right: solid 1px #e7e7e7;
+    margin-right: 10px;
+    padding-right: 10px;
+    
+    &.search-bar {
+      padding-right: 10px;
     }
+    
+    &.purchase-type-bar,
+    &.category-bar {
+      border-right: solid 1px #e7e7e7;
+    }
+    
+    &.sort-select-bar {
+      border-right: none;
+      margin-right: 0;
+      padding-right: 0;
+    }
+  }
+  
+  @media screen and (max-width: 820px) {
+    margin-top: 0;
+    margin-right: 8px;
+    margin-left: 0;
+    padding-right: 0;
+    padding-left: 0;
+    flex-shrink: 0;
+    white-space: nowrap;
+    
+    &:last-child {
+      margin-right: 0;
+    }
+    
+    .form-control,
+    .form-select {
+      box-sizing: border-box;
+      white-space: nowrap;
+    }
+    
+    .select-div {
+      box-sizing: border-box;
+      white-space: nowrap;
+      
+      button {
+        box-sizing: border-box;
+        white-space: nowrap;
+      }
+    }
+  }
+}
+
+.search-bar {
+  box-sizing: border-box;
+  max-width: 100%;
+  
+  @media screen and (min-width: 821px) {
+    .search-input {
+      padding-left: 35px;
+      min-width: 200px;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+  }
+  
+  @media screen and (max-width: 820px) {
+    flex-shrink: 0;
+    min-width: 150px;
+    
+    .search-input {
+      padding-left: 35px;
+      min-width: 150px;
+      width: 150px;
+      box-sizing: border-box;
+    }
+  }
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+  pointer-events: none;
+  z-index: 1;
 }
 .animate-charcter {
   text-transform: uppercase;
@@ -35,6 +183,10 @@
   -webkit-text-fill-color: transparent;
   animation: textclip 2s linear infinite;
   display: inline-block;
+  
+  @media screen and (max-width: 820px) {
+    display: none;
+  }
 }
 
 @keyframes textclip {
@@ -71,5 +223,7 @@
   font-size: 30px;
   @media screen and (max-width:820px){
     font-size:18px;
+    flex-shrink: 0;
+    margin-right: 10px;
   }
 }

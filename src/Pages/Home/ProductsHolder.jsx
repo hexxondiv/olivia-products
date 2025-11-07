@@ -8,15 +8,25 @@ import { Spinner } from "react-bootstrap";
 
 import { useProducts } from "../../ProductsContext";
 import { useCart } from "../../CartContext";
-import { calculatePriceForQuantity } from "../../Utils/pricingUtils";
+import { calculatePriceForQuantity, getPriceByPurchaseType } from "../../Utils/pricingUtils";
 import { MdNavigateBefore, MdNavigateNext } from "react-icons/md";
 import { Desktop, TabletAndBelow } from "../../Utils/mediaQueries";
+/**
+ * ProductsHolder component
+ * @param {string} category - Category filter
+ * @param {string} viewType - View type: "grid" or "slide"
+ * @param {string} sortType - Sort type
+ * @param {boolean} showOnlyBestSellers - Show only best sellers
+ * @param {string} searchQuery - Search query
+ * @param {('distribution'|'wholesale'|'retail'|null)} purchaseType - Selected purchase type
+ */
 export const ProductsHolder = ({
   category = "",
   viewType = "slide",
   sortType = "",
   showOnlyBestSellers = false,  // <-- new prop
   searchQuery = "",  // <-- new prop for search
+  purchaseType = null,  // <-- new prop for purchase type
 
 }) => {
   const [startIndex, setStartIndex] = useState(0);
@@ -94,16 +104,27 @@ export const ProductsHolder = ({
       })
     : categoryFiltered;
 
+  // Helper function to get display price based on purchase type
+  const getDisplayPrice = (product) => {
+    if (purchaseType) {
+      return getPriceByPurchaseType(product, purchaseType);
+    }
+    return product.price;
+  };
+
   // Sorting logic based on sortType
   const sortedProducts = [...filteredProducts].sort((a, b) => {
+    const priceA = getDisplayPrice(a);
+    const priceB = getDisplayPrice(b);
+    
     switch (sortType) {
       // Old format support
       case "low-high-price":
       case "price-asc":
-        return a.price - b.price;
+        return priceA - priceB;
       case "high-low-price":
       case "price-desc":
-        return b.price - a.price;
+        return priceB - priceA;
       case "high-low-rating":
       case "rating-desc":
         return (b.rating || 0) - (a.rating || 0);
@@ -185,7 +206,7 @@ export const ProductsHolder = ({
             <div key={index} className="mb-4">
               <MainProduct
                 productName={product.name}
-                productPrice={product.price}
+                productPrice={getDisplayPrice(product)}
                 firstImg={product.firstImg}
                 hoverImg={product.hoverImg}
                 rating={product.rating}
@@ -275,7 +296,7 @@ export const ProductsHolder = ({
                   >
                     <MainProduct
                       productName={product.name}
-                      productPrice={product.price}
+                      productPrice={getDisplayPrice(product)}
                       firstImg={product.firstImg}
                       hoverImg={product.hoverImg}
                       rating={product.rating}
@@ -365,7 +386,7 @@ export const ProductsHolder = ({
                   >
                     <MainProduct
                       productName={product.name}
-                      productPrice={product.price}
+                      productPrice={getDisplayPrice(product)}
                       firstImg={product.firstImg}
                       hoverImg={product.hoverImg}
                       rating={product.rating}
