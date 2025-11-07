@@ -521,6 +521,154 @@
   }
 }
 
+// Special styling for delete confirmation modal
+.cms-modal-delete {
+  .modal-dialog {
+    max-width: 420px;
+  }
+
+  .modal-header {
+    padding-bottom: 0.75rem;
+    
+    .modal-title {
+      font-size: $font-size-xl;
+      
+      svg {
+        font-size: 1.25rem;
+      }
+    }
+  }
+
+  .modal-body {
+    padding-top: 1rem;
+    padding-bottom: 1.5rem;
+
+    > p {
+      margin-bottom: 1rem;
+      font-size: $font-size-sm;
+    }
+  }
+
+  .delete-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .delete-option {
+    background: $white;
+    border: 2px solid rgba($color-slate, 0.15);
+    border-radius: $border-radius;
+    padding: 1rem 1.25rem;
+    text-align: left;
+    cursor: pointer;
+    transition: all $transition-base;
+    position: relative;
+    overflow: hidden;
+
+    &:hover:not(:disabled) {
+      border-color: rgba($color-slate, 0.3);
+      transform: translateY(-2px);
+      box-shadow: $shadow-md;
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    &-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+
+    &-title {
+      font-family: $font-heading;
+      font-weight: 600;
+      font-size: $font-size-base;
+      color: $color-charcoal;
+    }
+
+    &-desc {
+      margin: 0;
+      font-size: $font-size-sm;
+      color: $color-slate;
+      line-height: $line-height-normal;
+    }
+
+    &-soft {
+      $warning-color: $color-amber;
+      
+      &:hover:not(:disabled) {
+        border-color: $warning-color;
+        background-color: color.change($warning-color, $alpha: 0.05);
+      }
+
+      &:focus {
+        outline: none;
+        box-shadow: 0 0 0 0.25rem color.change($warning-color, $alpha: 0.25);
+      }
+    }
+
+    &-hard {
+      $danger-color: #e54b4b;
+      border-color: rgba($danger-color, 0.2);
+      background-color: color.change($danger-color, $alpha: 0.02);
+
+      &:hover:not(:disabled) {
+        border-color: $danger-color;
+        background-color: color.change($danger-color, $alpha: 0.08);
+      }
+
+      &:focus {
+        outline: none;
+        box-shadow: 0 0 0 0.25rem color.change($danger-color, $alpha: 0.25);
+      }
+
+      .delete-option-title {
+        color: $danger-color;
+      }
+    }
+  }
+
+  .modal-footer {
+    padding-top: 0.75rem;
+    justify-content: flex-end;
+  }
+
+  // Loading state
+  .delete-option:disabled {
+    position: relative;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: 1rem;
+      transform: translateY(-50%);
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid rgba($color-slate, 0.2);
+      border-top-color: $color-slate;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: translateY(-50%) rotate(360deg);
+  }
+}
+
 // Print styles
 @media print {
   .modal {

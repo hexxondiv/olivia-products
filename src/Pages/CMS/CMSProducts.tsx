@@ -67,6 +67,9 @@ export const CMSProducts: React.FC = () => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [uploadingImage, setUploadingImage] = useState<string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<number | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     fetchProducts();
@@ -91,15 +94,25 @@ export const CMSProducts: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!window.confirm('Are you sure you want to delete this product?')) {
-      return;
-    }
+  const handleDeleteClick = (id: number) => {
+    setProductToDelete(id);
+    setShowDeleteModal(true);
+  };
+
+  const handleDelete = async (hardDelete: boolean = false) => {
+    if (!productToDelete) return;
+
+    setDeleting(true);
+    setError('');
 
     try {
       const token = localStorage.getItem('cms_token');
       const apiUrl = getApiUrl();
-      const response = await fetch(`${apiUrl}/products.php?id=${id}`, {
+      const url = hardDelete 
+        ? `${apiUrl}/products.php?id=${productToDelete}&hard=true`
+        : `${apiUrl}/products.php?id=${productToDelete}`;
+      
+      const response = await fetch(url, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -108,6 +121,8 @@ export const CMSProducts: React.FC = () => {
 
       const data = await response.json();
       if (response.ok && data.success) {
+        setShowDeleteModal(false);
+        setProductToDelete(null);
         fetchProducts();
         setError('');
       } else {
@@ -116,6 +131,15 @@ export const CMSProducts: React.FC = () => {
     } catch (err) {
       setError('Failed to delete product');
       console.error(err);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleCloseDeleteModal = () => {
+    if (!deleting) {
+      setShowDeleteModal(false);
+      setProductToDelete(null);
     }
   };
 
@@ -469,7 +493,7 @@ export const CMSProducts: React.FC = () => {
                     <Button
                       variant="outline-danger"
                       size="sm"
-                      onClick={() => product.id && handleDelete(product.id)}
+                      onClick={() => product.id && handleDeleteClick(product.id)}
                     >
                       <FaTrash />
                     </Button>
@@ -544,7 +568,7 @@ export const CMSProducts: React.FC = () => {
                 <Button
                   variant="outline-danger"
                   size="sm"
-                  onClick={() => product.id && handleDelete(product.id)}
+                  onClick={() => product.id && handleDeleteClick(product.id)}
                 >
                   <FaTrash className="me-1" />
                   Delete
@@ -919,6 +943,50 @@ export const CMSProducts: React.FC = () => {
             </div>
           </Modal.Footer>
         </Form>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal show={showDeleteModal} onHide={handleCloseDeleteModal} centered className="cms-modal-delete">
+        <Modal.Header closeButton className="border-0 pb-0">
+          <Modal.Title className="d-flex align-items-center gap-2">
+            <FaTrash className="text-danger" />
+            Delete Product
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="pt-3">
+          <p className="mb-3 text-muted">Choose a deletion method:</p>
+          <div className="delete-options">
+            <button
+              type="button"
+              className="delete-option delete-option-soft"
+              onClick={() => handleDelete(false)}
+              disabled={deleting}
+            >
+              <div className="delete-option-header">
+                <span className="delete-option-title">Deactivate</span>
+                <Badge bg="warning" className="ms-2">Reversible</Badge>
+              </div>
+              <p className="delete-option-desc">Hide from store, keep in database</p>
+            </button>
+            <button
+              type="button"
+              className="delete-option delete-option-hard"
+              onClick={() => handleDelete(true)}
+              disabled={deleting}
+            >
+              <div className="delete-option-header">
+                <span className="delete-option-title">Force Delete</span>
+                <Badge bg="danger" className="ms-2">Permanent</Badge>
+              </div>
+              <p className="delete-option-desc">Permanently remove from database</p>
+            </button>
+          </div>
+        </Modal.Body>
+        <Modal.Footer className="border-0 pt-0">
+          <Button variant="secondary" onClick={handleCloseDeleteModal} disabled={deleting}>
+            Cancel
+          </Button>
+        </Modal.Footer>
       </Modal>
     </CMSLayout>
   );
