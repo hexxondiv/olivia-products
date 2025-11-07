@@ -4,6 +4,7 @@ import { Table, Button, Badge, Modal, Form, Alert, Spinner, InputGroup, Row, Col
 import { FaEdit, FaTrash, FaPlus, FaSearch, FaUpload, FaTimes } from 'react-icons/fa';
 import { getApiUrl } from '../../Utils/apiConfig';
 import './cms-modals.scss';
+import './cms-products.scss';
 
 interface Product {
   id?: number;
@@ -382,91 +383,183 @@ export const CMSProducts: React.FC = () => {
 
   return (
     <CMSLayout>
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h1>Products Management</h1>
-        <Button variant="primary" onClick={() => handleOpenModal()}>
-          <FaPlus className="me-2" />
-          Add Product
-        </Button>
-      </div>
-
-      {error && <Alert variant="danger">{error}</Alert>}
-
-      <InputGroup className="mb-3">
-        <InputGroup.Text>
-          <FaSearch />
-        </InputGroup.Text>
-        <Form.Control
-          type="text"
-          placeholder="Search products..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </InputGroup>
-
-      <div className="cms-table">
-        <Table striped bordered hover>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Heading</th>
-              <th>Price</th>
-              <th>Rating</th>
-              <th>Category</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredProducts.map((product) => (
-              <tr key={product.id}>
-                <td>{product.id}</td>
-                <td>{product.name}</td>
-                <td>{product.heading}</td>
-                <td>₦{product.price.toLocaleString()}</td>
-                <td>{product.rating}</td>
-                <td>
-                  {product.category && product.category.length > 0
-                    ? product.category.join(', ')
-                    : '-'}
-                </td>
-                <td>
-                  <Badge bg={product.isActive ? 'success' : 'secondary'}>
-                    {product.isActive ? 'Active' : 'Inactive'}
-                  </Badge>
-                  {product.bestSeller && (
-                    <Badge bg="warning" className="ms-1">Best Seller</Badge>
-                  )}
-                </td>
-                <td>
-                  <Button
-                    variant="outline-primary"
-                    size="sm"
-                    className="me-2"
-                    onClick={() => handleOpenModal(product)}
-                  >
-                    <FaEdit />
-                  </Button>
-                  <Button
-                    variant="outline-danger"
-                    size="sm"
-                    onClick={() => product.id && handleDelete(product.id)}
-                  >
-                    <FaTrash />
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      </div>
-
-      {filteredProducts.length === 0 && (
-        <div className="text-center py-5">
-          <p>No products found</p>
+      <div className="cms-products-page">
+        <div className="products-header">
+          <h1>Products Management</h1>
+          <Button variant="primary" onClick={() => handleOpenModal()}>
+            <FaPlus className="me-2" />
+            Add Product
+          </Button>
         </div>
-      )}
+
+        {error && <Alert variant="danger">{error}</Alert>}
+
+        <InputGroup className="search-input-group">
+          <InputGroup.Text>
+            <FaSearch />
+          </InputGroup.Text>
+          <Form.Control
+            type="text"
+            placeholder="Search products..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </InputGroup>
+
+        {/* Desktop Table View */}
+        <div className="cms-table">
+          <Table striped bordered hover responsive>
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Heading</th>
+                <th>Price</th>
+                <th>Rating</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredProducts.map((product) => (
+                <tr key={product.id}>
+                  <td>
+                    {product.firstImg ? (
+                      <img 
+                        src={product.firstImg} 
+                        alt={product.name}
+                        className="product-thumbnail"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      <div className="product-thumbnail-placeholder">No Image</div>
+                    )}
+                  </td>
+                  <td>{product.id}</td>
+                  <td>{product.name}</td>
+                  <td>{product.heading}</td>
+                  <td>₦{product.price.toLocaleString()}</td>
+                  <td>{product.rating}</td>
+                  <td>
+                    {product.category && product.category.length > 0
+                      ? product.category.join(', ')
+                      : '-'}
+                  </td>
+                  <td>
+                    <Badge bg={product.isActive ? 'success' : 'secondary'}>
+                      {product.isActive ? 'Active' : 'Inactive'}
+                    </Badge>
+                    {product.bestSeller && (
+                      <Badge bg="warning" className="ms-1">Best Seller</Badge>
+                    )}
+                  </td>
+                  <td>
+                    <Button
+                      variant="outline-primary"
+                      size="sm"
+                      className="me-2"
+                      onClick={() => handleOpenModal(product)}
+                    >
+                      <FaEdit />
+                    </Button>
+                    <Button
+                      variant="outline-danger"
+                      size="sm"
+                      onClick={() => product.id && handleDelete(product.id)}
+                    >
+                      <FaTrash />
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </div>
+
+        {/* Mobile Card View */}
+        <div className="products-mobile-view">
+          {filteredProducts.map((product) => (
+            <div key={product.id} className="product-card">
+              {product.firstImg && (
+                <div className="product-image">
+                  <img 
+                    src={product.firstImg} 
+                    alt={product.name}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                </div>
+              )}
+              <div className="product-header">
+                <div className="product-title">
+                  <h3>{product.name}</h3>
+                  <div className="product-heading">{product.heading}</div>
+                </div>
+                <div className="product-id">ID: {product.id}</div>
+              </div>
+              
+              <div className="product-details">
+                <div className="detail-item">
+                  <div className="label">Price</div>
+                  <div className="value">₦{product.price.toLocaleString()}</div>
+                </div>
+                <div className="detail-item">
+                  <div className="label">Rating</div>
+                  <div className="value">{product.rating}</div>
+                </div>
+              </div>
+
+              {product.category && product.category.length > 0 && (
+                <div className="product-categories">
+                  <div className="label">Categories</div>
+                  <div className="categories-list">
+                    {product.category.join(', ')}
+                  </div>
+                </div>
+              )}
+
+              <div className="product-status">
+                <Badge bg={product.isActive ? 'success' : 'secondary'}>
+                  {product.isActive ? 'Active' : 'Inactive'}
+                </Badge>
+                {product.bestSeller && (
+                  <Badge bg="warning">Best Seller</Badge>
+                )}
+              </div>
+
+              <div className="product-actions">
+                <Button
+                  variant="outline-primary"
+                  size="sm"
+                  onClick={() => handleOpenModal(product)}
+                >
+                  <FaEdit className="me-1" />
+                  Edit
+                </Button>
+                <Button
+                  variant="outline-danger"
+                  size="sm"
+                  onClick={() => product.id && handleDelete(product.id)}
+                >
+                  <FaTrash className="me-1" />
+                  Delete
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {filteredProducts.length === 0 && (
+          <div className="empty-state">
+            <p>No products found</p>
+          </div>
+        )}
+      </div>
 
       <Modal show={showModal} onHide={handleCloseModal} size="xl" className="cms-modal-product-form">
         <Form onSubmit={handleSubmit}>
@@ -681,9 +774,9 @@ export const CMSProducts: React.FC = () => {
               
               <Form.Group className="mb-3">
                 <Form.Label>Additional Images</Form.Label>
-                <div className="mb-2">
+                <div className="mb-2 additional-images-list">
                   {formData.additionalImgs?.map((img, index) => (
-                    <div key={index} className="d-flex align-items-center mb-2">
+                    <InputGroup key={index} className="mb-2">
                       <Form.Control
                         type="text"
                         value={img}
@@ -692,16 +785,30 @@ export const CMSProducts: React.FC = () => {
                           newImgs[index] = e.target.value;
                           handleInputChange('additionalImgs', newImgs);
                         }}
-                        className="me-2"
+                        placeholder="/assets/images/product-additional.png"
                       />
+                      <InputGroup.Text>
+                        <label className="mb-0" style={{ cursor: 'pointer' }}>
+                          <FaUpload />
+                          <input
+                            type="file"
+                            accept="image/*"
+                            style={{ display: 'none' }}
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) handleImageUpload('additionalImgs', file);
+                            }}
+                            disabled={uploadingImage === 'additionalImgs'}
+                          />
+                        </label>
+                      </InputGroup.Text>
                       <Button
                         variant="outline-danger"
-                        size="sm"
                         onClick={() => handleRemoveAdditionalImage(index)}
                       >
                         <FaTimes />
                       </Button>
-                    </div>
+                    </InputGroup>
                   ))}
                 </div>
                 <div className="d-flex gap-2">
@@ -712,24 +819,6 @@ export const CMSProducts: React.FC = () => {
                   >
                     Add Image URL
                   </Button>
-                  <Button
-                    variant="outline-secondary"
-                    size="sm"
-                    onClick={() => {
-                      const input = document.createElement('input');
-                      input.type = 'file';
-                      input.accept = 'image/*';
-                      input.onchange = (e) => {
-                        const file = (e.target as HTMLInputElement).files?.[0];
-                        if (file) handleImageUpload('additionalImgs', file);
-                      };
-                      input.click();
-                    }}
-                    disabled={uploadingImage === 'additionalImgs'}
-                  >
-                    <FaUpload className="me-1" />
-                    Upload Image
-                  </Button>
                   {uploadingImage === 'additionalImgs' && <Spinner size="sm" />}
                 </div>
               </Form.Group>
@@ -738,18 +827,19 @@ export const CMSProducts: React.FC = () => {
             <div className="form-section">
               <h6 className="section-title">Categories *</h6>
               <Form.Group className="mb-3">
-                <div className="d-flex flex-wrap gap-2">
+                <Row className="categories-grid">
                   {PRODUCT_CATEGORIES.map(cat => (
-                    <Form.Check
-                      key={cat}
-                      type="checkbox"
-                      id={`category-${cat}`}
-                      label={cat.replace(/-/g, ' ')}
-                      checked={(formData.category || []).includes(cat)}
-                      onChange={() => handleCategoryToggle(cat)}
-                    />
+                    <Col key={cat} xs={6} sm={4} md={3} lg={3}>
+                      <Form.Check
+                        type="checkbox"
+                        id={`category-${cat}`}
+                        label={cat.replace(/-/g, ' ')}
+                        checked={(formData.category || []).includes(cat)}
+                        onChange={() => handleCategoryToggle(cat)}
+                      />
+                    </Col>
                   ))}
-                </div>
+                </Row>
                 {formErrors.category && (
                   <div className="text-danger small mt-1">{formErrors.category}</div>
                 )}
@@ -758,31 +848,33 @@ export const CMSProducts: React.FC = () => {
 
             <div className="form-section">
               <h6 className="section-title">Flavours</h6>
-              {formData.flavours?.map((flavour, index) => (
-                <div key={index} className="d-flex align-items-center mb-2">
-                  <Form.Control
-                    type="text"
-                    value={flavour.name}
-                    onChange={(e) => handleFlavourChange(index, e.target.value)}
-                    placeholder="e.g., 🍌 Banana"
-                    className="me-2"
-                  />
-                  <Button
-                    variant="outline-danger"
-                    size="sm"
-                    onClick={() => handleRemoveFlavour(index)}
-                  >
-                    <FaTimes />
-                  </Button>
-                </div>
-              ))}
-              <Button
-                variant="outline-secondary"
-                size="sm"
-                onClick={handleAddFlavour}
-              >
-                Add Flavour
-              </Button>
+              <div className="flavours-list">
+                {formData.flavours?.map((flavour, index) => (
+                  <div key={index} className="d-flex align-items-center mb-2">
+                    <Form.Control
+                      type="text"
+                      value={flavour.name}
+                      onChange={(e) => handleFlavourChange(index, e.target.value)}
+                      placeholder="e.g., 🍌 Banana"
+                      className="me-2"
+                    />
+                    <Button
+                      variant="outline-danger"
+                      size="sm"
+                      onClick={() => handleRemoveFlavour(index)}
+                    >
+                      <FaTimes />
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  variant="outline-secondary"
+                  size="sm"
+                  onClick={handleAddFlavour}
+                >
+                  Add Flavour
+                </Button>
+              </div>
             </div>
 
             <div className="form-section">
@@ -810,19 +902,21 @@ export const CMSProducts: React.FC = () => {
             </div>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={handleCloseModal} disabled={submitting}>
-              Cancel
-            </Button>
-            <Button variant="primary" type="submit" disabled={submitting}>
-              {submitting ? (
-                <>
-                  <Spinner size="sm" className="me-2" />
-                  {selectedProduct ? 'Updating...' : 'Creating...'}
-                </>
-              ) : (
-                selectedProduct ? 'Update Product' : 'Create Product'
-              )}
-            </Button>
+            <div className="btn-group">
+              <Button variant="secondary" onClick={handleCloseModal} disabled={submitting}>
+                Cancel
+              </Button>
+              <Button variant="primary" type="submit" disabled={submitting}>
+                {submitting ? (
+                  <>
+                    <Spinner size="sm" className="me-2" />
+                    {selectedProduct ? 'Updating...' : 'Creating...'}
+                  </>
+                ) : (
+                  selectedProduct ? 'Update Product' : 'Create Product'
+                )}
+              </Button>
+            </div>
           </Modal.Footer>
         </Form>
       </Modal>
