@@ -1516,3 +1516,119 @@ function getCustomerPaymentStatusEmailTextTemplate($orderData, $isPaid) {
     return $text;
 }
 
+/**
+ * Get contact reply email template (HTML with Bootstrap)
+ */
+function getContactReplyEmailTemplate($contactData, $replyMessage, $adminName = 'Olivia Products Team') {
+    $fullName = htmlspecialchars($contactData['fullName']);
+    $originalMessage = nl2br(htmlspecialchars($contactData['message']));
+    $replyMessage = nl2br(htmlspecialchars($replyMessage));
+    $replyDate = date('F j, Y \a\t g:i A');
+    
+    return '
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Response to Your Inquiry</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f5f5f5; }
+        .email-container { max-width: 800px; margin: 0 auto; background-color: #ffffff; }
+        .header { background: linear-gradient(135deg, #003057 0%, #4b3d97 100%); color: #ffffff; padding: 40px 30px; text-align: center; }
+        .content { padding: 30px; }
+        .reply-box { background-color: #f5f9ff; border-left: 4px solid #7bbd21; padding: 20px; margin: 20px 0; border-radius: 4px; }
+        .original-message { background-color: #ffffff; border: 2px solid #e0e0e0; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .footer { background-color: #f8f9fa; padding: 30px; text-align: center; color: #6c757d; }
+        .info-label { font-weight: 600; color: #003057; display: inline-block; min-width: 120px; }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1 style="margin: 0; font-size: 32px;">Response to Your Inquiry</h1>
+            <p style="margin: 15px 0 0 0; font-size: 18px;">We\'re here to help!</p>
+        </div>
+        
+        <div class="content">
+            <p>Hello ' . $fullName . ',</p>
+            
+            <p>Thank you for contacting Olivia Products. We have reviewed your inquiry and are pleased to provide the following response:</p>
+            
+            <div class="reply-box">
+                <h3 style="margin-top: 0; color: #003057;">Our Response</h3>
+                <div style="color: #333333; line-height: 1.6;">
+                    ' . $replyMessage . '
+                </div>
+                <p style="margin-top: 15px; margin-bottom: 0; color: #6c757d; font-size: 0.9em;">
+                    <em>Sent on ' . $replyDate . ' by ' . htmlspecialchars($adminName) . '</em>
+                </p>
+            </div>
+            
+            <div class="original-message">
+                <h4 style="margin-top: 0; color: #003057;">Your Original Message</h4>
+                <div style="color: #666666; font-style: italic; line-height: 1.6;">
+                    ' . $originalMessage . '
+                </div>
+            </div>
+            
+            <p>If you have any further questions or need additional assistance, please don\'t hesitate to reach out to us:</p>
+            
+            <div style="background-color: #f5f9ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <p style="margin: 5px 0;"><strong>Email:</strong> ' . MAILGUN_REPLY_TO . '</p>
+                <p style="margin: 5px 0;"><strong>Phone:</strong> +234 901 419 6902</p>
+                <p style="margin: 5px 0;"><strong>WhatsApp:</strong> +234 912 350 9090</p>
+                <p style="margin: 5px 0;"><strong>Business Hours:</strong> Monday - Friday, 8am - 5pm</p>
+            </div>
+            
+            <p>We appreciate your interest in Olivia Products!</p>
+            
+            <p>Best regards,<br>
+            <strong>' . htmlspecialchars($adminName) . '</strong><br>
+            Olivia Products Team</p>
+        </div>
+        
+        <div class="footer">
+            <p style="margin: 0; font-weight: 600; color: #003057;">Olivia Products</p>
+            <p style="margin: 5px 0;">Thank you for choosing Olivia Products!</p>
+        </div>
+    </div>
+</body>
+</html>';
+}
+
+/**
+ * Get contact reply email template (Plain Text)
+ */
+function getContactReplyEmailTextTemplate($contactData, $replyMessage, $adminName = 'Olivia Products Team') {
+    $fullName = $contactData['fullName'];
+    $originalMessage = $contactData['message'];
+    $replyDate = date('F j, Y \a\t g:i A');
+    
+    $text = "RESPONSE TO YOUR INQUIRY\n";
+    $text .= "========================\n\n";
+    $text .= "Hello $fullName,\n\n";
+    $text .= "Thank you for contacting Olivia Products. We have reviewed your inquiry and are pleased to provide the following response:\n\n";
+    $text .= "OUR RESPONSE\n";
+    $text .= "------------\n";
+    $text .= "$replyMessage\n\n";
+    $text .= "Sent on $replyDate by $adminName\n\n";
+    $text .= "YOUR ORIGINAL MESSAGE\n";
+    $text .= "---------------------\n";
+    $text .= "$originalMessage\n\n";
+    $text .= "If you have any further questions or need additional assistance, please don't hesitate to reach out to us:\n\n";
+    $text .= "CONTACT INFORMATION\n";
+    $text .= "-------------------\n";
+    $text .= "Email: " . MAILGUN_REPLY_TO . "\n";
+    $text .= "Phone: +234 901 419 6902\n";
+    $text .= "WhatsApp: +234 912 350 9090\n";
+    $text .= "Business Hours: Monday - Friday, 8am - 5pm\n\n";
+    $text .= "We appreciate your interest in Olivia Products!\n\n";
+    $text .= "Best regards,\n";
+    $text .= "$adminName\n";
+    $text .= "Olivia Products Team\n";
+    
+    return $text;
+}
+

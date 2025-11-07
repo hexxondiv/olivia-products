@@ -107,6 +107,25 @@ CREATE TABLE IF NOT EXISTS contact_submissions (
     INDEX idx_email (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Contact Replies Table (stores all replies sent to contact submissions)
+CREATE TABLE IF NOT EXISTS contact_replies (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    contactId INT NOT NULL,
+    replyType ENUM('email', 'whatsapp') NOT NULL,
+    message TEXT NOT NULL,
+    sentTo VARCHAR(255) NOT NULL, -- email address or phone number
+    sentBy INT NULL, -- admin user ID who sent the reply
+    sentAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('sent', 'failed', 'pending') DEFAULT 'sent',
+    errorMessage TEXT NULL,
+    FOREIGN KEY (contactId) REFERENCES contact_submissions(id) ON DELETE CASCADE,
+    FOREIGN KEY (sentBy) REFERENCES admin_users(id) ON DELETE SET NULL,
+    INDEX idx_contactId (contactId),
+    INDEX idx_replyType (replyType),
+    INDEX idx_sentAt (sentAt),
+    INDEX idx_sentBy (sentBy)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Wholesale Form Submissions Table
 CREATE TABLE IF NOT EXISTS wholesale_submissions (
     id INT AUTO_INCREMENT PRIMARY KEY,
