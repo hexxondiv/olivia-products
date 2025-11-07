@@ -41,6 +41,9 @@
   position: relative;
   width: auto;
   pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 3.5rem);
 
   // Animation for modal entrance
   .modal.fade & {
@@ -76,6 +79,8 @@
   box-shadow: $shadow-2xl;
   outline: 0;
   overflow: hidden;
+  max-height: 100%;
+  height: 100%;
 
   // Smooth entrance animation
   animation: modalSlideIn $transition-slow $ease-out-expo;
@@ -103,6 +108,9 @@
   background: linear-gradient(135deg, $color-sky, $white);
   border-top-left-radius: $border-radius-lg;
   border-top-right-radius: $border-radius-lg;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 
   .modal-title {
     margin-bottom: 0;
@@ -167,6 +175,9 @@
   color: $color-slate;
   font-size: $font-size-base;
   line-height: $line-height-normal;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 
   // Styling for paragraphs
   p {
@@ -279,6 +290,9 @@
   border-bottom-left-radius: $border-radius-lg;
   border-bottom-right-radius: $border-radius-lg;
   gap: 0.75rem;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
 
   .btn {
     font-family: $font-heading;
@@ -347,10 +361,12 @@
   .modal-dialog {
     margin: 0.5rem;
     max-width: calc(100% - 1rem);
+    max-height: calc(100vh - 1rem);
   }
 
   .modal-content {
     border-radius: $border-radius;
+    max-height: 100%;
   }
 
   .modal-header {
@@ -365,6 +381,7 @@
 
   .modal-body {
     padding: 1.5rem;
+    max-height: calc(100vh - 200px); // Account for header and footer
 
     p strong {
       min-width: auto;
@@ -462,6 +479,81 @@
       .badge {
         background-color: $color-amber;
         color: $color-charcoal;
+      }
+    }
+
+    // Phone row with action buttons
+    .phone-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+
+      strong {
+        margin-right: 0.5rem;
+        flex-shrink: 0;
+      }
+
+      .phone-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-left: auto;
+
+        @include media-breakpoint-down(sm) {
+          width: 100%;
+          margin-left: 0;
+          margin-top: 0.5rem;
+        }
+
+        .phone-action-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.375rem;
+          white-space: nowrap;
+          text-decoration: none;
+          transition: all $transition-base;
+
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: $shadow-md;
+          }
+
+          &.whatsapp-btn {
+            color: #25D366;
+            border-color: #25D366;
+
+            &:hover {
+              background-color: #25D366;
+              color: $white;
+              border-color: #25D366;
+            }
+
+            svg {
+              font-size: 1rem;
+            }
+          }
+
+          &.call-btn {
+            color: $color-navy;
+            border-color: $color-navy;
+
+            &:hover {
+              background-color: $color-navy;
+              color: $white;
+              border-color: $color-navy;
+            }
+
+            svg {
+              font-size: 0.875rem;
+            }
+          }
+
+          svg {
+            flex-shrink: 0;
+          }
+        }
       }
     }
   }
