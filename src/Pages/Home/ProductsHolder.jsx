@@ -55,19 +55,19 @@ export const ProductsHolder = ({
   } = useCart();
 
   // Wrapper for addToCart that calculates price based on quantity
-  const addToCart = (item) => {
+  const addToCart = async (item) => {
     const product = allProductsData.find(p => p.id === item.id);
     if (product) {
       const quantity = item.quantity || 1;
       const priceForQuantity = calculatePriceForQuantity(product, quantity);
-      addToCartBase({
+      await addToCartBase({
         ...item,
         productPrice: priceForQuantity,
         quantity: quantity,
       });
     } else {
       // Fallback if product not found
-      addToCartBase(item);
+      await addToCartBase(item);
     }
   };
 
@@ -211,6 +211,9 @@ export const ProductsHolder = ({
                 hoverImg={product.hoverImg}
                 rating={product.rating}
                 id={product.id}
+                stockEnabled={product.stockEnabled}
+                stockStatus={product.stockStatus}
+                stockQuantity={product.stockQuantity}
                 onAddToCart={addToCart}
               />
             </div>

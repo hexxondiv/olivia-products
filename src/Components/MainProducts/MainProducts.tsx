@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Offcanvas } from "react-bootstrap"; // Assuming you're using Bootstrap's Offcanvas component
+import { Offcanvas, Badge } from "react-bootstrap"; // Assuming you're using Bootstrap's Offcanvas component
 import { Link } from "react-router-dom";
 import { Desktop } from "../../Utils/mediaQueries";
 import "./main-product.scss";
@@ -52,6 +52,9 @@ export interface ProductProps {
   productPrice: number;
   productName: string;
   rating: string;
+  stockEnabled?: boolean;
+  stockStatus?: 'in_stock' | 'low_stock' | 'out_of_stock' | 'on_backorder' | null;
+  stockQuantity?: number;
   onAddToCart: (item: {
     id: number;
     firstImg: string;
@@ -69,6 +72,9 @@ const MainProduct: React.FC<ProductProps> = ({
   productPrice,
   productName,
   rating,
+  stockEnabled,
+  stockStatus,
+  stockQuantity,
   onAddToCart,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -87,6 +93,27 @@ const MainProduct: React.FC<ProductProps> = ({
     }).format(price);
   };
 
+  // Get stock badge
+  const getStockBadge = () => {
+    if (!stockEnabled || !stockStatus) return null;
+
+    const badgeConfig = {
+      'in_stock': { bg: 'success', text: 'In Stock' },
+      'low_stock': { bg: 'warning', text: `Only ${stockQuantity} left!` },
+      'out_of_stock': { bg: 'danger', text: 'Out of Stock' },
+      'on_backorder': { bg: 'info', text: 'On Backorder' },
+    };
+
+    const config = badgeConfig[stockStatus];
+    if (!config) return null;
+
+    return (
+      <Badge bg={config.bg} className="stock-badge">
+        {config.text}
+      </Badge>
+    );
+  };
+
 
 
 
@@ -100,7 +127,12 @@ const MainProduct: React.FC<ProductProps> = ({
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <div className="image-wrapper">
+        <div className="image-wrapper" style={{ position: 'relative' }}>
+          {getStockBadge() && (
+            <div style={{ position: 'absolute', top: '8px', right: '8px', zIndex: 10 }}>
+              {getStockBadge()}
+            </div>
+          )}
           {" "}
           <img
             className={`product-image ${isHovered ? "hidden" : "visible"}`}

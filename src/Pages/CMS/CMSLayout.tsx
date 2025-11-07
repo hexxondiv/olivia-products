@@ -9,8 +9,11 @@ import {
   FaEnvelope, 
   FaHandshake, 
   FaSignOutAlt,
-  FaChartBar
+  FaChartBar,
+  FaExclamationTriangle,
+  FaWarehouse
 } from 'react-icons/fa';
+import { getApiUrl } from '../../Utils/apiConfig';
 import './cms-layout.scss';
 
 interface CMSLayoutProps {
@@ -23,6 +26,7 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({ children }) => {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navbarRef = useRef<HTMLDivElement>(null);
+  const [stockAlertsCount, setStockAlertsCount] = useState(0);
 
   const handleLogout = () => {
     logout();
@@ -70,6 +74,38 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({ children }) => {
     }
   }, []);
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchStockAlerts();
+      const interval = setInterval(fetchStockAlerts, 60000); // Refresh every minute
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated]);
+
+  const fetchStockAlerts = async () => {
+    try {
+      const token = localStorage.getItem('cms_token');
+      if (!token) return;
+
+      const apiUrl = getApiUrl();
+      const response = await fetch(`${apiUrl}/stock.php/alerts`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setStockAlertsCount(data.count || 0);
+        }
+      }
+    } catch (err) {
+      // Silently fail - don't show errors for alerts
+      console.error('Failed to fetch stock alerts:', err);
+    }
+  };
+
   if (!isAuthenticated) {
     return null;
   }
@@ -113,6 +149,15 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({ children }) => {
               <Nav.Link as={Link} to="/cms/wholesale" active={isActive('/cms/wholesale')} onClick={handleNavClick}>
                 <FaHandshake className="me-1" />
                 Wholesale
+              </Nav.Link>
+              <Nav.Link as={Link} to="/cms/stock" active={isActive('/cms/stock')} onClick={handleNavClick}>
+                <FaWarehouse className="me-1" />
+                Stock
+                {stockAlertsCount > 0 && (
+                  <Badge bg="danger" className="ms-2" pill>
+                    {stockAlertsCount}
+                  </Badge>
+                )}
               </Nav.Link>
             </Nav>
             <Nav>

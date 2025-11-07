@@ -110,9 +110,9 @@ export const ViewProductPage: React.FC = () => {
     return `Olivia ${name}${sufix ? ` ${sufix}` : ""}`;
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     const priceForQuantity = calculatePriceForQuantity(product, quantity);
-    addToCart({
+    await addToCart({
       id: product.id,
       productName: formatProductName(),
       productPrice: priceForQuantity,

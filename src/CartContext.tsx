@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { getApiUrl } from "./Utils/apiConfig";
 
 interface CartItem {
   id: number;
@@ -14,10 +15,10 @@ interface CartContextType {
   setIsOffCanvasOpen: (open: boolean) => void;
   openCart: () => void;          // NEW
   closeCart: () => void;         // NEW
-  addToCart: (item: CartItem) => void;
+  addToCart: (item: CartItem) => Promise<void>;
   removeFromCart: (id: number) => void;
   clearCart: () => void;
-  incrementQuantity: (id: number) => void;
+  incrementQuantity: (id: number) => Promise<void>;
   decrementQuantity: (id: number) => void;
   updateQuantity: (id: number, quantity: number) => void;
 }
@@ -74,14 +75,67 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     );
   };
 
-  const addToCart = (item: CartItem) => {
+  const checkStockAvailability = async (productId: number, requestedQuantity: number): Promise<{ available: boolean; message: string; availableQuantity: number }> => {
+    try {
+      const apiUrl = getApiUrl();
+      const response = await fetch(`${apiUrl}/products.php?id=${productId}`);
+      const data = await response.json();
+      
+      if (data.success && data.data) {
+        const product = data.data;
+        // If stock tracking is disabled, always available
+        if (!product.stockEnabled) {
+          return { available: true, message: 'Stock tracking disabled', availableQuantity: Infinity };
+        }
+        
+        const availableQty = product.stockQuantity ?? 0;
+        const allowBackorders = product.allowBackorders ?? false;
+        
+        if (availableQty >= requestedQuantity) {
+          return { available: true, message: 'Stock available', availableQuantity: availableQty };
+        } else if (availableQty === 0 && allowBackorders) {
+          return { available: true, message: 'Available for backorder', availableQuantity: 0 };
+        } else {
+          return {
+            available: false,
+            message: availableQty > 0 ? `Only ${availableQty} available` : 'Out of stock',
+            availableQuantity: availableQty
+          };
+        }
+      }
+    } catch (error) {
+      console.error('Error checking stock:', error);
+      // On error, allow the operation (fail open)
+      return { available: true, message: 'Unable to verify stock', availableQuantity: Infinity };
+    }
+    
+    return { available: true, message: 'Product not found', availableQuantity: Infinity };
+  };
+
+  const addToCart = async (item: CartItem) => {
+    const requestedQty = item.quantity || 1;
+    
+    // Check stock availability
+    const stockCheck = await checkStockAvailability(item.id, requestedQty);
+    
+    if (!stockCheck.available) {
+      // Show alert to user
+      alert(`Cannot add to cart: ${stockCheck.message}`);
+      return;
+    }
+    
+    // Limit quantity to available stock if needed
+    const finalQuantity = stockCheck.availableQuantity < Infinity 
+      ? Math.min(requestedQty, stockCheck.availableQuantity)
+      : requestedQty;
+    
     const itemExists = cart.some((cartItem) => cartItem.id === item.id);
     if (!itemExists) {
-      setCart((prev) => [...prev, { ...item, quantity: item.quantity || 1 }]);
+      setCart((prev) => [...prev, { ...item, quantity: finalQuantity }]);
       openCart(); // opens cart when item added
     } else {
       // Update quantity if item already exists
-      updateQuantity(item.id, item.quantity || 1);
+      updateQuantity(item.id, finalQuantity);
     }
   };
 
@@ -91,10 +145,28 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const clearCart = () => setCart([]);
 
-  const incrementQuantity = (id: number) => {
+  const incrementQuantity = async (id: number) => {
+    const cartItem = cart.find((item) => item.id === id);
+    if (!cartItem) return;
+    
+    const newQuantity = cartItem.quantity + 1;
+    
+    // Check stock availability
+    const stockCheck = await checkStockAvailability(id, newQuantity);
+    
+    if (!stockCheck.available) {
+      alert(`Cannot increase quantity: ${stockCheck.message}`);
+      return;
+    }
+    
+    // Limit to available stock
+    const finalQuantity = stockCheck.availableQuantity < Infinity
+      ? Math.min(newQuantity, stockCheck.availableQuantity)
+      : newQuantity;
+    
     setCart((prev) =>
       prev.map((item) =>
-        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+        item.id === id ? { ...item, quantity: finalQuantity } : item
       )
     );
   };

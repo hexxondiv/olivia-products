@@ -42,9 +42,10 @@ $requestUri = $_SERVER['REQUEST_URI'];
 $path = parse_url($requestUri, PHP_URL_PATH);
 $pathParts = explode('/', trim($path, '/'));
 
-// Check if path ends with /adjust or /alerts
+// Check if path ends with /adjust, /alerts, or /reports
 $isAdjustEndpoint = strpos($path, '/adjust') !== false || end($pathParts) === 'adjust';
 $isAlertsEndpoint = strpos($path, '/alerts') !== false || in_array('alerts', $pathParts);
+$isReportsEndpoint = strpos($path, '/reports') !== false || in_array('reports', $pathParts);
 
 try {
     // Check for /adjust endpoint
@@ -64,6 +65,10 @@ try {
             // Get alerts
             handleGetAlerts();
         }
+    }
+    // Check for /reports endpoint
+    elseif ($isReportsEndpoint && $method === 'GET') {
+        handleGetReports();
     } else {
         // Default: Get stock info
         handleGet();
@@ -257,6 +262,200 @@ function handleResolveAlert($alertId) {
             'message' => 'Failed to resolve alert'
         ]);
     }
+}
+
+function handleGetReports() {
+    // Require authentication
+    requireRole(['admin', 'manager', 'staff']);
+    
+    $reportType = isset($_GET['type']) ? $_GET['type'] : 'movements';
+    $startDate = isset($_GET['startDate']) ? $_GET['startDate'] : null;
+    $endDate = isset($_GET['endDate']) ? $_GET['endDate'] : null;
+    $movementType = isset($_GET['movementType']) ? $_GET['movementType'] : null;
+    $productId = isset($_GET['productId']) ? (int)$_GET['productId'] : null;
+    $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 100;
+    
+    switch ($reportType) {
+        case 'movements':
+            handleGetMovementReport($startDate, $endDate, $movementType, $productId, $limit);
+            break;
+        case 'low_stock':
+            handleGetLowStockReport();
+            break;
+        case 'value':
+            handleGetStockValueReport();
+            break;
+        case 'summary':
+            handleGetSummaryReport($startDate, $endDate);
+            break;
+        default:
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Invalid report type']);
+    }
+}
+
+function handleGetMovementReport($startDate, $endDate, $movementType, $productId, $limit) {
+    $sql = "SELECT sm.*, p.name as productName, p.price, u.username as createdByName
+            FROM stock_movements sm
+            JOIN products p ON sm.productId = p.id
+            LEFT JOIN admin_users u ON sm.createdBy = u.id
+            WHERE 1=1";
+    
+    $params = [];
+    
+    if ($startDate) {
+        $sql .= " AND sm.createdAt >= ?";
+        $params[] = $startDate . ' 00:00:00';
+    }
+    
+    if ($endDate) {
+        $sql .= " AND sm.createdAt <= ?";
+        $params[] = $endDate . ' 23:59:59';
+    }
+    
+    if ($movementType) {
+        $sql .= " AND sm.movementType = ?";
+        $params[] = $movementType;
+    }
+    
+    if ($productId) {
+        $sql .= " AND sm.productId = ?";
+        $params[] = $productId;
+    }
+    
+    $sql .= " ORDER BY sm.createdAt DESC LIMIT ?";
+    $params[] = $limit;
+    
+    $movements = dbQuery($sql, $params);
+    
+    // Calculate totals
+    $totals = [
+        'purchase' => 0,
+        'sale' => 0,
+        'adjustment' => 0,
+        'return' => 0,
+        'damaged' => 0,
+        'transfer' => 0
+    ];
+    
+    foreach ($movements as $movement) {
+        $type = $movement['movementType'];
+        if (isset($totals[$type])) {
+            $totals[$type] += abs((int)$movement['quantity']);
+        }
+    }
+    
+    echo json_encode([
+        'success' => true,
+        'data' => $movements,
+        'totals' => $totals,
+        'count' => count($movements)
+    ]);
+}
+
+function handleGetLowStockReport() {
+    $products = dbQuery(
+        "SELECT p.id, p.name, p.stockQuantity, p.lowStockThreshold, p.stockStatus, p.price,
+                (p.lowStockThreshold * 2 - p.stockQuantity) as recommendedOrder
+         FROM products p
+         WHERE p.stockEnabled = TRUE 
+         AND (p.stockStatus = 'low_stock' OR p.stockStatus = 'out_of_stock')
+         ORDER BY p.stockQuantity ASC, p.name ASC"
+    );
+    
+    $totalValue = 0;
+    foreach ($products as &$product) {
+        $product['stockQuantity'] = (int)$product['stockQuantity'];
+        $product['lowStockThreshold'] = (int)$product['lowStockThreshold'];
+        $product['recommendedOrder'] = max(0, (int)$product['recommendedOrder']);
+        $product['currentValue'] = (float)$product['price'] * $product['stockQuantity'];
+        $totalValue += $product['currentValue'];
+    }
+    
+    echo json_encode([
+        'success' => true,
+        'data' => $products,
+        'count' => count($products),
+        'totalValue' => $totalValue
+    ]);
+}
+
+function handleGetStockValueReport() {
+    $products = dbQuery(
+        "SELECT p.id, p.name, p.stockQuantity, p.price, p.stockStatus,
+                (p.stockQuantity * p.price) as totalValue
+         FROM products p
+         WHERE p.stockEnabled = TRUE
+         ORDER BY (p.stockQuantity * p.price) DESC"
+    );
+    
+    $totalInventoryValue = 0;
+    $statusBreakdown = [
+        'in_stock' => ['count' => 0, 'value' => 0],
+        'low_stock' => ['count' => 0, 'value' => 0],
+        'out_of_stock' => ['count' => 0, 'value' => 0],
+        'on_backorder' => ['count' => 0, 'value' => 0]
+    ];
+    
+    foreach ($products as &$product) {
+        $product['stockQuantity'] = (int)$product['stockQuantity'];
+        $product['totalValue'] = (float)$product['totalValue'];
+        $totalInventoryValue += $product['totalValue'];
+        
+        $status = $product['stockStatus'] ?? 'in_stock';
+        if (isset($statusBreakdown[$status])) {
+            $statusBreakdown[$status]['count']++;
+            $statusBreakdown[$status]['value'] += $product['totalValue'];
+        }
+    }
+    
+    echo json_encode([
+        'success' => true,
+        'data' => $products,
+        'totalInventoryValue' => $totalInventoryValue,
+        'statusBreakdown' => $statusBreakdown,
+        'count' => count($products)
+    ]);
+}
+
+function handleGetSummaryReport($startDate, $endDate) {
+    $dateFilter = '';
+    $params = [];
+    
+    if ($startDate && $endDate) {
+        $dateFilter = "WHERE sm.createdAt >= ? AND sm.createdAt <= ?";
+        $params = [$startDate . ' 00:00:00', $endDate . ' 23:59:59'];
+    }
+    
+    // Get movement summary by type
+    $summarySql = "SELECT sm.movementType, 
+                COUNT(*) as movementCount,
+                SUM(ABS(sm.quantity)) as totalQuantity,
+                SUM(CASE WHEN sm.quantity > 0 THEN ABS(sm.quantity) ELSE 0 END) as totalIn,
+                SUM(CASE WHEN sm.quantity < 0 THEN ABS(sm.quantity) ELSE 0 END) as totalOut
+         FROM stock_movements sm
+         $dateFilter
+         GROUP BY sm.movementType";
+    
+    $summary = $params ? dbQuery($summarySql, $params) : dbQuery($summarySql);
+    
+    // Get top products by movement
+    $topProductsSql = "SELECT p.id, p.name, COUNT(sm.id) as movementCount,
+                SUM(ABS(sm.quantity)) as totalMovement
+         FROM stock_movements sm
+         JOIN products p ON sm.productId = p.id
+         $dateFilter
+         GROUP BY p.id, p.name
+         ORDER BY movementCount DESC
+         LIMIT 10";
+    
+    $topProducts = $params ? dbQuery($topProductsSql, $params) : dbQuery($topProductsSql);
+    
+    echo json_encode([
+        'success' => true,
+        'summary' => $summary,
+        'topProducts' => $topProducts
+    ]);
 }
 
 function getCurrentUserId() {

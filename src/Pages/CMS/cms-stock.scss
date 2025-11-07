@@ -1,0 +1,102 @@
+@use "sass:color";
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/mixins";
+@import "../../_variables.scss";
+
+// CMS Stock Management Page Styles
+
+.cms-stock-page {
+  .stock-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+
+    h1 {
+      margin: 0;
+      font-size: 1.75rem;
+    }
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 1rem;
+
+      h1 {
+        font-size: 1.5rem;
+        text-align: center;
+      }
+    }
+  }
+
+  .stat-card {
+    border-left: 4px solid #dee2e6;
+    transition: transform 0.2s, box-shadow 0.2s;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    &.stat-warning {
+      border-left-color: #ffc107;
+    }
+
+    &.stat-danger {
+      border-left-color: #dc3545;
+    }
+
+    &.stat-info {
+      border-left-color: #0dcaf0;
+    }
+
+    .card-title {
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-text {
+      font-weight: 600;
+      color: #212529;
+    }
+  }
+
+  .stock-actions {
+    .form-select {
+      max-width: 300px;
+    }
+
+    @media (max-width: 768px) {
+      .text-end {
+        text-align: left !important;
+        margin-top: 1rem;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+  }
+
+  .table {
+    th {
+      font-weight: 600;
+      border-bottom: 2px solid #dee2e6;
+    }
+
+    td {
+      vertical-align: middle;
+    }
+  }
+
+  .spinner-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+  }
+}
+
