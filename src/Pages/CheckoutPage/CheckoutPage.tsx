@@ -311,6 +311,37 @@ export const CheckoutPage: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Validate stock availability for all cart items
+  const validateStock = () => {
+    const stockErrors: Array<{ productName: string; message: string; availableQuantity: number }> = [];
+    
+    cart.forEach((item) => {
+      const product = getProductById(item.id);
+      if (product && product.stockEnabled) {
+        const stockQty = product.stockQuantity ?? 0;
+        const requestedQty = item.quantity;
+        
+        if (stockQty < requestedQty) {
+          if (stockQty === 0 && !product.allowBackorders) {
+            stockErrors.push({
+              productName: formatProductName(item),
+              message: 'Out of stock',
+              availableQuantity: 0
+            });
+          } else if (stockQty > 0) {
+            stockErrors.push({
+              productName: formatProductName(item),
+              message: `Only ${stockQty} available`,
+              availableQuantity: stockQty
+            });
+          }
+        }
+      }
+    });
+    
+    return stockErrors;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitError(null);
@@ -322,6 +353,17 @@ export const CheckoutPage: React.FC = () => {
     }
 
     if (!validateForm()) {
+      return;
+    }
+
+    // Validate stock before submitting
+    const stockErrors = validateStock();
+    if (stockErrors.length > 0) {
+      const errorMessages = stockErrors.map(err => 
+        `${err.productName}: ${err.message}${err.availableQuantity > 0 ? ` (${err.availableQuantity} available)` : ''}`
+      ).join('\n');
+      setSubmitError(`Stock validation failed:\n${errorMessages}`);
+      setIsSubmitting(false);
       return;
     }
 
@@ -360,6 +402,13 @@ export const CheckoutPage: React.FC = () => {
       const result = await response.json();
 
       if (!response.ok || !result.success) {
+        // Handle stock validation errors from backend
+        if (result.stockErrors && Array.isArray(result.stockErrors)) {
+          const stockErrorMessages = result.stockErrors.map((err: any) => 
+            `${err.productName}: ${err.message}${err.availableQuantity > 0 ? ` (${err.availableQuantity} available)` : ''}`
+          ).join('\n');
+          throw new Error(`Stock validation failed:\n${stockErrorMessages}`);
+        }
         throw new Error(result.message || 'Failed to submit order. Please try again.');
       }
 

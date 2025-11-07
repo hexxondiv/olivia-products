@@ -30,10 +30,19 @@ CREATE TABLE IF NOT EXISTS products (
     wholesaleMinQty INT NULL,
     distributorPrice DECIMAL(10, 2) NULL,
     distributorMinQty INT NULL,
+    -- Stock Management Fields
+    stockQuantity INT DEFAULT 0,
+    stockEnabled BOOLEAN DEFAULT FALSE,
+    lowStockThreshold INT DEFAULT 10,
+    allowBackorders BOOLEAN DEFAULT FALSE,
+    stockStatus ENUM('in_stock', 'low_stock', 'out_of_stock', 'on_backorder') DEFAULT 'in_stock',
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_bestSeller (bestSeller),
-    INDEX idx_isActive (isActive)
+    INDEX idx_isActive (isActive),
+    INDEX idx_stockStatus (stockStatus),
+    INDEX idx_stockEnabled (stockEnabled),
+    INDEX idx_stockQuantity (stockQuantity)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Orders Table
@@ -140,6 +149,45 @@ CREATE TABLE IF NOT EXISTS admin_users (
     updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_username (username),
     INDEX idx_email (email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Stock Movements Table (for tracking all stock changes)
+CREATE TABLE IF NOT EXISTS stock_movements (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    productId INT NOT NULL,
+    movementType ENUM('purchase', 'sale', 'adjustment', 'return', 'damaged', 'transfer') NOT NULL,
+    quantity INT NOT NULL,
+    previousQuantity INT NOT NULL,
+    newQuantity INT NOT NULL,
+    referenceType ENUM('order', 'manual', 'purchase_order', 'return', 'other') NULL,
+    referenceId VARCHAR(100) NULL,
+    notes TEXT,
+    createdBy INT NULL,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (productId) REFERENCES products(id) ON DELETE CASCADE,
+    FOREIGN KEY (createdBy) REFERENCES admin_users(id) ON DELETE SET NULL,
+    INDEX idx_productId (productId),
+    INDEX idx_movementType (movementType),
+    INDEX idx_createdAt (createdAt),
+    INDEX idx_reference (referenceType, referenceId)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Stock Alerts Table (for low stock and out of stock notifications)
+CREATE TABLE IF NOT EXISTS stock_alerts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    productId INT NOT NULL,
+    alertType ENUM('low_stock', 'out_of_stock', 'backorder') NOT NULL,
+    isResolved BOOLEAN DEFAULT FALSE,
+    resolvedAt TIMESTAMP NULL,
+    resolvedBy INT NULL,
+    notes TEXT,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (productId) REFERENCES products(id) ON DELETE CASCADE,
+    FOREIGN KEY (resolvedBy) REFERENCES admin_users(id) ON DELETE SET NULL,
+    INDEX idx_productId (productId),
+    INDEX idx_alertType (alertType),
+    INDEX idx_isResolved (isResolved),
+    INDEX idx_createdAt (createdAt)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Create default admin user (password: admin123 - CHANGE THIS!)

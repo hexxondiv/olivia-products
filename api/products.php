@@ -31,6 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/database.php';
 require_once __DIR__ . '/auth-helper.php';
+require_once __DIR__ . '/stock-helper.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 $input = file_get_contents('php://input');
@@ -70,6 +71,8 @@ function handleGet() {
     $id = isset($_GET['id']) ? (int)$_GET['id'] : null;
     $category = isset($_GET['category']) ? $_GET['category'] : null;
     $activeOnly = isset($_GET['activeOnly']) ? filter_var($_GET['activeOnly'], FILTER_VALIDATE_BOOLEAN) : false;
+    $stockStatus = isset($_GET['stockStatus']) ? $_GET['stockStatus'] : null;
+    $includeStockHistory = isset($_GET['includeStockHistory']) ? filter_var($_GET['includeStockHistory'], FILTER_VALIDATE_BOOLEAN) : false;
     
     if ($id) {
         // Get single product
@@ -99,6 +102,17 @@ function handleGet() {
         $product['wholesaleMinQty'] = isset($product['wholesaleMinQty']) ? (int)$product['wholesaleMinQty'] : null;
         $product['distributorPrice'] = isset($product['distributorPrice']) ? (float)$product['distributorPrice'] : null;
         $product['distributorMinQty'] = isset($product['distributorMinQty']) ? (int)$product['distributorMinQty'] : null;
+        // Handle stock fields
+        $product['stockQuantity'] = isset($product['stockQuantity']) ? (int)$product['stockQuantity'] : 0;
+        $product['stockEnabled'] = isset($product['stockEnabled']) ? (bool)$product['stockEnabled'] : false;
+        $product['lowStockThreshold'] = isset($product['lowStockThreshold']) ? (int)$product['lowStockThreshold'] : 10;
+        $product['allowBackorders'] = isset($product['allowBackorders']) ? (bool)$product['allowBackorders'] : false;
+        $product['stockStatus'] = isset($product['stockStatus']) ? $product['stockStatus'] : calculateStockStatus($product);
+        
+        // Include stock history if requested
+        if ($includeStockHistory) {
+            $product['stockHistory'] = getStockHistory($id, 50);
+        }
         
         echo json_encode(['success' => true, 'data' => $product]);
     } else {
@@ -113,6 +127,11 @@ function handleGet() {
         if ($category) {
             $sql .= " AND JSON_CONTAINS(category, ?)";
             $params[] = json_encode($category);
+        }
+        
+        if ($stockStatus) {
+            $sql .= " AND stockStatus = ?";
+            $params[] = $stockStatus;
         }
         
         $sql .= " ORDER BY createdAt DESC";
@@ -135,6 +154,12 @@ function handleGet() {
             $product['wholesaleMinQty'] = isset($product['wholesaleMinQty']) ? (int)$product['wholesaleMinQty'] : null;
             $product['distributorPrice'] = isset($product['distributorPrice']) ? (float)$product['distributorPrice'] : null;
             $product['distributorMinQty'] = isset($product['distributorMinQty']) ? (int)$product['distributorMinQty'] : null;
+            // Handle stock fields
+            $product['stockQuantity'] = isset($product['stockQuantity']) ? (int)$product['stockQuantity'] : 0;
+            $product['stockEnabled'] = isset($product['stockEnabled']) ? (bool)$product['stockEnabled'] : false;
+            $product['lowStockThreshold'] = isset($product['lowStockThreshold']) ? (int)$product['lowStockThreshold'] : 10;
+            $product['allowBackorders'] = isset($product['allowBackorders']) ? (bool)$product['allowBackorders'] : false;
+            $product['stockStatus'] = isset($product['stockStatus']) ? $product['stockStatus'] : calculateStockStatus($product);
         }
         
         echo json_encode(['success' => true, 'data' => $products, 'count' => count($products)]);
@@ -166,8 +191,23 @@ function handlePost() {
     // Prepare data
     $sql = "INSERT INTO products (heading, name, sufix, price, rating, color, detail, moreDetail, tagline, 
             firstImg, hoverImg, additionalImgs, category, flavours, bestSeller, isActive,
-            retailPrice, retailMinQty, wholesalePrice, wholesaleMinQty, distributorPrice, distributorMinQty) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            retailPrice, retailMinQty, wholesalePrice, wholesaleMinQty, distributorPrice, distributorMinQty,
+            stockQuantity, stockEnabled, lowStockThreshold, allowBackorders, stockStatus) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    
+    // Calculate stock status if stock is enabled
+    $stockEnabled = isset($data['stockEnabled']) ? (bool)$data['stockEnabled'] : false;
+    $stockQuantity = isset($data['stockQuantity']) ? (int)$data['stockQuantity'] : 0;
+    $lowStockThreshold = isset($data['lowStockThreshold']) ? (int)$data['lowStockThreshold'] : 10;
+    $allowBackorders = isset($data['allowBackorders']) ? (bool)$data['allowBackorders'] : false;
+    
+    $tempProduct = [
+        'stockEnabled' => $stockEnabled,
+        'stockQuantity' => $stockQuantity,
+        'lowStockThreshold' => $lowStockThreshold,
+        'allowBackorders' => $allowBackorders
+    ];
+    $stockStatus = calculateStockStatus($tempProduct) ?? 'in_stock';
     
     $params = [
         $data['heading'] ?? '',
@@ -191,7 +231,12 @@ function handlePost() {
         isset($data['wholesalePrice']) ? (float)$data['wholesalePrice'] : null,
         isset($data['wholesaleMinQty']) ? (int)$data['wholesaleMinQty'] : null,
         isset($data['distributorPrice']) ? (float)$data['distributorPrice'] : null,
-        isset($data['distributorMinQty']) ? (int)$data['distributorMinQty'] : null
+        isset($data['distributorMinQty']) ? (int)$data['distributorMinQty'] : null,
+        $stockQuantity,
+        $stockEnabled ? 1 : 0,
+        $lowStockThreshold,
+        $allowBackorders ? 1 : 0,
+        $stockStatus
     ];
     
     $id = dbExecute($sql, $params);
@@ -244,22 +289,48 @@ function handlePut() {
     $allowedFields = ['heading', 'name', 'sufix', 'price', 'rating', 'color', 'detail', 'moreDetail', 
                       'tagline', 'firstImg', 'hoverImg', 'additionalImgs', 'category', 'flavours', 
                       'bestSeller', 'isActive', 'retailPrice', 'retailMinQty', 'wholesalePrice', 
-                      'wholesaleMinQty', 'distributorPrice', 'distributorMinQty'];
+                      'wholesaleMinQty', 'distributorPrice', 'distributorMinQty', 'stockQuantity', 
+                      'stockEnabled', 'lowStockThreshold', 'allowBackorders'];
     
     foreach ($allowedFields as $field) {
         if (isset($data[$field])) {
             if (in_array($field, ['additionalImgs', 'category', 'flavours'])) {
                 $fields[] = "$field = ?";
                 $params[] = json_encode($data[$field]);
-            } elseif (in_array($field, ['bestSeller', 'isActive', 'retailMinQty', 'wholesaleMinQty', 'distributorMinQty'])) {
+            } elseif (in_array($field, ['bestSeller', 'isActive', 'retailMinQty', 'wholesaleMinQty', 'distributorMinQty', 'stockQuantity', 'lowStockThreshold'])) {
                 $fields[] = "$field = ?";
                 $params[] = (int)$data[$field];
+            } elseif (in_array($field, ['stockEnabled', 'allowBackorders'])) {
+                $fields[] = "$field = ?";
+                $params[] = (bool)$data[$field] ? 1 : 0;
             } elseif (in_array($field, ['price', 'rating', 'retailPrice', 'wholesalePrice', 'distributorPrice'])) {
                 $fields[] = "$field = ?";
                 $params[] = (float)$data[$field];
             } else {
                 $fields[] = "$field = ?";
                 $params[] = $data[$field];
+            }
+        }
+    }
+    
+    // Auto-calculate stockStatus if stock-related fields are updated
+    $stockFieldsUpdated = isset($data['stockQuantity']) || isset($data['stockEnabled']) || 
+                         isset($data['lowStockThreshold']) || isset($data['allowBackorders']);
+    
+    if ($stockFieldsUpdated) {
+        // Get current product to calculate status
+        $currentProduct = dbQueryOne("SELECT stockQuantity, stockEnabled, lowStockThreshold, allowBackorders FROM products WHERE id = ?", [$id]);
+        if ($currentProduct) {
+            // Merge with updates
+            if (isset($data['stockQuantity'])) $currentProduct['stockQuantity'] = (int)$data['stockQuantity'];
+            if (isset($data['stockEnabled'])) $currentProduct['stockEnabled'] = (bool)$data['stockEnabled'];
+            if (isset($data['lowStockThreshold'])) $currentProduct['lowStockThreshold'] = (int)$data['lowStockThreshold'];
+            if (isset($data['allowBackorders'])) $currentProduct['allowBackorders'] = (bool)$data['allowBackorders'];
+            
+            $stockStatus = calculateStockStatus($currentProduct);
+            if ($stockStatus) {
+                $fields[] = "stockStatus = ?";
+                $params[] = $stockStatus;
             }
         }
     }

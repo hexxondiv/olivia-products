@@ -26,6 +26,12 @@ export interface Product {
   wholesaleMinQty?: number | null;
   distributorPrice?: number | null;
   distributorMinQty?: number | null;
+  // Stock management fields
+  stockQuantity?: number;
+  stockEnabled?: boolean;
+  lowStockThreshold?: number;
+  allowBackorders?: boolean;
+  stockStatus?: 'in_stock' | 'low_stock' | 'out_of_stock' | 'on_backorder' | null;
 }
 
 interface ProductsContextType {

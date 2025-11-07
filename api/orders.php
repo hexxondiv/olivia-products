@@ -33,6 +33,43 @@ require_once __DIR__ . '/database.php';
 require_once __DIR__ . '/auth-helper.php';
 require_once __DIR__ . '/mailgun-helper.php';
 require_once __DIR__ . '/pricing-helper.php';
+require_once __DIR__ . '/stock-helper.php';
+
+// Helper function to get current user ID from token (without requiring auth)
+function getCurrentUserId() {
+    $headers = getallheaders();
+    $token = null;
+    
+    // Get token from Authorization header
+    if (isset($headers['Authorization'])) {
+        $authHeader = $headers['Authorization'];
+        if (preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
+            $token = $matches[1];
+        }
+    }
+    
+    // Fallback to token parameter
+    if (!$token && isset($_GET['token'])) {
+        $token = $_GET['token'];
+    }
+    
+    // Fallback to POST token
+    if (!$token && isset($_POST['token'])) {
+        $token = $_POST['token'];
+    }
+    
+    if (!$token) {
+        return null;
+    }
+    
+    // Verify token and get user
+    $user = verifyAuthToken($token);
+    if ($user && isset($user['id'])) {
+        return (int)$user['id'];
+    }
+    
+    return null;
+}
 
 $method = $_SERVER['REQUEST_METHOD'];
 $input = file_get_contents('php://input');
@@ -232,6 +269,7 @@ function handlePut() {
     $newStatus = null;
     $paymentStatusChanged = false;
     $newIsPaid = null;
+    $orderCancelled = false;
     
     // Build update query
     $fields = [];
@@ -257,6 +295,10 @@ function handlePut() {
             if ($field === 'status' && $value !== $oldStatus) {
                 $statusChanged = true;
                 $newStatus = $value;
+                // Check if order is being cancelled
+                if ($value === 'cancelled' && $oldStatus !== 'cancelled') {
+                    $orderCancelled = true;
+                }
             }
             
             // Track payment status change
@@ -313,6 +355,41 @@ function handlePut() {
     if ($result !== false) {
         $order = dbQueryOne("SELECT * FROM orders WHERE orderId = ?", [$orderId]);
         $order['totalAmount'] = (float)$order['totalAmount'];
+        
+        // Restore stock if order is being cancelled
+        if ($orderCancelled) {
+            try {
+                // Get all order items
+                $orderItems = dbQuery(
+                    "SELECT productId, quantity FROM order_items WHERE orderId = ?",
+                    [$orderId]
+                );
+                
+                foreach ($orderItems as $item) {
+                    if (!empty($item['productId'])) {
+                        $quantity = (int)$item['quantity'];
+                        $stockResult = updateProductStock(
+                            $item['productId'],
+                            $quantity, // Positive to restore stock
+                            'return',
+                            'order',
+                            $orderId,
+                            "Stock restored from cancelled order $orderId",
+                            getCurrentUserId()
+                        );
+                        
+                        if ($stockResult['success']) {
+                            error_log("Stock restored for product {$item['productId']}: {$quantity} units (Order: $orderId)");
+                        } else {
+                            error_log("Warning: Failed to restore stock for product {$item['productId']}: {$stockResult['message']}");
+                        }
+                    }
+                }
+            } catch (Exception $e) {
+                // Log error but don't fail the order update
+                error_log("Error restoring stock for cancelled order $orderId: " . $e->getMessage());
+            }
+        }
         
         // Helper function to format order data for emails
         $formatOrderDataForEmail = function($order) use ($orderId) {
@@ -423,11 +500,46 @@ function handleDelete() {
     }
     
     // Check if order exists
-    $order = dbQueryOne("SELECT orderId FROM orders WHERE orderId = ?", [$orderId]);
+    $order = dbQueryOne("SELECT orderId, status FROM orders WHERE orderId = ?", [$orderId]);
     if (!$order) {
         http_response_code(404);
         echo json_encode(['success' => false, 'message' => 'Order not found']);
         return;
+    }
+    
+    // Restore stock before deleting order (if order wasn't already cancelled)
+    if ($order['status'] !== 'cancelled') {
+        try {
+            // Get all order items
+            $orderItems = dbQuery(
+                "SELECT productId, quantity FROM order_items WHERE orderId = ?",
+                [$orderId]
+            );
+            
+            foreach ($orderItems as $item) {
+                if (!empty($item['productId'])) {
+                    $quantity = (int)$item['quantity'];
+                    $stockResult = updateProductStock(
+                        $item['productId'],
+                        $quantity, // Positive to restore stock
+                        'return',
+                        'order',
+                        $orderId,
+                        "Stock restored from deleted order $orderId",
+                        getCurrentUserId()
+                    );
+                    
+                    if ($stockResult['success']) {
+                        error_log("Stock restored for product {$item['productId']}: {$quantity} units (Deleted Order: $orderId)");
+                    } else {
+                        error_log("Warning: Failed to restore stock for product {$item['productId']}: {$stockResult['message']}");
+                    }
+                }
+            }
+        } catch (Exception $e) {
+            // Log error but continue with deletion
+            error_log("Error restoring stock for deleted order $orderId: " . $e->getMessage());
+        }
     }
     
     // Delete order (cascade will delete order_items)

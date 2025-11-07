@@ -53,6 +53,7 @@ try {
         throw new Exception('Pricing helper file not found');
     }
     require_once __DIR__ . '/pricing-helper.php';
+    require_once __DIR__ . '/stock-helper.php';
 } catch (Exception $e) {
     ob_clean();
     http_response_code(500);
@@ -117,6 +118,36 @@ try {
     
     // Prepare order data with order ID
     $orderData['orderId'] = $orderId;
+    
+    // Validate stock availability for all items
+    $stockValidationErrors = [];
+    foreach ($orderData['items'] as $item) {
+        if (!empty($item['id'])) {
+            $stockCheck = checkStockAvailability($item['id'], (int)$item['quantity']);
+            if (!$stockCheck['available']) {
+                $stockValidationErrors[] = [
+                    'productId' => $item['id'],
+                    'productName' => $item['productName'] ?? 'Unknown',
+                    'requestedQuantity' => (int)$item['quantity'],
+                    'availableQuantity' => $stockCheck['availableQuantity'],
+                    'message' => $stockCheck['message']
+                ];
+            }
+        }
+    }
+    
+    // If stock validation fails, return error
+    if (!empty($stockValidationErrors)) {
+        ob_clean();
+        http_response_code(400);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Stock validation failed',
+            'stockErrors' => $stockValidationErrors
+        ]);
+        ob_end_flush();
+        exit();
+    }
     
     // Apply tier-corrected pricing to order items before sending emails
     // This ensures emails show the correct prices based on quantity and tier
@@ -219,7 +250,7 @@ try {
         $orderInserted = dbExecute($orderSql, $orderParams);
         
         if ($orderInserted) {
-            // Insert order items (with corrected prices)
+            // Insert order items (with corrected prices) and deduct stock
             foreach ($items as $item) {
                 $itemSql = "INSERT INTO order_items (orderId, productId, productName, productPrice, 
                            quantity, productImage) VALUES (?, ?, ?, ?, ?, ?)";
@@ -232,6 +263,26 @@ try {
                     $item['firstImg'] ?? null
                 ];
                 dbExecute($itemSql, $itemParams);
+                
+                // Deduct stock if product has stock tracking enabled
+                if (!empty($item['id'])) {
+                    $quantity = (int)($item['quantity'] ?? 1);
+                    $stockResult = updateProductStock(
+                        $item['id'],
+                        -$quantity, // Negative for deduction
+                        'sale',
+                        'order',
+                        $orderId,
+                        "Stock deducted for order $orderId",
+                        null // User ID not available in public order submission
+                    );
+                    
+                    if ($stockResult['success']) {
+                        error_log("Stock deducted for product {$item['id']}: {$quantity} units");
+                    } else {
+                        error_log("Warning: Failed to deduct stock for product {$item['id']}: {$stockResult['message']}");
+                    }
+                }
             }
             error_log("Order saved to database: $orderId");
         } else {

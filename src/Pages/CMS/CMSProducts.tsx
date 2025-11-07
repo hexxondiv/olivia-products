@@ -31,6 +31,12 @@ interface Product {
   wholesaleMinQty?: number | null;
   distributorPrice?: number | null;
   distributorMinQty?: number | null;
+  // Stock management fields
+  stockQuantity?: number;
+  stockEnabled?: boolean;
+  lowStockThreshold?: number;
+  allowBackorders?: boolean;
+  stockStatus?: 'in_stock' | 'low_stock' | 'out_of_stock' | 'on_backorder' | null;
 }
 
 const PRODUCT_CATEGORIES = [
@@ -75,7 +81,12 @@ export const CMSProducts: React.FC = () => {
     wholesalePrice: null,
     wholesaleMinQty: null,
     distributorPrice: null,
-    distributorMinQty: null
+    distributorMinQty: null,
+    stockQuantity: 0,
+    stockEnabled: false,
+    lowStockThreshold: 10,
+    allowBackorders: false,
+    stockStatus: null
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -83,6 +94,17 @@ export const CMSProducts: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState<number | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [showStockAdjustModal, setShowStockAdjustModal] = useState(false);
+  const [productForStockAdjust, setProductForStockAdjust] = useState<Product | null>(null);
+  const [stockAdjustData, setStockAdjustData] = useState({
+    quantity: 0,
+    movementType: 'adjustment' as 'adjustment' | 'purchase' | 'return' | 'damaged',
+    notes: ''
+  });
+  const [adjustingStock, setAdjustingStock] = useState(false);
+  const [showStockHistoryModal, setShowStockHistoryModal] = useState(false);
+  const [stockHistory, setStockHistory] = useState<any[]>([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
 
   useEffect(() => {
     fetchProducts();
@@ -181,7 +203,12 @@ export const CMSProducts: React.FC = () => {
         wholesalePrice: product.wholesalePrice ?? null,
         wholesaleMinQty: product.wholesaleMinQty ?? null,
         distributorPrice: product.distributorPrice ?? null,
-        distributorMinQty: product.distributorMinQty ?? null
+        distributorMinQty: product.distributorMinQty ?? null,
+        stockQuantity: product.stockQuantity ?? 0,
+        stockEnabled: product.stockEnabled ?? false,
+        lowStockThreshold: product.lowStockThreshold ?? 10,
+        allowBackorders: product.allowBackorders ?? false,
+        stockStatus: product.stockStatus ?? null
       });
     } else {
       setSelectedProduct(null);
@@ -207,7 +234,12 @@ export const CMSProducts: React.FC = () => {
         wholesalePrice: null,
         wholesaleMinQty: null,
         distributorPrice: null,
-        distributorMinQty: null
+        distributorMinQty: null,
+        stockQuantity: 0,
+        stockEnabled: false,
+        lowStockThreshold: 10,
+        allowBackorders: false,
+        stockStatus: null
       });
     }
     setFormErrors({});
@@ -238,8 +270,13 @@ export const CMSProducts: React.FC = () => {
       retailMinQty: 1,
       wholesalePrice: null,
       wholesaleMinQty: null,
-      distributorPrice: null,
-      distributorMinQty: null
+        distributorPrice: null,
+        distributorMinQty: null,
+        stockQuantity: 0,
+        stockEnabled: false,
+        lowStockThreshold: 10,
+        allowBackorders: false,
+        stockStatus: null
     });
     setFormErrors({});
   };
@@ -426,6 +463,108 @@ export const CMSProducts: React.FC = () => {
     product.heading.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleOpenStockAdjust = (product: Product, movementType: 'adjustment' | 'purchase' | 'return' | 'damaged') => {
+    setProductForStockAdjust(product);
+    setStockAdjustData({
+      quantity: movementType === 'purchase' ? 0 : 0,
+      movementType,
+      notes: ''
+    });
+    setShowStockAdjustModal(true);
+  };
+
+  const handleCloseStockAdjustModal = () => {
+    setShowStockAdjustModal(false);
+    setProductForStockAdjust(null);
+    setStockAdjustData({ quantity: 0, movementType: 'adjustment', notes: '' });
+  };
+
+  const handleStockAdjust = async () => {
+    if (!productForStockAdjust?.id) return;
+
+    setAdjustingStock(true);
+    setError('');
+
+    try {
+      const token = localStorage.getItem('cms_token');
+      const apiUrl = getApiUrl();
+      
+      // For purchase and return, ensure quantity is positive
+      // For adjustment, allow positive or negative
+      // For damaged, ensure quantity is positive (will be negated by backend)
+      let quantity = stockAdjustData.quantity;
+      if (stockAdjustData.movementType === 'purchase' || stockAdjustData.movementType === 'return') {
+        quantity = Math.abs(quantity); // Ensure positive
+      } else if (stockAdjustData.movementType === 'damaged') {
+        quantity = Math.abs(quantity); // Ensure positive (backend will negate)
+      }
+      
+      const payload = {
+        productId: productForStockAdjust.id,
+        quantity: stockAdjustData.movementType === 'damaged' ? -quantity : quantity, // Negate for damaged
+        movementType: stockAdjustData.movementType,
+        referenceType: stockAdjustData.movementType === 'purchase' ? 'purchase_order' : 'manual',
+        notes: stockAdjustData.notes || undefined
+      };
+
+      const response = await fetch(`${apiUrl}/stock.php/adjust`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        handleCloseStockAdjustModal();
+        fetchProducts();
+        setError('');
+      } else {
+        setError(data.message || 'Failed to adjust stock');
+      }
+    } catch (err) {
+      setError('Failed to adjust stock');
+      console.error(err);
+    } finally {
+      setAdjustingStock(false);
+    }
+  };
+
+  const handleViewStockHistory = async (productId: number) => {
+    setLoadingHistory(true);
+    setShowStockHistoryModal(true);
+    setError('');
+
+    try {
+      const token = localStorage.getItem('cms_token');
+      const apiUrl = getApiUrl();
+      
+      const response = await fetch(`${apiUrl}/stock.php?productId=${productId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setStockHistory(data.data.history || []);
+      } else {
+        setError(data.message || 'Failed to load stock history');
+        setStockHistory([]);
+      }
+    } catch (err) {
+      setError('Failed to load stock history');
+      setStockHistory([]);
+      console.error(err);
+    } finally {
+      setLoadingHistory(false);
+    }
+  };
+
   if (loading) {
     return (
       <CMSLayout>
@@ -473,6 +612,7 @@ export const CMSProducts: React.FC = () => {
                 <th>Price</th>
                 <th>Rating</th>
                 <th>Category</th>
+                <th>Stock</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -505,6 +645,44 @@ export const CMSProducts: React.FC = () => {
                       : '-'}
                   </td>
                   <td>
+                    {product.stockEnabled ? (
+                      <div>
+                        <div>
+                          {product.stockQuantity ?? 0}
+                          {product.id && (
+                            <Button
+                              variant="link"
+                              size="sm"
+                              className="p-0 ms-2"
+                              onClick={() => product.id && handleViewStockHistory(product.id)}
+                              title="View Stock History"
+                            >
+                              <FaSearch className="small" />
+                            </Button>
+                          )}
+                        </div>
+                        {product.stockStatus && (
+                          <Badge 
+                            bg={
+                              product.stockStatus === 'in_stock' ? 'success' :
+                              product.stockStatus === 'low_stock' ? 'warning' :
+                              product.stockStatus === 'out_of_stock' ? 'danger' :
+                              'info'
+                            }
+                            className="mt-1"
+                          >
+                            {product.stockStatus === 'in_stock' ? 'In Stock' :
+                             product.stockStatus === 'low_stock' ? 'Low Stock' :
+                             product.stockStatus === 'out_of_stock' ? 'Out of Stock' :
+                             'Backorder'}
+                          </Badge>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-muted">Unlimited</span>
+                    )}
+                  </td>
+                  <td>
                     <Badge bg={product.isActive ? 'success' : 'secondary'}>
                       {product.isActive ? 'Active' : 'Inactive'}
                     </Badge>
@@ -521,6 +699,28 @@ export const CMSProducts: React.FC = () => {
                     >
                       <FaEdit />
                     </Button>
+                    {product.stockEnabled && (
+                      <>
+                        <Button
+                          variant="outline-success"
+                          size="sm"
+                          className="me-2"
+                          onClick={() => handleOpenStockAdjust(product, 'purchase')}
+                          title="Add Stock (Purchase)"
+                        >
+                          <FaPlus />
+                        </Button>
+                        <Button
+                          variant="outline-warning"
+                          size="sm"
+                          className="me-2"
+                          onClick={() => handleOpenStockAdjust(product, 'adjustment')}
+                          title="Adjust Stock"
+                        >
+                          ±
+                        </Button>
+                      </>
+                    )}
                     <Button
                       variant="outline-danger"
                       size="sm"
@@ -1033,6 +1233,97 @@ export const CMSProducts: React.FC = () => {
             </div>
 
             <div className="form-section">
+              <h6 className="section-title">Stock Management</h6>
+              <Row>
+                <Col md={12}>
+                  <Form.Check
+                    type="switch"
+                    id="stockEnabled"
+                    label="Enable Stock Tracking"
+                    checked={formData.stockEnabled || false}
+                    onChange={(e) => handleInputChange('stockEnabled', e.target.checked)}
+                  />
+                  <Form.Text className="text-muted">
+                    When enabled, the system will track inventory and prevent overselling
+                  </Form.Text>
+                </Col>
+              </Row>
+              
+              {formData.stockEnabled && (
+                <>
+                  <Row className="mt-3">
+                    <Col md={6}>
+                      <Form.Group className="mb-3">
+                        <Form.Label>Current Stock Quantity</Form.Label>
+                        <Form.Control
+                          type="number"
+                          step="1"
+                          min="0"
+                          value={formData.stockQuantity ?? 0}
+                          onChange={(e) => handleInputChange('stockQuantity', parseInt(e.target.value) || 0)}
+                        />
+                        <Form.Text className="text-muted">Current available quantity</Form.Text>
+                      </Form.Group>
+                    </Col>
+                    <Col md={6}>
+                      <Form.Group className="mb-3">
+                        <Form.Label>Low Stock Threshold</Form.Label>
+                        <Form.Control
+                          type="number"
+                          step="1"
+                          min="1"
+                          value={formData.lowStockThreshold ?? 10}
+                          onChange={(e) => handleInputChange('lowStockThreshold', parseInt(e.target.value) || 10)}
+                        />
+                        <Form.Text className="text-muted">Alert when stock falls below this quantity</Form.Text>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  
+                  <Row>
+                    <Col md={6}>
+                      <Form.Group className="mb-3">
+                        <Form.Label>Stock Status</Form.Label>
+                        <Form.Control
+                          type="text"
+                          value={
+                            formData.stockStatus === 'in_stock' ? 'In Stock' :
+                            formData.stockStatus === 'low_stock' ? 'Low Stock' :
+                            formData.stockStatus === 'out_of_stock' ? 'Out of Stock' :
+                            formData.stockStatus === 'on_backorder' ? 'On Backorder' :
+                            'Not Set'
+                          }
+                          disabled
+                          className={
+                            formData.stockStatus === 'in_stock' ? 'bg-success text-white' :
+                            formData.stockStatus === 'low_stock' ? 'bg-warning text-dark' :
+                            formData.stockStatus === 'out_of_stock' ? 'bg-danger text-white' :
+                            formData.stockStatus === 'on_backorder' ? 'bg-info text-white' :
+                            ''
+                          }
+                        />
+                        <Form.Text className="text-muted">Calculated automatically based on quantity and settings</Form.Text>
+                      </Form.Group>
+                    </Col>
+                    <Col md={6}>
+                      <Form.Check
+                        type="switch"
+                        id="allowBackorders"
+                        label="Allow Backorders"
+                        checked={formData.allowBackorders || false}
+                        onChange={(e) => handleInputChange('allowBackorders', e.target.checked)}
+                        className="mt-4"
+                      />
+                      <Form.Text className="text-muted">
+                        Allow customers to order when stock is 0
+                      </Form.Text>
+                    </Col>
+                  </Row>
+                </>
+              )}
+            </div>
+
+            <div className="form-section">
               <h6 className="section-title">Settings</h6>
               <Row>
                 <Col md={6}>
@@ -1117,9 +1408,179 @@ export const CMSProducts: React.FC = () => {
           <Button variant="secondary" onClick={handleCloseDeleteModal} disabled={deleting}>
             Cancel
           </Button>
+          </Modal.Footer>
+        </Modal>
+
+      {/* Stock Adjustment Modal */}
+      <Modal show={showStockAdjustModal} onHide={handleCloseStockAdjustModal} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            {stockAdjustData.movementType === 'purchase' ? 'Add Stock (Purchase)' :
+             stockAdjustData.movementType === 'return' ? 'Return Stock' :
+             stockAdjustData.movementType === 'damaged' ? 'Remove Damaged Stock' :
+             'Adjust Stock'}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {productForStockAdjust && (
+            <>
+              <div className="mb-3">
+                <strong>Product:</strong> {productForStockAdjust.name}
+              </div>
+              <div className="mb-3">
+                <strong>Current Stock:</strong> {productForStockAdjust.stockQuantity ?? 0}
+              </div>
+              
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  {stockAdjustData.movementType === 'purchase' ? 'Quantity to Add' :
+                   stockAdjustData.movementType === 'return' ? 'Quantity to Return' :
+                   stockAdjustData.movementType === 'damaged' ? 'Quantity to Remove' :
+                   'Quantity Change'}
+                </Form.Label>
+                <Form.Control
+                  type="number"
+                  step="1"
+                  min={stockAdjustData.movementType === 'purchase' || stockAdjustData.movementType === 'return' ? 1 : undefined}
+                  value={stockAdjustData.quantity}
+                  onChange={(e) => setStockAdjustData({
+                    ...stockAdjustData,
+                    quantity: parseInt(e.target.value) || 0
+                  })}
+                  placeholder={stockAdjustData.movementType === 'adjustment' ? "Enter positive or negative number" : "Enter quantity"}
+                />
+                <Form.Text className="text-muted">
+                  {stockAdjustData.movementType === 'adjustment' 
+                    ? 'Positive number to add, negative to subtract'
+                    : stockAdjustData.movementType === 'purchase'
+                    ? 'Enter the quantity received from supplier'
+                    : stockAdjustData.movementType === 'return'
+                    ? 'Enter the quantity being returned'
+                    : 'Enter the quantity of damaged items to remove'}
+                </Form.Text>
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Notes (Optional)</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={3}
+                  value={stockAdjustData.notes}
+                  onChange={(e) => setStockAdjustData({
+                    ...stockAdjustData,
+                    notes: e.target.value
+                  })}
+                  placeholder="Add any notes about this stock change..."
+                />
+              </Form.Group>
+
+              {stockAdjustData.quantity !== 0 && productForStockAdjust && (
+                <Alert variant="info" className="mt-3">
+                  <strong>New Stock Quantity:</strong> {
+                    (productForStockAdjust.stockQuantity ?? 0) + 
+                    (stockAdjustData.movementType === 'damaged' 
+                      ? -Math.abs(stockAdjustData.quantity) 
+                      : stockAdjustData.quantity)
+                  }
+                </Alert>
+              )}
+            </>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseStockAdjustModal} disabled={adjustingStock}>
+            Cancel
+          </Button>
+          <Button 
+            variant="primary" 
+            onClick={handleStockAdjust} 
+            disabled={adjustingStock || stockAdjustData.quantity === 0}
+          >
+            {adjustingStock ? (
+              <>
+                <Spinner size="sm" className="me-2" />
+                Processing...
+              </>
+            ) : (
+              stockAdjustData.movementType === 'purchase' ? 'Add Stock' :
+              stockAdjustData.movementType === 'return' ? 'Return Stock' :
+              stockAdjustData.movementType === 'damaged' ? 'Remove Stock' :
+              'Adjust Stock'
+            )}
+          </Button>
         </Modal.Footer>
       </Modal>
-    </CMSLayout>
-  );
-};
+
+      {/* Stock History Modal */}
+      <Modal show={showStockHistoryModal} onHide={() => setShowStockHistoryModal(false)} size="lg">
+        <Modal.Header closeButton>
+          <Modal.Title>Stock History</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {loadingHistory ? (
+            <div className="text-center py-4">
+              <Spinner animation="border" />
+            </div>
+          ) : stockHistory.length === 0 ? (
+            <p className="text-muted">No stock history available</p>
+          ) : (
+            <Table striped bordered hover>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Quantity</th>
+                  <th>Previous</th>
+                  <th>New</th>
+                  <th>Reference</th>
+                  <th>Notes</th>
+                  <th>User</th>
+                </tr>
+              </thead>
+              <tbody>
+                {stockHistory.map((movement: any) => (
+                  <tr key={movement.id}>
+                    <td>{new Date(movement.createdAt).toLocaleString()}</td>
+                    <td>
+                      <Badge bg={
+                        movement.movementType === 'purchase' ? 'success' :
+                        movement.movementType === 'sale' ? 'danger' :
+                        movement.movementType === 'return' ? 'info' :
+                        movement.movementType === 'damaged' ? 'warning' :
+                        'secondary'
+                      }>
+                        {movement.movementType}
+                      </Badge>
+                    </td>
+                    <td className={movement.quantity > 0 ? 'text-success' : 'text-danger'}>
+                      {movement.quantity > 0 ? '+' : ''}{movement.quantity}
+                    </td>
+                    <td>{movement.previousQuantity}</td>
+                    <td><strong>{movement.newQuantity}</strong></td>
+                    <td>
+                      {movement.referenceType && movement.referenceId ? (
+                        <span className="small">
+                          {movement.referenceType}: {movement.referenceId}
+                        </span>
+                      ) : (
+                        <span className="text-muted">-</span>
+                      )}
+                    </td>
+                    <td className="small">{movement.notes || '-'}</td>
+                    <td className="small">{movement.createdByName || '-'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowStockHistoryModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      </CMSLayout>
+    );
+  };
 

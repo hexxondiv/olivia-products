@@ -146,7 +146,17 @@ export const ViewProductPage: React.FC = () => {
 
   const inc = () => {
     setQuantity((q) => {
-      const newQty = q + 1;
+      // Check stock limit if stock tracking is enabled
+      let maxQty = Infinity;
+      if (product.stockEnabled && product.stockQuantity !== undefined) {
+        maxQty = product.stockQuantity;
+        // Allow backorders if enabled
+        if (product.allowBackorders && product.stockQuantity === 0) {
+          maxQty = Infinity;
+        }
+      }
+      
+      const newQty = Math.min(q + 1, maxQty);
       // Update cart if item exists
       if (product) {
         const cartItem = cart.find((item) => item.id === product.id);
@@ -165,6 +175,37 @@ export const ViewProductPage: React.FC = () => {
       }
       return newQty;
     });
+  };
+  
+  // Check if product is available for purchase
+  const isAvailable = () => {
+    if (!product.stockEnabled) return true; // Unlimited stock
+    if (product.stockQuantity === undefined) return true;
+    if (product.stockQuantity > 0) return true;
+    if (product.allowBackorders) return true; // Backorders allowed
+    return false; // Out of stock
+  };
+  
+  // Get stock status message
+  const getStockMessage = () => {
+    if (!product.stockEnabled) return null;
+    
+    const stockQty = product.stockQuantity ?? 0;
+    const status = product.stockStatus;
+    
+    if (status === 'out_of_stock' && !product.allowBackorders) {
+      return { text: 'Out of Stock', type: 'danger' };
+    }
+    if (status === 'low_stock' && stockQty > 0) {
+      return { text: `Only ${stockQty} left!`, type: 'warning' };
+    }
+    if (status === 'on_backorder') {
+      return { text: 'Available for Backorder', type: 'info' };
+    }
+    if (status === 'in_stock') {
+      return null; // No message needed for in stock
+    }
+    return null;
   };
 
   return (
@@ -249,19 +290,59 @@ export const ViewProductPage: React.FC = () => {
               <li key={item.id}>{item.name}</li>
             ))}
           </ul>
-<div className="d-flex"><h6>Select Quantity</h6>
+          
+          {/* Stock Status */}
+          {product.stockEnabled && (
+            <div className="mb-3">
+              {(() => {
+                const stockMsg = getStockMessage();
+                if (stockMsg) {
+                  return (
+                    <Alert variant={stockMsg.type as any} className="mb-2 py-2">
+                      <strong>{stockMsg.text}</strong>
+                    </Alert>
+                  );
+                }
+                return null;
+              })()}
+            </div>
+          )}
+          
+          <div className="d-flex"><h6>Select Quantity</h6>
           <div className="quantity-controls" aria-label="Quantity selector">
             <span onClick={dec} className="decrement-btn" style={{ cursor: "pointer" }}>
               –
             </span>
             <span>{quantity}</span>
-            <span onClick={inc} className="increment-btn" style={{ cursor: "pointer" }}>
+            <span 
+              onClick={inc} 
+              className="increment-btn" 
+              style={{ 
+                cursor: product.stockEnabled && product.stockQuantity !== undefined && 
+                        !product.allowBackorders && quantity >= (product.stockQuantity || 0) 
+                        ? "not-allowed" : "pointer",
+                opacity: product.stockEnabled && product.stockQuantity !== undefined && 
+                         !product.allowBackorders && quantity >= (product.stockQuantity || 0) 
+                         ? 0.5 : 1
+              }}
+            >
               +
             </span>
           </div></div>
 
-          <button className="add-to-cart2" onClick={handleAddToCart}>
-            Add to Cart | ₦{(calculatePriceForQuantity(product, quantity) * quantity).toLocaleString()}
+          <button 
+            className="add-to-cart2" 
+            onClick={handleAddToCart}
+            disabled={!isAvailable()}
+            style={{
+              opacity: isAvailable() ? 1 : 0.5,
+              cursor: isAvailable() ? "pointer" : "not-allowed"
+            }}
+          >
+            {isAvailable() 
+              ? `Add to Cart | ₦${(calculatePriceForQuantity(product, quantity) * quantity).toLocaleString()}`
+              : "Out of Stock"
+            }
           </button>
 
 
