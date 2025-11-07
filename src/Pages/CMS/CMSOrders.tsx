@@ -80,6 +80,7 @@ export const CMSOrders: React.FC = () => {
     const variants: { [key: string]: string } = {
       pending: 'warning',
       processing: 'info',
+      paid: 'success',
       shipped: 'primary',
       delivered: 'success',
       cancelled: 'danger',
@@ -121,10 +122,28 @@ export const CMSOrders: React.FC = () => {
             Processing
           </Button>
           <Button
+            variant={statusFilter === 'paid' ? 'success' : 'outline-success'}
+            onClick={() => setSearchParams({ status: 'paid' })}
+          >
+            Paid
+          </Button>
+          <Button
+            variant={statusFilter === 'shipped' ? 'primary' : 'outline-primary'}
+            onClick={() => setSearchParams({ status: 'shipped' })}
+          >
+            Shipped
+          </Button>
+          <Button
             variant={statusFilter === 'delivered' ? 'success' : 'outline-success'}
             onClick={() => setSearchParams({ status: 'delivered' })}
           >
             Delivered
+          </Button>
+          <Button
+            variant={statusFilter === 'cancelled' ? 'danger' : 'outline-danger'}
+            onClick={() => setSearchParams({ status: 'cancelled' })}
+          >
+            Cancelled
           </Button>
         </div>
       </div>
@@ -166,6 +185,7 @@ export const CMSOrders: React.FC = () => {
                   >
                     <option value="pending">Pending</option>
                     <option value="processing">Processing</option>
+                    <option value="paid">Paid</option>
                     <option value="shipped">Shipped</option>
                     <option value="delivered">Delivered</option>
                     <option value="cancelled">Cancelled</option>

@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS orders (
     customerPostalCode VARCHAR(20),
     customerNotes TEXT,
     totalAmount DECIMAL(10, 2) NOT NULL,
-    status ENUM('pending', 'processing', 'shipped', 'delivered', 'cancelled') DEFAULT 'pending',
+    status ENUM('pending', 'processing', 'paid', 'shipped', 'delivered', 'cancelled') DEFAULT 'pending',
     submittedVia ENUM('email', 'whatsapp') DEFAULT 'email',
     salesEmailSent BOOLEAN DEFAULT FALSE,
     customerEmailSent BOOLEAN DEFAULT FALSE,
