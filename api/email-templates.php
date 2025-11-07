@@ -919,3 +919,544 @@ function getWholesaleAcknowledgementEmailTextTemplate($wholesaleData) {
     return $text;
 }
 
+/**
+ * Get customer order status update email template (HTML with Bootstrap)
+ */
+function getCustomerStatusUpdateEmailTemplate($orderData, $newStatus, $oldStatus = null) {
+    $orderId = $orderData['orderId'];
+    $orderDate = date('F j, Y \a\t g:i A', strtotime($orderData['orderDate']));
+    $customer = $orderData['customer'];
+    $items = $orderData['items'];
+    $total = number_format($orderData['total'], 2);
+    
+    // Status-specific content
+    $statusConfig = [
+        'pending' => [
+            'title' => 'Order Received',
+            'icon' => '📋',
+            'message' => 'We have received your order and it is currently being reviewed.',
+            'nextSteps' => [
+                'Our team will review your order within 24 hours',
+                'You will receive a confirmation call to verify your details',
+                'We\'ll begin processing your order once confirmed'
+            ],
+            'color' => '#ffc107'
+        ],
+        'processing' => [
+            'title' => 'Order Processing',
+            'icon' => '⚙️',
+            'message' => 'Great news! Your order is now being processed and prepared for shipment.',
+            'nextSteps' => [
+                'We\'re carefully preparing your items',
+                'Your order will be shipped soon',
+                'You\'ll receive tracking information once it ships'
+            ],
+            'color' => '#17a2b8'
+        ],
+        'shipped' => [
+            'title' => 'Order Shipped!',
+            'icon' => '🚚',
+            'message' => 'Your order has been shipped and is on its way to you!',
+            'nextSteps' => [
+                'Your package is now in transit',
+                'You can track your shipment using the tracking number provided',
+                'Expected delivery: 3-5 business days',
+                'Please ensure someone is available to receive the package'
+            ],
+            'color' => '#007bff'
+        ],
+        'delivered' => [
+            'title' => 'Order Delivered!',
+            'icon' => '✓',
+            'message' => 'Your order has been successfully delivered!',
+            'nextSteps' => [
+                'Your package should have arrived at your specified address',
+                'Please check your items and ensure everything is correct',
+                'If you have any concerns, please contact us immediately',
+                'We hope you enjoy your Olivia Products!'
+            ],
+            'color' => '#28a745'
+        ],
+        'cancelled' => [
+            'title' => 'Order Cancelled',
+            'icon' => '❌',
+            'message' => 'Your order has been cancelled as requested.',
+            'nextSteps' => [
+                'If payment was made, refund will be processed within 5-7 business days',
+                'If you have any questions about this cancellation, please contact us',
+                'We hope to serve you again in the future'
+            ],
+            'color' => '#dc3545'
+        ]
+    ];
+    
+    $config = $statusConfig[$newStatus] ?? $statusConfig['pending'];
+    
+    $itemsHtml = '';
+    foreach ($items as $item) {
+        $itemTotal = number_format($item['productPrice'] * $item['quantity'], 2);
+        $formattedName = formatProductName($item['productName']);
+        $itemsHtml .= '
+        <tr>
+            <td style="padding: 12px; border-bottom: 1px solid #e0e0e0;">
+                <img src="' . htmlspecialchars($item['firstImg']) . '" alt="' . htmlspecialchars($formattedName) . '" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 2px solid #e0e0e0;">
+            </td>
+            <td style="padding: 12px; border-bottom: 1px solid #e0e0e0;">
+                <strong>' . htmlspecialchars($formattedName) . '</strong>
+            </td>
+            <td style="padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: center;">
+                ' . htmlspecialchars($item['quantity']) . '
+            </td>
+            <td style="padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: right;">
+                <strong>₦' . $itemTotal . '</strong>
+            </td>
+        </tr>';
+    }
+    
+    $nextStepsHtml = '';
+    foreach ($config['nextSteps'] as $step) {
+        $nextStepsHtml .= '<li style="margin-bottom: 8px;">' . htmlspecialchars($step) . '</li>';
+    }
+    
+    return '
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Update - ' . $orderId . '</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f5f5f5; }
+        .email-container { max-width: 800px; margin: 0 auto; background-color: #ffffff; }
+        .header { background: linear-gradient(135deg, #003057 0%, #4b3d97 100%); color: #ffffff; padding: 40px 30px; text-align: center; }
+        .status-icon { font-size: 60px; margin-bottom: 20px; }
+        .content { padding: 30px; }
+        .status-badge { display: inline-block; background-color: ' . $config['color'] . '; color: #ffffff; padding: 10px 20px; border-radius: 25px; font-weight: bold; margin-bottom: 20px; font-size: 1.1em; text-transform: uppercase; }
+        .info-box { background-color: #f5f9ff; border-left: 4px solid ' . $config['color'] . '; padding: 20px; margin: 20px 0; border-radius: 4px; }
+        .next-steps { background-color: #fff9e6; border: 2px solid ' . $config['color'] . '; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .table th { background-color: #003057; color: #ffffff; padding: 12px; text-align: left; font-weight: 600; }
+        .footer { background-color: #f8f9fa; padding: 30px; text-align: center; color: #6c757d; }
+        .btn { display: inline-block; padding: 12px 30px; background-color: #7bbd21; color: #ffffff; text-decoration: none; border-radius: 25px; font-weight: 600; margin: 10px 5px; }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <div class="status-icon">' . $config['icon'] . '</div>
+            <h1 style="margin: 0; font-size: 32px;">' . $config['title'] . '</h1>
+            <p style="margin: 15px 0 0 0; font-size: 18px;">Order #' . htmlspecialchars($orderId) . '</p>
+        </div>
+        
+        <div class="content">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <div class="status-badge">' . ucfirst($newStatus) . '</div>
+                <p style="color: #6c757d; margin: 10px 0;">Order Date: ' . $orderDate . '</p>
+            </div>
+            
+            <div class="info-box">
+                <h3 style="margin-top: 0; color: #003057;">Hello ' . htmlspecialchars($customer['fullName']) . '!</h3>
+                <p style="margin: 0; line-height: 1.6; font-size: 1.1em;">' . $config['message'] . '</p>
+            </div>
+            
+            <div class="next-steps">
+                <h4 style="margin-top: 0; color: #003057;">What\'s Next?</h4>
+                <ul style="margin: 10px 0; padding-left: 20px; line-height: 1.8;">
+                    ' . $nextStepsHtml . '
+                </ul>
+            </div>
+            
+            <h3 style="color: #003057; margin-top: 30px;">Order Summary</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Product</th>
+                        <th style="text-align: center;">Quantity</th>
+                        <th style="text-align: right;">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ' . $itemsHtml . '
+                </tbody>
+                <tfoot>
+                    <tr style="background-color: #f5f9ff; font-weight: bold; font-size: 1.2em;">
+                        <td colspan="3" style="text-align: right; padding: 15px;">Total Amount:</td>
+                        <td style="text-align: right; padding: 15px; color: ' . $config['color'] . ';">₦' . $total . '</td>
+                    </tr>
+                </tfoot>
+            </table>
+            
+            <div class="info-box">
+                <h4 style="margin-top: 0; color: #003057;">Shipping Address</h4>
+                <p style="margin: 0;">
+                    ' . htmlspecialchars($customer['fullName']) . '<br>
+                    ' . htmlspecialchars($customer['address']) . '<br>
+                    ' . htmlspecialchars($customer['city']) . ', ' . htmlspecialchars($customer['state']) . 
+                    (!empty($customer['postalCode']) ? ' ' . htmlspecialchars($customer['postalCode']) : '') . '<br>
+                    Phone: ' . htmlspecialchars($customer['phone']) . '
+                </p>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="https://oliviaproducts.com" class="btn">Visit Our Website</a>
+                <a href="mailto:' . MAILGUN_REPLY_TO . '" class="btn" style="background-color: #003057;">Contact Us</a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p style="margin: 0; font-weight: 600; color: #003057;">Olivia Products</p>
+            <p style="margin: 5px 0;">Thank you for your business!</p>
+            <p style="margin: 10px 0 0 0; font-size: 0.9em;">This is an automated status update email. Please do not reply to this email.</p>
+        </div>
+    </div>
+</body>
+</html>';
+}
+
+/**
+ * Get customer order status update email template (Plain Text)
+ */
+function getCustomerStatusUpdateEmailTextTemplate($orderData, $newStatus, $oldStatus = null) {
+    $orderId = $orderData['orderId'];
+    $orderDate = date('F j, Y \a\t g:i A', strtotime($orderData['orderDate']));
+    $customer = $orderData['customer'];
+    $items = $orderData['items'];
+    $total = number_format($orderData['total'], 2);
+    
+    // Status-specific content
+    $statusConfig = [
+        'pending' => [
+            'title' => 'ORDER RECEIVED',
+            'message' => 'We have received your order and it is currently being reviewed.',
+            'nextSteps' => [
+                'Our team will review your order within 24 hours',
+                'You will receive a confirmation call to verify your details',
+                'We\'ll begin processing your order once confirmed'
+            ]
+        ],
+        'processing' => [
+            'title' => 'ORDER PROCESSING',
+            'message' => 'Great news! Your order is now being processed and prepared for shipment.',
+            'nextSteps' => [
+                'We\'re carefully preparing your items',
+                'Your order will be shipped soon',
+                'You\'ll receive tracking information once it ships'
+            ]
+        ],
+        'shipped' => [
+            'title' => 'ORDER SHIPPED!',
+            'message' => 'Your order has been shipped and is on its way to you!',
+            'nextSteps' => [
+                'Your package is now in transit',
+                'You can track your shipment using the tracking number provided',
+                'Expected delivery: 3-5 business days',
+                'Please ensure someone is available to receive the package'
+            ]
+        ],
+        'delivered' => [
+            'title' => 'ORDER DELIVERED!',
+            'message' => 'Your order has been successfully delivered!',
+            'nextSteps' => [
+                'Your package should have arrived at your specified address',
+                'Please check your items and ensure everything is correct',
+                'If you have any concerns, please contact us immediately',
+                'We hope you enjoy your Olivia Products!'
+            ]
+        ],
+        'cancelled' => [
+            'title' => 'ORDER CANCELLED',
+            'message' => 'Your order has been cancelled as requested.',
+            'nextSteps' => [
+                'If payment was made, refund will be processed within 5-7 business days',
+                'If you have any questions about this cancellation, please contact us',
+                'We hope to serve you again in the future'
+            ]
+        ]
+    ];
+    
+    $config = $statusConfig[$newStatus] ?? $statusConfig['pending'];
+    
+    $text = $config['title'] . "\n";
+    $text .= str_repeat("=", strlen($config['title'])) . "\n\n";
+    $text .= "Hello {$customer['fullName']}!\n\n";
+    $text .= $config['message'] . "\n\n";
+    
+    $text .= "ORDER DETAILS\n";
+    $text .= "-------------\n";
+    $text .= "Order ID: $orderId\n";
+    $text .= "Order Date: $orderDate\n";
+    $text .= "Status: " . ucfirst($newStatus) . "\n\n";
+    
+    $text .= "ORDER ITEMS\n";
+    $text .= "-----------\n";
+    foreach ($items as $item) {
+        $itemTotal = number_format($item['productPrice'] * $item['quantity'], 2);
+        $formattedName = formatProductName($item['productName']);
+        $text .= "- {$formattedName} (Qty: {$item['quantity']}) - ₦{$itemTotal}\n";
+    }
+    $text .= "\n";
+    $text .= "TOTAL: ₦$total\n\n";
+    
+    $text .= "SHIPPING ADDRESS\n";
+    $text .= "---------------\n";
+    $text .= "{$customer['fullName']}\n";
+    $text .= "{$customer['address']}\n";
+    $text .= "{$customer['city']}, {$customer['state']}";
+    if (!empty($customer['postalCode'])) {
+        $text .= " {$customer['postalCode']}";
+    }
+    $text .= "\n";
+    $text .= "Phone: {$customer['phone']}\n\n";
+    
+    $text .= "WHAT'S NEXT?\n";
+    $text .= "------------\n";
+    foreach ($config['nextSteps'] as $step) {
+        $text .= "- $step\n";
+    }
+    $text .= "\n";
+    
+    $text .= "If you have any questions, please contact us at " . MAILGUN_REPLY_TO . "\n";
+    $text .= "Phone: +234 901 419 6902\n";
+    $text .= "WhatsApp: +234 912 350 9090\n\n";
+    
+    $text .= "Thank you for your business!\n\n";
+    $text .= "Olivia Products\n";
+    $text .= "This is an automated status update email. Please do not reply to this email.\n";
+    
+    return $text;
+}
+
+/**
+ * Get customer payment status update email template (HTML with Bootstrap)
+ */
+function getCustomerPaymentStatusEmailTemplate($orderData, $isPaid) {
+    $orderId = $orderData['orderId'];
+    $orderDate = date('F j, Y \a\t g:i A', strtotime($orderData['orderDate']));
+    $customer = $orderData['customer'];
+    $items = $orderData['items'];
+    $total = number_format($orderData['total'], 2);
+    
+    if ($isPaid) {
+        $title = 'Payment Received';
+        $icon = '✓';
+        $message = 'Great news! We have received your payment for this order.';
+        $nextSteps = [
+            'Your payment has been successfully processed',
+            'Your order will now proceed to processing',
+            'You will receive updates as your order progresses',
+            'Thank you for your prompt payment!'
+        ];
+        $color = '#28a745';
+        $badgeText = 'PAID';
+    } else {
+        $title = 'Payment Status Updated';
+        $icon = 'ℹ️';
+        $message = 'The payment status for your order has been updated.';
+        $nextSteps = [
+            'Please ensure payment is completed to proceed with your order',
+            'If you have already made payment, please contact us with proof of payment',
+            'We will process your order once payment is confirmed',
+            'If you need assistance, please contact us'
+        ];
+        $color = '#ffc107';
+        $badgeText = 'PENDING PAYMENT';
+    }
+    
+    $itemsHtml = '';
+    foreach ($items as $item) {
+        $itemTotal = number_format($item['productPrice'] * $item['quantity'], 2);
+        $formattedName = formatProductName($item['productName']);
+        $itemsHtml .= '
+        <tr>
+            <td style="padding: 12px; border-bottom: 1px solid #e0e0e0;">
+                <img src="' . htmlspecialchars($item['firstImg']) . '" alt="' . htmlspecialchars($formattedName) . '" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 2px solid #e0e0e0;">
+            </td>
+            <td style="padding: 12px; border-bottom: 1px solid #e0e0e0;">
+                <strong>' . htmlspecialchars($formattedName) . '</strong>
+            </td>
+            <td style="padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: center;">
+                ' . htmlspecialchars($item['quantity']) . '
+            </td>
+            <td style="padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: right;">
+                <strong>₦' . $itemTotal . '</strong>
+            </td>
+        </tr>';
+    }
+    
+    $nextStepsHtml = '';
+    foreach ($nextSteps as $step) {
+        $nextStepsHtml .= '<li style="margin-bottom: 8px;">' . htmlspecialchars($step) . '</li>';
+    }
+    
+    return '
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Update - ' . $orderId . '</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f5f5f5; }
+        .email-container { max-width: 800px; margin: 0 auto; background-color: #ffffff; }
+        .header { background: linear-gradient(135deg, #003057 0%, #4b3d97 100%); color: #ffffff; padding: 40px 30px; text-align: center; }
+        .payment-icon { font-size: 60px; margin-bottom: 20px; }
+        .content { padding: 30px; }
+        .payment-badge { display: inline-block; background-color: ' . $color . '; color: #ffffff; padding: 10px 20px; border-radius: 25px; font-weight: bold; margin-bottom: 20px; font-size: 1.1em; text-transform: uppercase; }
+        .info-box { background-color: #f5f9ff; border-left: 4px solid ' . $color . '; padding: 20px; margin: 20px 0; border-radius: 4px; }
+        .next-steps { background-color: #fff9e6; border: 2px solid ' . $color . '; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .table th { background-color: #003057; color: #ffffff; padding: 12px; text-align: left; font-weight: 600; }
+        .footer { background-color: #f8f9fa; padding: 30px; text-align: center; color: #6c757d; }
+        .btn { display: inline-block; padding: 12px 30px; background-color: #7bbd21; color: #ffffff; text-decoration: none; border-radius: 25px; font-weight: 600; margin: 10px 5px; }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <div class="payment-icon">' . $icon . '</div>
+            <h1 style="margin: 0; font-size: 32px;">' . $title . '</h1>
+            <p style="margin: 15px 0 0 0; font-size: 18px;">Order #' . htmlspecialchars($orderId) . '</p>
+        </div>
+        
+        <div class="content">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <div class="payment-badge">' . $badgeText . '</div>
+                <p style="color: #6c757d; margin: 10px 0;">Order Date: ' . $orderDate . '</p>
+            </div>
+            
+            <div class="info-box">
+                <h3 style="margin-top: 0; color: #003057;">Hello ' . htmlspecialchars($customer['fullName']) . '!</h3>
+                <p style="margin: 0; line-height: 1.6; font-size: 1.1em;">' . $message . '</p>
+            </div>
+            
+            <div class="next-steps">
+                <h4 style="margin-top: 0; color: #003057;">What\'s Next?</h4>
+                <ul style="margin: 10px 0; padding-left: 20px; line-height: 1.8;">
+                    ' . $nextStepsHtml . '
+                </ul>
+            </div>
+            
+            <h3 style="color: #003057; margin-top: 30px;">Order Summary</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Product</th>
+                        <th style="text-align: center;">Quantity</th>
+                        <th style="text-align: right;">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ' . $itemsHtml . '
+                </tbody>
+                <tfoot>
+                    <tr style="background-color: #f5f9ff; font-weight: bold; font-size: 1.2em;">
+                        <td colspan="3" style="text-align: right; padding: 15px;">Total Amount:</td>
+                        <td style="text-align: right; padding: 15px; color: ' . $color . ';">₦' . $total . '</td>
+                    </tr>
+                </tfoot>
+            </table>
+            
+            <div class="info-box">
+                <h4 style="margin-top: 0; color: #003057;">Payment Information</h4>
+                <p style="margin: 0;">
+                    <strong>Order ID:</strong> ' . htmlspecialchars($orderId) . '<br>
+                    <strong>Total Amount:</strong> ₦' . $total . '<br>
+                    <strong>Payment Status:</strong> ' . ($isPaid ? '<span style="color: #28a745; font-weight: bold;">Paid</span>' : '<span style="color: #ffc107; font-weight: bold;">Pending</span>') . '
+                </p>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="https://oliviaproducts.com" class="btn">Visit Our Website</a>
+                <a href="mailto:' . MAILGUN_REPLY_TO . '" class="btn" style="background-color: #003057;">Contact Us</a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p style="margin: 0; font-weight: 600; color: #003057;">Olivia Products</p>
+            <p style="margin: 5px 0;">Thank you for your business!</p>
+            <p style="margin: 10px 0 0 0; font-size: 0.9em;">This is an automated payment status update email. Please do not reply to this email.</p>
+        </div>
+    </div>
+</body>
+</html>';
+}
+
+/**
+ * Get customer payment status update email template (Plain Text)
+ */
+function getCustomerPaymentStatusEmailTextTemplate($orderData, $isPaid) {
+    $orderId = $orderData['orderId'];
+    $orderDate = date('F j, Y \a\t g:i A', strtotime($orderData['orderDate']));
+    $customer = $orderData['customer'];
+    $items = $orderData['items'];
+    $total = number_format($orderData['total'], 2);
+    
+    if ($isPaid) {
+        $title = 'PAYMENT RECEIVED';
+        $message = 'Great news! We have received your payment for this order.';
+        $nextSteps = [
+            'Your payment has been successfully processed',
+            'Your order will now proceed to processing',
+            'You will receive updates as your order progresses',
+            'Thank you for your prompt payment!'
+        ];
+    } else {
+        $title = 'PAYMENT STATUS UPDATED';
+        $message = 'The payment status for your order has been updated.';
+        $nextSteps = [
+            'Please ensure payment is completed to proceed with your order',
+            'If you have already made payment, please contact us with proof of payment',
+            'We will process your order once payment is confirmed',
+            'If you need assistance, please contact us'
+        ];
+    }
+    
+    $text = $title . "\n";
+    $text .= str_repeat("=", strlen($title)) . "\n\n";
+    $text .= "Hello {$customer['fullName']}!\n\n";
+    $text .= $message . "\n\n";
+    
+    $text .= "ORDER DETAILS\n";
+    $text .= "-------------\n";
+    $text .= "Order ID: $orderId\n";
+    $text .= "Order Date: $orderDate\n";
+    $text .= "Payment Status: " . ($isPaid ? "Paid" : "Pending") . "\n\n";
+    
+    $text .= "ORDER ITEMS\n";
+    $text .= "-----------\n";
+    foreach ($items as $item) {
+        $itemTotal = number_format($item['productPrice'] * $item['quantity'], 2);
+        $formattedName = formatProductName($item['productName']);
+        $text .= "- {$formattedName} (Qty: {$item['quantity']}) - ₦{$itemTotal}\n";
+    }
+    $text .= "\n";
+    $text .= "TOTAL: ₦$total\n\n";
+    
+    $text .= "PAYMENT INFORMATION\n";
+    $text .= "-------------------\n";
+    $text .= "Order ID: $orderId\n";
+    $text .= "Total Amount: ₦$total\n";
+    $text .= "Payment Status: " . ($isPaid ? "Paid" : "Pending") . "\n\n";
+    
+    $text .= "WHAT'S NEXT?\n";
+    $text .= "------------\n";
+    foreach ($nextSteps as $step) {
+        $text .= "- $step\n";
+    }
+    $text .= "\n";
+    
+    $text .= "If you have any questions, please contact us at " . MAILGUN_REPLY_TO . "\n";
+    $text .= "Phone: +234 901 419 6902\n";
+    $text .= "WhatsApp: +234 912 350 9090\n\n";
+    
+    $text .= "Thank you for your business!\n\n";
+    $text .= "Olivia Products\n";
+    $text .= "This is an automated payment status update email. Please do not reply to this email.\n";
+    
+    return $text;
+}
+

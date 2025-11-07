@@ -234,3 +234,93 @@ function sendWholesaleAcknowledgementToCustomer($wholesaleData) {
     return sendMailgunEmail($customerEmail, $subject, $htmlBody, $textBody);
 }
 
+/**
+ * Send order status update email to customer
+ */
+function sendOrderStatusUpdateToCustomer($orderData, $newStatus, $oldStatus = null) {
+    // Validate order data
+    if (!isset($orderData['customer']['email'])) {
+        throw new Exception("Customer email is required");
+    }
+    
+    if (!isset($orderData['orderId'])) {
+        throw new Exception("Order ID is required");
+    }
+    
+    $customerEmail = $orderData['customer']['email'];
+    $customerName = $orderData['customer']['fullName'] ?? 'Customer';
+    $orderId = $orderData['orderId'];
+    
+    // Status-specific subject lines
+    $statusSubjects = [
+        'pending' => 'Order Received - ' . $orderId,
+        'processing' => 'Your Order is Being Processed - ' . $orderId,
+        'shipped' => 'Your Order Has Shipped! - ' . $orderId,
+        'delivered' => 'Your Order Has Been Delivered! - ' . $orderId,
+        'cancelled' => 'Order Cancellation Notice - ' . $orderId
+    ];
+    
+    $subject = $statusSubjects[$newStatus] ?? 'Order Status Update - ' . $orderId;
+    
+    // Generate email templates
+    $htmlBody = getCustomerStatusUpdateEmailTemplate($orderData, $newStatus, $oldStatus);
+    $textBody = getCustomerStatusUpdateEmailTextTemplate($orderData, $newStatus, $oldStatus);
+    
+    // Validate templates were generated
+    if (empty($htmlBody)) {
+        throw new Exception("Failed to generate status update email HTML template");
+    }
+    
+    if (empty($textBody)) {
+        throw new Exception("Failed to generate status update email text template");
+    }
+    
+    error_log("Sending status update email to: $customerEmail");
+    error_log("Email subject: $subject");
+    error_log("Status changed from: " . ($oldStatus ?? 'N/A') . " to: $newStatus");
+    
+    return sendMailgunEmail($customerEmail, $subject, $htmlBody, $textBody);
+}
+
+/**
+ * Send payment status update email to customer
+ */
+function sendPaymentStatusUpdateToCustomer($orderData, $isPaid) {
+    // Validate order data
+    if (!isset($orderData['customer']['email'])) {
+        throw new Exception("Customer email is required");
+    }
+    
+    if (!isset($orderData['orderId'])) {
+        throw new Exception("Order ID is required");
+    }
+    
+    $customerEmail = $orderData['customer']['email'];
+    $customerName = $orderData['customer']['fullName'] ?? 'Customer';
+    $orderId = $orderData['orderId'];
+    
+    // Payment status-specific subject lines
+    $subject = $isPaid 
+        ? 'Payment Received - ' . $orderId 
+        : 'Payment Status Update - ' . $orderId;
+    
+    // Generate email templates
+    $htmlBody = getCustomerPaymentStatusEmailTemplate($orderData, $isPaid);
+    $textBody = getCustomerPaymentStatusEmailTextTemplate($orderData, $isPaid);
+    
+    // Validate templates were generated
+    if (empty($htmlBody)) {
+        throw new Exception("Failed to generate payment status email HTML template");
+    }
+    
+    if (empty($textBody)) {
+        throw new Exception("Failed to generate payment status email text template");
+    }
+    
+    error_log("Sending payment status update email to: $customerEmail");
+    error_log("Email subject: $subject");
+    error_log("Payment status: " . ($isPaid ? 'Paid' : 'Not Paid'));
+    
+    return sendMailgunEmail($customerEmail, $subject, $htmlBody, $textBody);
+}
+
