@@ -89,11 +89,32 @@ try {
         exit();
     }
     
-    // Validate file size (max 10MB)
-    $maxSize = 10 * 1024 * 1024; // 10MB
-    if ($file['size'] > $maxSize) {
+    // Validate file size - check against PHP's upload_max_filesize
+    $uploadMaxSize = ini_get('upload_max_filesize');
+    // Convert PHP ini size (e.g., "2M", "10M") to bytes
+    $maxSizeBytes = 0;
+    if (preg_match('/(\d+)([KMGT]?)/i', $uploadMaxSize, $matches)) {
+        $value = (int)$matches[1];
+        $unit = strtoupper($matches[2] ?? '');
+        switch ($unit) {
+            case 'G': $maxSizeBytes = $value * 1024 * 1024 * 1024; break;
+            case 'M': $maxSizeBytes = $value * 1024 * 1024; break;
+            case 'K': $maxSizeBytes = $value * 1024; break;
+            default: $maxSizeBytes = $value; break;
+        }
+    } else {
+        // Fallback to 2MB if parsing fails
+        $maxSizeBytes = 2 * 1024 * 1024;
+    }
+    
+    if ($file['size'] > $maxSizeBytes) {
+        $fileSizeMB = round($file['size'] / (1024 * 1024), 2);
+        $maxSizeMB = round($maxSizeBytes / (1024 * 1024), 2);
         http_response_code(400);
-        echo json_encode(['success' => false, 'message' => 'File too large. Maximum size is 10MB.']);
+        echo json_encode([
+            'success' => false, 
+            'message' => "File too large. File size: {$fileSizeMB}MB, Maximum allowed: {$maxSizeMB}MB (PHP upload_max_filesize: {$uploadMaxSize})"
+        ]);
         ob_end_flush();
         exit();
     }
@@ -113,17 +134,36 @@ try {
     
     // Create directory if it doesn't exist
     if (!is_dir($uploadDir)) {
-        if (!mkdir($uploadDir, 0755, true)) {
-            throw new Exception('Failed to create upload directory');
+        if (!mkdir($uploadDir, 0775, true)) {
+            $error = error_get_last();
+            throw new Exception('Failed to create upload directory: ' . ($error['message'] ?? 'Unknown error'));
         }
+    }
+    
+    // Check if directory is writable
+    if (!is_writable($uploadDir)) {
+        $perms = substr(sprintf('%o', fileperms($uploadDir)), -4);
+        throw new Exception("Upload directory is not writable. Directory: $uploadDir, Permissions: $perms, Owner: " . fileowner($uploadDir));
     }
     
     // Full path to uploaded file
     $uploadPath = $uploadDir . $uniqueName;
     
+    // Check if temp file exists and is readable
+    if (!is_uploaded_file($file['tmp_name'])) {
+        throw new Exception('Invalid uploaded file or file was not uploaded via POST');
+    }
+    
     // Move uploaded file
     if (!move_uploaded_file($file['tmp_name'], $uploadPath)) {
-        throw new Exception('Failed to move uploaded file');
+        $error = error_get_last();
+        $errorMsg = 'Failed to move uploaded file';
+        if ($error) {
+            $errorMsg .= ': ' . $error['message'];
+        }
+        $errorMsg .= '. Temp file: ' . $file['tmp_name'] . ', Destination: ' . $uploadPath;
+        $errorMsg .= ', Directory writable: ' . (is_writable($uploadDir) ? 'yes' : 'no');
+        throw new Exception($errorMsg);
     }
     
     // Return success with file path

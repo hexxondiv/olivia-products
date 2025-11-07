@@ -231,8 +231,18 @@ export const CMSProducts: React.FC = () => {
   };
 
   const handleImageUpload = async (field: 'firstImg' | 'hoverImg' | 'additionalImgs', file: File) => {
+    // Check file size before upload (2MB limit based on PHP default)
+    const maxSizeBytes = 2 * 1024 * 1024; // 2MB
+    if (file.size > maxSizeBytes) {
+      const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+      const maxSizeMB = (maxSizeBytes / (1024 * 1024)).toFixed(0);
+      setError(`File too large. File size: ${fileSizeMB}MB, Maximum allowed: ${maxSizeMB}MB. Please compress the image or use a smaller file.`);
+      return;
+    }
+    
     try {
       setUploadingImage(field);
+      setError(''); // Clear previous errors
       const token = localStorage.getItem('cms_token');
       const apiUrl = getApiUrl();
       
@@ -256,12 +266,24 @@ export const CMSProducts: React.FC = () => {
         } else {
           handleInputChange(field, data.path);
         }
+        // Clear any previous errors on success
+        setError('');
       } else {
-        setError(data.message || 'Failed to upload image');
+        const errorMsg = data.message || `Failed to upload image${response.status ? ` (Status: ${response.status})` : ''}`;
+        setError(errorMsg);
+        // Keep error visible for 5 seconds, then allow it to be cleared
+        setTimeout(() => {
+          setError(prev => prev === errorMsg ? '' : prev);
+        }, 5000);
       }
     } catch (err) {
-      setError('Failed to upload image');
-      console.error(err);
+      const errorMsg = err instanceof Error ? err.message : 'Failed to upload image. Please check your connection and try again.';
+      setError(errorMsg);
+      console.error('Image upload error:', err);
+      // Keep error visible for 5 seconds
+      setTimeout(() => {
+        setError(prev => prev === errorMsg ? '' : prev);
+      }, 5000);
     } finally {
       setUploadingImage(null);
     }
@@ -454,7 +476,12 @@ export const CMSProducts: React.FC = () => {
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            {error && <Alert variant="danger">{error}</Alert>}
+            {error && (
+              <Alert variant="danger" dismissible onClose={() => setError('')}>
+                <Alert.Heading>Error</Alert.Heading>
+                {error}
+              </Alert>
+            )}
             
             <div className="form-section">
               <h6 className="section-title">Basic Information</h6>
