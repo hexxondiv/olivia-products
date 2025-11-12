@@ -333,7 +333,7 @@ function getCustomerOrderEmailTemplate($orderData) {
             </div>
             
             <div style="text-align: center; margin-top: 30px;">
-                <a href="https://oliviaproducts.com" class="btn">Visit Our Website</a>
+                <a href="https://celineolivia.com" class="btn">Visit Our Website</a>
                 <a href="mailto:' . MAILGUN_REPLY_TO . '" class="btn" style="background-color: #003057;">Contact Us</a>
             </div>
         </div>
@@ -597,7 +597,7 @@ function getContactAcknowledgementEmailTemplate($contactData) {
             </div>
             
             <div style="text-align: center; margin-top: 30px;">
-                <a href="https://oliviaproducts.com" class="btn">Visit Our Website</a>
+                <a href="https://celineolivia.com" class="btn">Visit Our Website</a>
                 <a href="mailto:' . MAILGUN_REPLY_TO . '" class="btn" style="background-color: #003057;">Contact Us</a>
             </div>
         </div>
@@ -896,7 +896,7 @@ function getWholesaleAcknowledgementEmailTemplate($wholesaleData) {
             </div>
             
             <div style="text-align: center; margin-top: 30px;">
-                <a href="https://oliviaproducts.com" class="btn">Visit Our Website</a>
+                <a href="https://celineolivia.com" class="btn">Visit Our Website</a>
                 <a href="mailto:' . MAILGUN_REPLY_TO . '" class="btn" style="background-color: #003057;">Contact Us</a>
             </div>
         </div>
@@ -1135,7 +1135,7 @@ function getCustomerStatusUpdateEmailTemplate($orderData, $newStatus, $oldStatus
             </div>
             
             <div style="text-align: center; margin-top: 30px;">
-                <a href="https://oliviaproducts.com" class="btn">Visit Our Website</a>
+                <a href="https://celineolivia.com" class="btn">Visit Our Website</a>
                 <a href="mailto:' . MAILGUN_REPLY_TO . '" class="btn" style="background-color: #003057;">Contact Us</a>
             </div>
         </div>
@@ -1419,7 +1419,7 @@ function getCustomerPaymentStatusEmailTemplate($orderData, $isPaid) {
             </div>
             
             <div style="text-align: center; margin-top: 30px;">
-                <a href="https://oliviaproducts.com" class="btn">Visit Our Website</a>
+                <a href="https://celineolivia.com" class="btn">Visit Our Website</a>
                 <a href="mailto:' . MAILGUN_REPLY_TO . '" class="btn" style="background-color: #003057;">Contact Us</a>
             </div>
         </div>

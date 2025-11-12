@@ -58,7 +58,7 @@ Response:
   "user": {
     "id": 1,
     "username": "admin",
-    "email": "admin@oliviaproducts.com",
+    "email": "admin@celineolivia.com",
     "fullName": "Administrator",
     "role": "admin",
     "token": "base64_encoded_token"

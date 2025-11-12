@@ -214,6 +214,6 @@ CREATE TABLE IF NOT EXISTS stock_alerts (
 -- This INSERT will create the user if it doesn't exist, but won't update password if user exists
 -- Run: php api/seed-admin.php to ensure password hash is correct
 INSERT INTO admin_users (username, email, passwordHash, fullName, role) 
-VALUES ('admin', 'admin@oliviaproducts.com', '$2y$12$GnPmpJfz7JNR1bIuTGW/yudJ9VY5e0Uk0ypIJYCo8TpZ91EX/J/3W', 'Administrator', 'admin')
+VALUES ('admin', 'admin@celineolivia.com', '$2y$12$GnPmpJfz7JNR1bIuTGW/yudJ9VY5e0Uk0ypIJYCo8TpZ91EX/J/3W', 'Administrator', 'admin')
 ON DUPLICATE KEY UPDATE username=username;
 

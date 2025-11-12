@@ -87,7 +87,7 @@ export const Careers = () => {
               Interested in joining our team? Send your resume and cover letter to:
             </p>
             <div className="contact-info">
-              <p><strong>Email:</strong> <a href="mailto:careers@oliviaproducts.com">careers@oliviaproducts.com</a></p>
+              <p><strong>Email:</strong> <a href="mailto:careers@celineolivia.com">careers@celineolivia.com</a></p>
               <p><strong>Subject Line:</strong> Career Application - [Your Name]</p>
               <p>
                 Please include your resume, cover letter, and specify the position or department 

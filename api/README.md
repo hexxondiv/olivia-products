@@ -12,10 +12,10 @@ Set the following environment variables (or update `config.php` directly):
 MAILGUN_DOMAIN="educare.school"
 MAILGUN_PRIVATE="key-3e777634c2d522f0ac0d671365685d34"
 MAILGUN_PUBLIC="pubkey-0c6af3551a472c507f2066dc1706db42"
-MAILGUN_FROM_ADDRESS="info@oliviaproducts.com"
+MAILGUN_FROM_ADDRESS="info@celineolivia.com"
 MAILGUN_FROM_NAME="Olivia Products"
-MAILGUN_REPLY_TO="Info@oliviaproducts.com"
-MAILGUN_FORCE_FROM_ADDRESS="Info@oliviaproducts.com"
+MAILGUN_REPLY_TO="Info@celineolivia.com"
+MAILGUN_FORCE_FROM_ADDRESS="Info@celineolivia.com"
 SALES_EMAIL="hexxondiv@gmail.com"
 ```
 

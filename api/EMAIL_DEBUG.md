@@ -39,7 +39,7 @@ You can test if Mailgun is working by making a direct API call:
 ```bash
 curl -s --user 'api:key-3e777634c2d522f0ac0d671365685d34' \
   https://api.mailgun.net/v3/educare.school/messages \
-  -F from='Olivia Products <info@oliviaproducts.com>' \
+  -F from='Olivia Products <info@celineolivia.com>' \
   -F to='test@example.com' \
   -F subject='Test Email' \
   -F text='This is a test email'

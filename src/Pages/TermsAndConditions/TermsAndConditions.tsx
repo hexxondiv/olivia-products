@@ -219,7 +219,7 @@ export const TermsAndConditions: React.FC = () => {
             <div className="contact-info">
               <p><strong>Olivia Products Nigeria Ltd</strong></p>
               <p>Okaka plaza suite 1 first Avenue festac town, Lagos State</p>
-              <p><strong>Email:</strong> <a href="mailto:Info@oliviaproducts.com">Info@oliviaproducts.com</a></p>
+              <p><strong>Email:</strong> <a href="mailto:Info@celineolivia.com">Info@celineolivia.com</a></p>
               <p><strong>Phone (Lagos):</strong> +234 901 419 6902</p>
               <p><strong>WhatsApp:</strong> +234 912 350 9090</p>
               <p><strong>Business Hours:</strong> Monday - Friday, 8am - 5pm</p>
