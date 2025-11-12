@@ -306,9 +306,9 @@ export const ContactUs = () => {
   <li><span>Whatsapp:</span> +234 912 350 9090</li>
   <li><span>Monday - Friday:</span>8am - 5pm</li>
   <h5>Write to us:</h5>
-  <li><span>General Enquiries</span> customercare@olivia.com</li>
-  <li><span>Sales Enquiries</span> sales@olivia.com</li>
-  <li><span>Supplier Enquiries</span> purchases@aolivia.com</li>
+  <li><span>General Enquiries</span> customercare@celineolivia.com</li>
+  <li><span>Sales Enquiries</span> sales@celineolivia.com</li>
+  <li><span>Supplier Enquiries</span> purchases@celineolivia.com</li>
   
   </ul>
   <h5>Follow us on:</h5>

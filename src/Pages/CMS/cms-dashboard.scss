@@ -2,6 +2,7 @@
 
 // Import Sass color module
 @use "sass:color";
+@use "../../_variables" as *;
 
 // Import Bootstrap variables and mixins
 @import "bootstrap/scss/functions";
@@ -10,26 +11,28 @@
 
 // Dashboard Container
 .cms-dashboard {
-  padding: 2rem 0;
+  padding: $spacing-xl 0;
 
   h1 {
+    font-family: $font-heading;
     font-weight: 600;
-    color: $gray-800;
-    margin-bottom: 2rem;
+    color: $color-charcoal;
+    margin-bottom: $spacing-xl;
+    font-size: $font-size-3xl;
   }
 }
 
 // Stat Cards Container
 .cms-stats {
-  margin-bottom: 2.5rem;
-  gap: 1.5rem;
+  margin-bottom: $spacing-2xl;
+  gap: $spacing-lg;
 
   @include media-breakpoint-up(lg) {
-    gap: 2rem;
+    gap: $spacing-xl;
   }
 
   @include media-breakpoint-down(md) {
-    gap: 1rem;
+    gap: $spacing-md;
   }
 }
 
@@ -38,8 +41,8 @@
   background: $white;
   border: none;
   border-radius: $border-radius-lg;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
+  box-shadow: $shadow-card;
+  transition: all $transition-base;
   overflow: hidden;
   position: relative;
   height: 100%;
@@ -50,7 +53,7 @@
   // Hover effect
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    box-shadow: $shadow-card-hover;
     text-decoration: none;
   }
 
@@ -78,16 +81,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 1rem;
+    margin-bottom: $spacing-md;
     background: linear-gradient(135deg, var(--card-color), var(--card-color-dark));
     color: $white;
-    font-size: 1.5rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    font-size: $font-size-2xl;
+    box-shadow: $shadow-md;
   }
 
   // Card body
   .card-body {
-    padding: 1.75rem;
+    padding: $spacing-xl;
     position: relative;
     z-index: 1;
     display: flex;
@@ -97,56 +100,65 @@
 
   // Stat number
   h3 {
-    font-size: 2.5rem;
+    font-family: $font-heading;
+    font-size: $font-size-4xl;
     font-weight: 700;
-    margin: 0 0 0.5rem 0;
-    color: $gray-900;
-    line-height: 1.2;
+    margin: 0 0 $spacing-sm 0;
+    color: $color-charcoal;
+    line-height: $line-height-tight;
     white-space: nowrap;
   }
 
   // Stat label
   p {
-    font-size: 0.95rem;
-    color: $gray-600;
-    margin: 0 0 1rem 0;
+    font-family: $font-sans;
+    font-size: $font-size-sm;
+    color: $color-slate;
+    margin: 0 0 $spacing-md 0;
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     white-space: normal;
     word-wrap: break-word;
-    line-height: 1.4;
+    line-height: $line-height-normal;
   }
 
   // Badge for secondary info
   .stat-badge {
     display: inline-block;
-    padding: 0.25rem 0.75rem;
+    padding: $spacing-xs $spacing-md;
     border-radius: $border-radius-pill;
-    font-size: 0.75rem;
+    font-family: $font-sans;
+    font-size: $font-size-xs;
     font-weight: 600;
-    margin-bottom: 1rem;
+    margin-bottom: $spacing-md;
     background-color: var(--card-badge-bg);
-    color: var(--card-color);
+    // Use darker variant for text to ensure WCAG AA contrast (4.5:1 minimum)
+    color: var(--card-text-color);
+    line-height: $line-height-normal;
   }
 
   // Link styling
   .stat-link {
-    color: var(--card-color);
+    // Use darker variant for text to ensure WCAG AA contrast (4.5:1 minimum)
+    color: var(--card-text-color);
+    font-family: $font-sans;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: $font-size-sm;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    transition: all 0.2s ease;
+    gap: $spacing-sm;
+    transition: all $transition-fast;
     cursor: pointer;
     margin-top: auto;
     white-space: nowrap;
+    line-height: $line-height-normal;
 
     &::after {
       content: '→';
-      transition: transform 0.2s ease;
+      transition: transform $transition-fast;
+      font-weight: 700;
     }
   }
 
@@ -155,8 +167,9 @@
 // When card is wrapped in a link, apply hover effects
 a:hover .cms-stat-card {
   .stat-link {
-    color: var(--card-color-dark);
-    gap: 0.75rem;
+    // Use even darker variant on hover for better contrast
+    color: var(--card-text-color-hover);
+    gap: $spacing-md;
 
     &::after {
       transform: translateX(4px);
@@ -165,33 +178,47 @@ a:hover .cms-stat-card {
 }
 
 // Color variants for stat cards
+// Using project theme colors with proper contrast ratios for text
 .cms-stat-card {
-  // Products card - Blue
+  // Products card - Navy (Primary)
   &.stat-products {
     --card-color: #{$primary};
-    --card-color-dark: #{color.adjust($primary, $lightness: -10%)};
-    --card-badge-bg: #{color.change($primary, $alpha: 0.1)};
+    --card-color-dark: #{color.adjust($primary, $lightness: -15%)};
+    --card-badge-bg: #{color.change($primary, $alpha: 0.12)};
+    // Navy is dark enough for white background - use as-is
+    --card-text-color: #{$primary};
+    --card-text-color-hover: #{color.adjust($primary, $lightness: -20%)};
   }
 
-  // Orders card - Green
+  // Orders card - Lime (Success)
   &.stat-orders {
     --card-color: #{$success};
-    --card-color-dark: #{color.adjust($success, $lightness: -10%)};
-    --card-badge-bg: #{color.change($success, $alpha: 0.1)};
+    --card-color-dark: #{color.adjust($success, $lightness: -15%)};
+    --card-badge-bg: #{color.change($success, $alpha: 0.12)};
+    // Lime (#7bbd21) needs darkening for text on white - use darker variant
+    --card-text-color: #{color.adjust($success, $lightness: -25%)};
+    --card-text-color-hover: #{color.adjust($success, $lightness: -35%)};
   }
 
-  // Contacts card - Yellow/Orange
+  // Contacts card - Amber (Warning)
   &.stat-contacts {
     --card-color: #{$warning};
-    --card-color-dark: #{color.adjust($warning, $lightness: -10%)};
-    --card-badge-bg: #{color.change($warning, $alpha: 0.1)};
+    --card-color-dark: #{color.adjust($warning, $lightness: -15%)};
+    --card-badge-bg: #{color.change($warning, $alpha: 0.12)};
+    // Amber (#ffc857) is too light for text on white - use much darker variant
+    // Calculate a darker shade that meets WCAG AA (4.5:1 contrast)
+    --card-text-color: #{color.adjust($warning, $lightness: -40%, $saturation: 10%)};
+    --card-text-color-hover: #{color.adjust($warning, $lightness: -50%, $saturation: 10%)};
   }
 
-  // Wholesale card - Red/Pink
+  // Wholesale card - Red (Danger)
   &.stat-wholesale {
     --card-color: #{$danger};
-    --card-color-dark: #{color.adjust($danger, $lightness: -10%)};
-    --card-badge-bg: #{color.change($danger, $alpha: 0.1)};
+    --card-color-dark: #{color.adjust($danger, $lightness: -15%)};
+    --card-badge-bg: #{color.change($danger, $alpha: 0.12)};
+    // Danger red (#e54b4b) is dark enough but can be slightly darker for better contrast
+    --card-text-color: #{color.adjust($danger, $lightness: -15%)};
+    --card-text-color-hover: #{color.adjust($danger, $lightness: -25%)};
   }
 }
 
@@ -200,56 +227,59 @@ a:hover .cms-stat-card {
   .card {
     border: none;
     border-radius: $border-radius-lg;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: $shadow-card;
     overflow: hidden;
   }
   h5 {
+    font-family: $font-heading;
     color: $white !important;
   }
 
   .card-header {
-    background: linear-gradient(135deg, $gray-800, $gray-900);
+    background: linear-gradient(135deg, $color-charcoal, color.adjust($color-charcoal, $lightness: -5%));
     color: $white;
     border: none;
-    padding: 1.25rem 1.75rem;
+    padding: $spacing-lg $spacing-xl;
+    font-family: $font-heading;
     font-weight: 600;
-    font-size: 1.1rem;
+    font-size: $font-size-lg;
     letter-spacing: 0.5px;
   }
 
   .card-body {
-    padding: 1.75rem;
+    padding: $spacing-xl;
     background: $white;
   }
 
   .cms-btn-group {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
+    gap: $spacing-md;
 
     @include media-breakpoint-down(sm) {
       grid-template-columns: 1fr;
     }
 
     .btn {
-      padding: 0.875rem 1.5rem;
+      padding: $spacing-md $spacing-lg;
+      font-family: $font-sans;
       font-weight: 600;
       border-radius: $border-radius;
-      transition: all 0.3s ease;
+      transition: all $transition-base;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
+      gap: $spacing-sm;
       border: none;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: $shadow-sm;
 
       &:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        box-shadow: $shadow-md;
       }
 
       svg {
-        font-size: 1.1rem;
+        font-size: $font-size-lg;
       }
     }
   }
@@ -267,7 +297,8 @@ a:hover .cms-stat-card {
   .alert {
     border-radius: $border-radius-lg;
     border: none;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: $shadow-card;
+    font-family: $font-sans;
   }
 }
 
@@ -277,23 +308,23 @@ a:hover .cms-stat-card {
     min-height: 220px;
     
     .card-body {
-      padding: 2rem;
+      padding: $spacing-xl;
     }
 
     h3 {
-      font-size: 3rem;
+      font-size: $font-size-5xl;
     }
 
     .stat-icon {
       width: 64px;
       height: 64px;
-      font-size: 1.75rem;
-      margin-bottom: 1.25rem;
+      font-size: $font-size-3xl;
+      margin-bottom: $spacing-lg;
     }
 
     p {
-      font-size: 1rem;
-      margin-bottom: 1.25rem;
+      font-size: $font-size-base;
+      margin-bottom: $spacing-lg;
     }
   }
 }
@@ -304,38 +335,38 @@ a:hover .cms-stat-card {
     min-height: 180px;
     
     .card-body {
-      padding: 1.5rem;
+      padding: $spacing-lg;
     }
 
     h3 {
-      font-size: 2rem;
+      font-size: $font-size-3xl;
     }
 
     .stat-icon {
       width: 48px;
       height: 48px;
-      font-size: 1.25rem;
+      font-size: $font-size-xl;
     }
   }
 }
 
 @include media-breakpoint-down(sm) {
   .cms-dashboard {
-    padding: 1rem 0;
+    padding: $spacing-md 0;
 
     h1 {
-      font-size: 1.75rem;
-      margin-bottom: 1.5rem;
+      font-size: $font-size-2xl;
+      margin-bottom: $spacing-lg;
     }
   }
 
   .cms-stat-card {
     .card-body {
-      padding: 1.25rem;
+      padding: $spacing-lg;
     }
 
     h3 {
-      font-size: 1.75rem;
+      font-size: $font-size-2xl;
     }
   }
 }
@@ -353,6 +384,6 @@ a:hover .cms-stat-card {
 }
 
 .cms-stat-card h3 {
-  animation: countUp 0.5s ease-out;
+  animation: countUp $transition-slow $ease-out-expo;
 }
 
