@@ -12,6 +12,7 @@ import "./home.scss";
 import { Link } from "react-router-dom";
 import TestimonialCarousel from "./Testimonials";
 import WholesaleCarousel from "./WholesaleCarousel";
+import FlashInfoModal from "./FlashInfo";
 import { TabletAndBelow } from "../../Utils/mediaQueries";
 import { HomeSlide } from "./HomeSlide/HomeSlide";
 import FBSocials from "./FBSocials";
@@ -26,6 +27,7 @@ export const Home = () => {
   return (
     <div className="home-div">
       <HomeSlide />
+      <FlashInfoModal />
 
       <div className=" d-md-flex abt-div col-md-12 container">
         <div className=" col-md-6 ">

@@ -18,6 +18,7 @@ import { CMSContacts } from "./Pages/CMS/CMSContacts";
 import { CMSWholesale } from "./Pages/CMS/CMSWholesale";
 import { CMSStock } from "./Pages/CMS/CMSStock";
 import { CMSTestimonials } from "./Pages/CMS/CMSTestimonials";
+import { CMSFlashInfo } from "./Pages/CMS/CMSFlashInfo";
 import { PublicRoutes } from "./Pages/PublicRoutes";
 
 function GlobalCart() {
@@ -123,6 +124,14 @@ function App() {
             element={
               <CMSProtectedRoute>
                 <CMSTestimonials />
+              </CMSProtectedRoute>
+            }
+          />
+          <Route
+            path="/cms/flash-info"
+            element={
+              <CMSProtectedRoute>
+                <CMSFlashInfo />
               </CMSProtectedRoute>
             }
           />

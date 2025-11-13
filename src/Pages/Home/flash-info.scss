@@ -1,0 +1,235 @@
+@use "../../_variables" as *;
+
+.flash-info-modal {
+  z-index: 9999;
+
+  .modal-dialog {
+    max-width: 800px;
+    margin: 1.75rem auto;
+
+    @media (max-width: 767.98px) {
+      max-width: 95%;
+      margin: 1rem auto;
+    }
+  }
+
+  .modal-content {
+    border-radius: 1rem;
+    border: none;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+  }
+}
+
+.flash-info-header {
+  border-bottom: 2px solid rgba($color-navy, 0.1);
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, rgba($color-navy, 0.05) 0%, rgba($color-lime, 0.05) 100%);
+
+  .flash-info-title {
+    font-family: $font-heading;
+    color: $color-navy;
+    font-weight: 600;
+    font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+    margin: 0;
+    flex: 1;
+  }
+
+  .flash-info-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: $color-slate;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    border-radius: 50%;
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-left: 1rem;
+
+    &:hover {
+      background: rgba($color-navy, 0.1);
+      color: $color-navy;
+      transform: rotate(90deg);
+    }
+
+    &:active {
+      transform: rotate(90deg) scale(0.9);
+    }
+  }
+}
+
+.flash-info-body {
+  padding: 2rem;
+  max-height: 70vh;
+  overflow-y: auto;
+
+  @media (max-width: 767.98px) {
+    padding: 1.5rem;
+    max-height: 60vh;
+  }
+}
+
+.flash-info-content-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  width: 100%;
+}
+
+.flash-info-media {
+  max-width: 100%;
+  max-height: 60vh;
+  object-fit: contain;
+  border-radius: 0.5rem;
+  display: block;
+  margin: 0 auto;
+}
+
+.flash-info-video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  min-height: 300px;
+  border: none;
+  border-radius: 0.5rem;
+
+  @media (max-width: 767.98px) {
+    min-height: 200px;
+  }
+}
+
+.flash-info-text {
+  width: 100%;
+  color: $color-slate;
+  line-height: $line-height-relaxed;
+  text-align: center;
+  font-size: clamp(1rem, 2vw, 1.125rem);
+
+  // Style HTML content
+  p {
+    margin-bottom: 1rem;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  strong, b {
+    font-weight: 600;
+    color: $color-navy;
+  }
+
+  em, i {
+    font-style: italic;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: $font-heading;
+    color: $color-navy;
+    margin-bottom: 0.75rem;
+    margin-top: 1rem;
+    
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  ul, ol {
+    text-align: left;
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+  }
+
+  a {
+    color: $color-lime;
+    text-decoration: underline;
+    &:hover {
+      color: $color-navy;
+    }
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+  }
+}
+
+.flash-info-footer {
+  border-top: 2px solid rgba($color-navy, 0.1);
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  @media (max-width: 767.98px) {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+.flash-info-navigation {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+
+  @media (max-width: 767.98px) {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+.flash-info-nav-btn {
+  min-width: 100px;
+  
+  @media (max-width: 767.98px) {
+    min-width: 80px;
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+.flash-info-counter {
+  color: $color-slate;
+  font-weight: 500;
+  font-size: 0.875rem;
+  padding: 0 0.5rem;
+  white-space: nowrap;
+}
+
+// Modal backdrop
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+}
+
+// Animation for modal entrance
+@keyframes flashInfoFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.flash-info-modal.show .modal-dialog {
+  animation: flashInfoFadeIn 0.3s ease-out;
+}
+
+// Ensure modal is above everything
+.modal.show {
+  display: block !important;
+}

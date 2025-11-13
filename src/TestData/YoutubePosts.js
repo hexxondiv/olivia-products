@@ -22,8 +22,8 @@ export const YoutubePosts = [
   },
   {
     id: 4,
-    url: "https://youtube.com/shorts/6AHIDaDFey4?si=ykvbhUBjsems6JzS",
+    url: "https://youtube.com/shorts/?v=6AHIDaDFey4&si=ykvbhUBjsems6JzS",
     caption: "Celebrate Excellence, Inspire Tomorrow:",
-    description: "BSC showcasing the values that define our institution.",
+    description: "Olivia Products showcasing the values that define our brand.",
   },
 ];

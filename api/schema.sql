@@ -229,6 +229,24 @@ CREATE TABLE IF NOT EXISTS testimonials (
     INDEX idx_displayOrder (displayOrder)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Flash Info Table
+CREATE TABLE IF NOT EXISTS flash_info (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    contentType ENUM('image', 'video', 'gif', 'text') NOT NULL DEFAULT 'text',
+    contentUrl VARCHAR(1000) NULL,
+    contentText TEXT NULL,
+    displayOrder INT DEFAULT 0,
+    isActive BOOLEAN DEFAULT TRUE,
+    delayMs INT DEFAULT 3000 COMMENT 'Delay in milliseconds before showing modal',
+    storageExpiryMinutes INT DEFAULT 1440 COMMENT 'Minutes before showing again (0 = always show, 1440 = 24 hours)',
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_isActive (isActive),
+    INDEX idx_displayOrder (displayOrder),
+    INDEX idx_contentType (contentType)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Seed initial testimonials data
 -- Note: This will insert default testimonials. If you need to re-seed, delete existing records first or use seed-testimonials.php
 INSERT IGNORE INTO testimonials (name, comment, rating, backgroundColor, displayOrder, isActive) VALUES
