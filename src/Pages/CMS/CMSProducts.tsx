@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CMSLayout } from './CMSLayout';
 import { Table, Button, Badge, Modal, Form, Alert, Spinner, InputGroup, Row, Col } from 'react-bootstrap';
-import { FaEdit, FaTrash, FaPlus, FaSearch, FaUpload, FaTimes } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaPlus, FaSearch, FaUpload, FaTimes, FaSync } from 'react-icons/fa';
 import { getApiUrl } from '../../Utils/apiConfig';
 import './cms-modals.scss';
 import './cms-products.scss';
@@ -63,6 +63,7 @@ export const CMSProducts: React.FC = () => {
   const [formData, setFormData] = useState<Partial<Product>>({
     heading: '',
     name: '',
+    barcode: '',
     sufix: '',
     price: 0,
     rating: 0,
@@ -185,6 +186,7 @@ export const CMSProducts: React.FC = () => {
       setFormData({
         heading: product.heading || '',
         name: product.name || '',
+        barcode: product.barcode || '',
         sufix: product.sufix || '',
         price: product.price || 0,
         rating: product.rating || 0,
@@ -216,6 +218,7 @@ export const CMSProducts: React.FC = () => {
       setFormData({
         heading: '',
         name: '',
+        barcode: '',
         sufix: '',
         price: 0,
         rating: 0,
@@ -314,6 +317,53 @@ export const CMSProducts: React.FC = () => {
         return newErrors;
       });
     }
+  };
+
+  const generateBarcode = () => {
+    // Generate a unique 13-digit EAN-13 style barcode
+    // Check against existing products to ensure uniqueness
+    const maxAttempts = 100; // Prevent infinite loop
+    let attempts = 0;
+    
+    while (attempts < maxAttempts) {
+      attempts++;
+      
+      // Generate 12 random digits
+      let barcodeBase = '';
+      for (let i = 0; i < 12; i++) {
+        barcodeBase += Math.floor(Math.random() * 10).toString();
+      }
+      
+      // Calculate EAN-13 check digit
+      let sum = 0;
+      for (let i = 0; i < 12; i++) {
+        const digit = parseInt(barcodeBase[i]);
+        sum += (i % 2 === 0) ? digit : digit * 3;
+      }
+      const checkDigit = (10 - (sum % 10)) % 10;
+      const barcode = barcodeBase + checkDigit.toString();
+      
+      // Check if barcode is unique (excluding current product if editing)
+      const existingBarcodes = products
+        .filter(p => p.barcode && p.barcode.trim() && p.id !== selectedProduct?.id)
+        .map(p => p.barcode?.trim().toLowerCase());
+      
+      if (!existingBarcodes.includes(barcode.toLowerCase())) {
+        handleInputChange('barcode', barcode);
+        // Clear any previous barcode errors
+        if (formErrors.barcode) {
+          setFormErrors(prev => {
+            const newErrors = { ...prev };
+            delete newErrors.barcode;
+            return newErrors;
+          });
+        }
+        return;
+      }
+    }
+    
+    // If we couldn't generate a unique barcode after max attempts
+    setError('Unable to generate unique barcode after multiple attempts. Please try again or enter manually.');
   };
 
   const handleCategoryToggle = (category: string) => {
@@ -872,6 +922,27 @@ export const CMSProducts: React.FC = () => {
               <Row>
                 <Col md={6}>
                   <Form.Group className="mb-3">
+                    <Form.Label>Barcode</Form.Label>
+                    <InputGroup>
+                      <Form.Control
+                        type="text"
+                        value={formData.barcode || ''}
+                        onChange={(e) => handleInputChange('barcode', e.target.value)}
+                        placeholder="e.g., 1234567890123"
+                      />
+                      <Button
+                        variant="outline-secondary"
+                        onClick={generateBarcode}
+                        title="Generate unique barcode"
+                      >
+                        <FaSync />
+                      </Button>
+                    </InputGroup>
+                    <Form.Text className="text-muted">Product barcode or SKU (optional)</Form.Text>
+                  </Form.Group>
+                </Col>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
                     <Form.Label>Suffix</Form.Label>
                     <Form.Control
                       type="text"
@@ -881,6 +952,9 @@ export const CMSProducts: React.FC = () => {
                     />
                   </Form.Group>
                 </Col>
+              </Row>
+              
+              <Row>
                 <Col md={6}>
                   <Form.Group className="mb-3">
                     <Form.Label>Color</Form.Label>

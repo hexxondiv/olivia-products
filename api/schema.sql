@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS products (
     id INT AUTO_INCREMENT PRIMARY KEY,
     heading VARCHAR(255) NOT NULL,
     name VARCHAR(255) NOT NULL,
+    barcode VARCHAR(50) NULL,
     sufix VARCHAR(255),
     price DECIMAL(10, 2) NOT NULL,
     rating DECIMAL(3, 1) DEFAULT 0.0,
@@ -42,7 +43,8 @@ CREATE TABLE IF NOT EXISTS products (
     INDEX idx_isActive (isActive),
     INDEX idx_stockStatus (stockStatus),
     INDEX idx_stockEnabled (stockEnabled),
-    INDEX idx_stockQuantity (stockQuantity)
+    INDEX idx_stockQuantity (stockQuantity),
+    INDEX idx_barcode (barcode)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Orders Table

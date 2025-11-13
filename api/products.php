@@ -195,11 +195,11 @@ function handlePost() {
     }
     
     // Prepare data
-    $sql = "INSERT INTO products (heading, name, sufix, price, rating, color, detail, moreDetail, tagline, 
+    $sql = "INSERT INTO products (heading, name, barcode, sufix, price, rating, color, detail, moreDetail, tagline, 
             firstImg, hoverImg, additionalImgs, category, flavours, bestSeller, isActive,
             retailPrice, retailMinQty, wholesalePrice, wholesaleMinQty, distributorPrice, distributorMinQty,
             stockQuantity, stockEnabled, lowStockThreshold, allowBackorders, stockStatus) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     
     // Calculate stock status if stock is enabled
     $stockEnabled = isset($data['stockEnabled']) ? (bool)$data['stockEnabled'] : false;
@@ -218,6 +218,7 @@ function handlePost() {
     $params = [
         $data['heading'] ?? '',
         $data['name'] ?? '',
+        $data['barcode'] ?? null,
         $data['sufix'] ?? null,
         $data['price'] ?? 0,
         $data['rating'] ?? 0.0,
@@ -292,7 +293,7 @@ function handlePut() {
     $fields = [];
     $params = [];
     
-    $allowedFields = ['heading', 'name', 'sufix', 'price', 'rating', 'color', 'detail', 'moreDetail', 
+    $allowedFields = ['heading', 'name', 'barcode', 'sufix', 'price', 'rating', 'color', 'detail', 'moreDetail', 
                       'tagline', 'firstImg', 'hoverImg', 'additionalImgs', 'category', 'flavours', 
                       'bestSeller', 'isActive', 'retailPrice', 'retailMinQty', 'wholesalePrice', 
                       'wholesaleMinQty', 'distributorPrice', 'distributorMinQty', 'stockQuantity', 
