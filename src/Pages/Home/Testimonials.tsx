@@ -85,16 +85,12 @@ const TestimonialCarousel: React.FC = () => {
               className={`testimonial-slide ${index === 1 ? "active" : ""}`}
               style={{
                 backgroundColor: testimonial.backgroundColor,
-                width: index === 1 ? "70%" : "15%", // Middle one takes 70%, others take 15%
-                opacity: index === 1 ? 1 : 0.4,
-                transform: index === 1 ? "scale(1.1)" : "scale(0.9)",
-                zIndex: index === 1 ? 2 : 1, // Middle one is on top
               }}
             >
-              <h3 style={{ fontSize: index == 1 ? "24px" : "14px" }}>
+              <h3>
                 {testimonial.name}
               </h3>
-              <p style={{ fontSize: index == 1 ? "18px" : "11px" }}>
+              <p>
                 {testimonial.comment}
               </p>
               <div className="rating">

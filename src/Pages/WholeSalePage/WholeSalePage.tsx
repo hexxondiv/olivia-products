@@ -20,6 +20,7 @@ export const WholeSalePage: React.FC = () => {
     businessName: "",
     website: "",
     cacRegistrationNumber: "",
+    businessPhysicalAddress: "",
     city: "",
     state: "",
     country: "",
@@ -39,15 +40,15 @@ export const WholeSalePage: React.FC = () => {
   const logoInputRef = useRef<HTMLInputElement>(null);
 
   const options: Option[] = [
-    { id: "1", label: "Retailer" },
-    { id: "2", label: "E-Commerce" },
-    { id: "3", label: "Corporate Gifti" },
-    { id: "4", label: "Hospitality" },
-    { id: "5", label: "Distributor" },
-    { id: "6", label: "Janitorial/Cleaning Services" },
-    { id: "7", label: "Non-Profit" },
-    { id: "8", label: "Government" },
-    { id: "9", label: "Approved Broker" },
+    { id: "1", label: "Distributor" },
+    { id: "2", label: "Drop-shipping" },
+    { id: "3", label: "E-Commerce" },
+    { id: "4", label: "Government" },
+    { id: "5", label: "Hospitality" },
+    { id: "6", label: "Non-Profit" },
+    { id: "7", label: "Retailer" },
+    { id: "8", label: "Wholesale" },
+    { id: "9", label: "Others" },
   ];
 
   const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -205,6 +206,10 @@ export const WholeSalePage: React.FC = () => {
       newErrors.businessName = "Business name is required";
     }
 
+    if (!formData.businessPhysicalAddress.trim()) {
+      newErrors.businessPhysicalAddress = "Business physical address is required";
+    }
+
     if (!formData.city.trim()) {
       newErrors.city = "City is required";
     }
@@ -278,6 +283,7 @@ export const WholeSalePage: React.FC = () => {
           businessName: "",
           website: "",
           cacRegistrationNumber: "",
+          businessPhysicalAddress: "",
           city: "",
           state: "",
           country: "",
@@ -356,6 +362,7 @@ export const WholeSalePage: React.FC = () => {
     if (formData.website) {
       message += `*Website:* ${formData.website}\n`;
     }
+    message += `*Business Physical Address:* ${formData.businessPhysicalAddress}\n`;
     message += `*Location:* ${formData.city}, ${formData.state}, ${formData.country}\n\n`;
     
     if (selectedBusinessTypes.length > 0) {
@@ -406,6 +413,7 @@ export const WholeSalePage: React.FC = () => {
       businessName: "",
       website: "",
       cacRegistrationNumber: "",
+      businessPhysicalAddress: "",
       city: "",
       state: "",
       country: "",
@@ -730,6 +738,20 @@ export const WholeSalePage: React.FC = () => {
               )}
             </Col>
           </Row>
+          <h6>
+            Business Physical Address <span>*</span>
+          </h6>
+          <textarea
+            placeholder="Enter your business physical address"
+            name="businessPhysicalAddress"
+            value={formData.businessPhysicalAddress}
+            onChange={handleChange}
+            className={errors.businessPhysicalAddress ? "error" : ""}
+            rows={3}
+          />
+          {errors.businessPhysicalAddress && (
+            <span className="error-message">{errors.businessPhysicalAddress}</span>
+          )}
           <Row>
             <Col>
               <h6>

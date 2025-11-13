@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { CMSLayout } from './CMSLayout';
 import { Table, Button, Badge, Form, Alert, Spinner, Modal } from 'react-bootstrap';
 import { useSearchParams } from 'react-router-dom';
-import { FaEye, FaTrash, FaPhone, FaWhatsapp } from 'react-icons/fa';
+import { FaEye, FaTrash, FaPhone, FaWhatsapp, FaUser, FaEnvelope, FaBuilding, FaGlobe, FaMapMarkerAlt, FaCalendarAlt, FaTag, FaFileAlt, FaCheckCircle, FaTimesCircle, FaClock } from 'react-icons/fa';
 import { getApiUrl } from '../../Utils/apiConfig';
 import './cms-modals.scss';
 import './cms-wholesale.scss';
@@ -18,6 +18,7 @@ interface Wholesale {
   website?: string;
   companyLogo?: string;
   cacRegistrationNumber?: string;
+  businessPhysicalAddress?: string;
   city: string;
   state: string;
   country: string;
@@ -33,6 +34,9 @@ export const CMSWholesale: React.FC = () => {
   const [error, setError] = useState('');
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedWholesale, setSelectedWholesale] = useState<Wholesale | null>(null);
+  const [cacVerifying, setCacVerifying] = useState(false);
+  const [cacResult, setCacResult] = useState<any>(null);
+  const [showCacModal, setShowCacModal] = useState(false);
   const statusFilter = searchParams.get('status') || '';
   const typeFilter = searchParams.get('formType') || '';
 
@@ -124,6 +128,165 @@ export const CMSWholesale: React.FC = () => {
       archived: 'secondary',
     };
     return variants[status] || 'secondary';
+  };
+
+  const verifyCAC = async (cacNumber: string, searchType: string = 'ALL') => {
+    setCacVerifying(true);
+    setCacResult(null);
+    
+    // Validate and trim the CAC number
+    if (!cacNumber || !cacNumber.trim()) {
+      setCacResult({
+        success: false,
+        error: 'CAC registration number is required',
+      });
+      setShowCacModal(true);
+      setCacVerifying(false);
+      return;
+    }
+    
+    const trimmedCacNumber = cacNumber.trim();
+    console.log('Verifying CAC number:', trimmedCacNumber);
+    
+    try {
+      const apiUrl = getApiUrl();
+      const requestBody = {
+        action: 'verifyCAC',
+        searchType: searchType,
+        searchTerm: trimmedCacNumber,
+      };
+      
+      console.log('Sending CAC verification request:', requestBody);
+      
+      const response = await fetch(`${apiUrl}/wholesale.php`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      // Parse response even if status is not OK to get error details
+      let data;
+      try {
+        data = await response.json();
+      } catch (parseError) {
+        // If JSON parsing fails, treat as not verified
+        setCacResult({
+          success: false,
+          notVerified: true,
+          error: 'CAC registration number could not be verified',
+          message: `Failed to parse response: ${response.status} ${response.statusText}`,
+        });
+        setShowCacModal(true);
+        setCacVerifying(false);
+        return;
+      }
+      
+      if (data.success) {
+        // Check if data is empty array or null/empty
+        const responseData = data.data;
+        if (Array.isArray(responseData) && responseData.length === 0) {
+          // Empty data array means not verified
+          setCacResult({
+            success: false,
+            notVerified: true,
+            error: 'CAC registration number not found',
+            message: data.message || 'No matching records found in CAC registry',
+          });
+        } else if (!responseData || responseData === '') {
+          // Null or empty data means not verified
+          setCacResult({
+            success: false,
+            notVerified: true,
+            error: 'CAC registration number not found',
+            message: data.message || 'No matching records found in CAC registry',
+          });
+        } else {
+          // Valid data found
+          setCacResult({
+            success: true,
+            message: data.message,
+            data: responseData,
+          });
+        }
+      } else {
+        // Check if this is a "not verified" case
+        setCacResult({
+          success: false,
+          notVerified: data.notVerified || false,
+          error: data.error || data.message || 'Search failed',
+          message: data.message || data.error || 'CAC registration number could not be verified',
+        });
+      }
+      setShowCacModal(true);
+    } catch (err) {
+      console.error('CAC verification error:', err);
+      setCacResult({
+        success: false,
+        notVerified: true,
+        error: 'CAC registration number could not be verified',
+        message: err instanceof Error ? err.message : 'Failed to verify CAC registration number. Please try again later.',
+      });
+      setShowCacModal(true);
+    } finally {
+      setCacVerifying(false);
+    }
+  };
+
+  // Format classification name - remove underscores, convert to title case
+  const formatClassification = (classification: string | null | undefined): string => {
+    if (!classification) return 'N/A';
+    
+    // Replace underscores with spaces
+    let formatted = classification.replace(/_/g, ' ');
+    
+    // Convert to title case (capitalize first letter of each word)
+    formatted = formatted.toLowerCase()
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+    
+    return formatted;
+  };
+
+  // Format location with proper structure
+  const formatLocation = (wholesale: Wholesale): React.ReactNode => {
+    const parts: string[] = [];
+    
+    if (wholesale.businessPhysicalAddress) {
+      parts.push(wholesale.businessPhysicalAddress);
+    }
+    
+    if (wholesale.city) {
+      parts.push(wholesale.city);
+    }
+    
+    if (wholesale.state) {
+      parts.push(wholesale.state);
+    }
+    
+    if (wholesale.country) {
+      parts.push(wholesale.country);
+    }
+    
+    if (parts.length === 0) {
+      return <em className="text-muted">*Not Provided*</em>;
+    }
+    
+    // Format with line breaks for better readability
+    return (
+      <div style={{ lineHeight: '1.6' }}>
+        {wholesale.businessPhysicalAddress && (
+          <div>{wholesale.businessPhysicalAddress}</div>
+        )}
+        <div>
+          {[wholesale.city, wholesale.state, wholesale.country]
+            .filter(Boolean)
+            .join(', ')}
+        </div>
+      </div>
+    );
   };
 
   // Format phone number for links in international format (+234 by default if not included)
@@ -310,7 +473,12 @@ export const CMSWholesale: React.FC = () => {
                   </div>
                   <div className="detail-row">
                     <span className="detail-label">Location</span>
-                    <span className="detail-value">{app.city}, {app.state}</span>
+                    <span className="detail-value">
+                      {app.city && app.state ? `${app.city}, ${app.state}` : 
+                       app.city ? app.city : 
+                       app.state ? app.state : 
+                       <em className="text-muted">*Not Provided*</em>}
+                    </span>
                   </div>
                   <div className="detail-row">
                     <span className="detail-label">Date</span>
@@ -375,99 +543,248 @@ export const CMSWholesale: React.FC = () => {
             size="lg" 
             className="cms-modal-wholesale-details"
           >
-            <Modal.Header closeButton>
-              <Modal.Title>Application Details - {selectedWholesale.formType}</Modal.Title>
+            <Modal.Header closeButton className="wholesale-modal-header">
+              <div className="wholesale-modal-header-content">
+                <div className="wholesale-modal-header-main">
+                  <Modal.Title className="wholesale-modal-title">
+                    <FaBuilding className="me-2" />
+                    {selectedWholesale.businessName}
+                  </Modal.Title>
+                  <div className="wholesale-modal-subtitle">
+                    <Badge bg="secondary" className="me-2">{selectedWholesale.formType}</Badge>
+                    <Badge bg={getStatusBadge(selectedWholesale.status)}>{selectedWholesale.status}</Badge>
+                  </div>
+                </div>
+                {selectedWholesale.companyLogo && (
+                  <div className="wholesale-modal-header-logo">
+                    <img 
+                      src={selectedWholesale.companyLogo} 
+                      alt={`${selectedWholesale.businessName} logo`}
+                      className="header-logo-img"
+                    />
+                  </div>
+                )}
+              </div>
             </Modal.Header>
             <Modal.Body className="wholesale-modal-body">
-              <div className="wholesale-modal-content">
-                <div className="wholesale-modal-main">
-                  <p><strong>Name:</strong> {selectedWholesale.firstName} {selectedWholesale.lastName || <em className="text-muted">*Not Provided*</em>}</p>
-                  <p><strong>Email:</strong> {selectedWholesale.email}</p>
-                  <p className="phone-row">
-                    <strong>Phone:</strong> {selectedWholesale.phone}
-                    {phoneNumber && (
-                      <span className="phone-actions">
-                        <Button
-                          variant="outline-success"
-                          size="sm"
-                          className="phone-action-btn whatsapp-btn"
-                          href={whatsappUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          title="Open WhatsApp"
-                          as="a"
-                        >
-                          <FaWhatsapp /> WhatsApp
-                        </Button>
-                        <Button
-                          variant="outline-primary"
-                          size="sm"
-                          className="phone-action-btn call-btn"
-                          href={callUrl}
-                          title="Call"
-                          as="a"
-                        >
-                          <FaPhone /> Call
-                        </Button>
-                      </span>
-                    )}
-                  </p>
-                  <p><strong>Business Name:</strong> {selectedWholesale.businessName}</p>
-                  <p><strong>CAC Registration Number:</strong> {selectedWholesale.cacRegistrationNumber ? (
-                    <a 
-                      href={`https://icrp.cac.gov.ng/public-search`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      title="Verify on CAC Portal"
-                    >
-                      {selectedWholesale.cacRegistrationNumber}
-                    </a>
-                  ) : (
-                    <em className="text-muted">*Not Provided*</em>
-                  )}</p>
-                  <p><strong>Website:</strong> {selectedWholesale.website ? (
-                    <a href={selectedWholesale.website} target="_blank" rel="noopener noreferrer">{selectedWholesale.website}</a>
-                  ) : (
-                    <em className="text-muted">*Not Provided*</em>
-                  )}</p>
-                  <p><strong>Location:</strong> {selectedWholesale.city}, {selectedWholesale.state}, {selectedWholesale.country}</p>
+              <div className="wholesale-modal-sections">
+                {/* Contact Information Section */}
+                <div className="wholesale-modal-section">
+                  <div className="section-header">
+                    <FaUser className="section-icon" />
+                    <h5 className="section-title">Contact Information</h5>
+                  </div>
+                  <div className="section-content">
+                    <div className="info-item">
+                      <div className="info-label">
+                        <FaUser className="info-icon" />
+                        <span>Name</span>
+                      </div>
+                      <div className="info-value">
+                        {selectedWholesale.firstName} {selectedWholesale.lastName || <em className="text-muted">*Not Provided*</em>}
+                      </div>
+                    </div>
+                    <div className="info-item">
+                      <div className="info-label">
+                        <FaEnvelope className="info-icon" />
+                        <span>Email</span>
+                      </div>
+                      <div className="info-value">
+                        <a href={`mailto:${selectedWholesale.email}`}>{selectedWholesale.email}</a>
+                      </div>
+                    </div>
+                    <div className="info-item">
+                      <div className="info-label">
+                        <FaPhone className="info-icon" />
+                        <span>Phone</span>
+                      </div>
+                      <div className="info-value">
+                        <div className="phone-value-group">
+                          <span>{selectedWholesale.phone}</span>
+                          {phoneNumber && (
+                            <div className="phone-actions">
+                              <Button
+                                variant="outline-success"
+                                size="sm"
+                                className="phone-action-btn whatsapp-btn"
+                                href={whatsappUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                title="Open WhatsApp"
+                                as="a"
+                              >
+                                <FaWhatsapp /> WhatsApp
+                              </Button>
+                              <Button
+                                variant="outline-primary"
+                                size="sm"
+                                className="phone-action-btn call-btn"
+                                href={callUrl}
+                                title="Call"
+                                as="a"
+                              >
+                                <FaPhone /> Call
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="wholesale-modal-logo">
-                  <div className="company-logo-display">
-                    {selectedWholesale.companyLogo ? (
-                      <img 
-                        src={selectedWholesale.companyLogo} 
-                        alt={`${selectedWholesale.businessName} logo`}
-                        className="company-logo-img"
-                      />
-                    ) : (
-                      <div className="company-logo-placeholder">
-                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2" fill="none"/>
-                          <path d="M9 9C9 10.1046 9.89543 11 11 11C12.1046 11 13 10.1046 13 9C13 7.89543 12.1046 7 11 7C9.89543 7 9 7.89543 9 9Z" stroke="currentColor" strokeWidth="2" fill="none"/>
-                          <path d="M5 19L8.5 15.5L11 18L15 14L19 18V19H5Z" stroke="currentColor" strokeWidth="2" fill="none"/>
-                        </svg>
-                        <span>No Logo</span>
+
+                {/* Business Information Section */}
+                <div className="wholesale-modal-section">
+                  <div className="section-header">
+                    <FaBuilding className="section-icon" />
+                    <h5 className="section-title">Business Information</h5>
+                  </div>
+                  <div className="section-content">
+                    <div className="info-item">
+                      <div className="info-label">
+                        <FaBuilding className="info-icon" />
+                        <span>Business Name</span>
+                      </div>
+                      <div className="info-value">{selectedWholesale.businessName}</div>
+                    </div>
+                    {selectedWholesale.cacRegistrationNumber && (
+                      <div className="info-item">
+                        <div className="info-label">
+                          <FaFileAlt className="info-icon" />
+                          <span>CAC Registration</span>
+                        </div>
+                        <div className="info-value">
+                          <div className="cac-registration-group">
+                            <span>{selectedWholesale.cacRegistrationNumber}</span>
+                            <Button
+                              variant="outline-info"
+                              size="sm"
+                              className={`cac-verify-btn ${cacVerifying ? 'cac-verifying' : ''}`}
+                              onClick={() => {
+                                const cacNumber = selectedWholesale.cacRegistrationNumber;
+                                console.log('Button clicked, CAC number:', cacNumber);
+                                if (cacNumber) {
+                                  verifyCAC(cacNumber);
+                                } else {
+                                  console.error('CAC number is missing');
+                                  setCacResult({
+                                    success: false,
+                                    error: 'CAC registration number is missing',
+                                  });
+                                  setShowCacModal(true);
+                                }
+                              }}
+                              disabled={cacVerifying || !selectedWholesale.cacRegistrationNumber}
+                              title={cacVerifying ? 'Verifying CAC Registration...' : 'Verify CAC Registration'}
+                            >
+                              {cacVerifying ? (
+                                <>
+                                  <Spinner animation="border" size="sm" className="me-1" />
+                                  Verifying...
+                                </>
+                              ) : (
+                                <>
+                                  <FaCheckCircle className="me-1" />
+                                  Verify
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        </div>
                       </div>
                     )}
+                    {selectedWholesale.website && (
+                      <div className="info-item">
+                        <div className="info-label">
+                          <FaGlobe className="info-icon" />
+                          <span>Website</span>
+                        </div>
+                        <div className="info-value">
+                          <a href={selectedWholesale.website} target="_blank" rel="noopener noreferrer">
+                            {selectedWholesale.website}
+                          </a>
+                        </div>
+                      </div>
+                    )}
+                    <div className="info-item">
+                      <div className="info-label">
+                        <FaMapMarkerAlt className="info-icon" />
+                        <span>Location</span>
+                      </div>
+                      <div className="info-value">{formatLocation(selectedWholesale)}</div>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <p><strong>Status:</strong> <Badge bg={getStatusBadge(selectedWholesale.status)}>{selectedWholesale.status}</Badge></p>
-              <p><strong>Date:</strong> {new Date(selectedWholesale.createdAt).toLocaleString()}</p>
-              {selectedWholesale.businessTypes && selectedWholesale.businessTypes.length > 0 && (
-                <div className="mt-2">
-                  <strong>Business Types:</strong>
-                  <div className="business-types">
-                    {selectedWholesale.businessTypes.map((type, idx) => (
-                      <Badge key={idx} bg="warning" text="dark">{type}</Badge>
-                    ))}
+
+                {/* Business Details Section */}
+                {selectedWholesale.businessTypes && selectedWholesale.businessTypes.length > 0 && (
+                  <div className="wholesale-modal-section">
+                    <div className="section-header">
+                      <FaTag className="section-icon" />
+                      <h5 className="section-title">Business Types</h5>
+                    </div>
+                    <div className="section-content">
+                      <div className="business-types">
+                        {selectedWholesale.businessTypes.map((type, idx) => (
+                          <Badge key={idx} bg="warning" text="dark" className="business-type-badge">{type}</Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* About Business Section */}
+                <div className="wholesale-modal-section">
+                  <div className="section-header">
+                    <FaFileAlt className="section-icon" />
+                    <h5 className="section-title">About Business</h5>
+                  </div>
+                  <div className="section-content">
+                    <div className="business-info">{selectedWholesale.aboutBusiness}</div>
                   </div>
                 </div>
-              )}
-              <div className="mt-3">
-                <strong>About Business:</strong>
-                <div className="business-info">{selectedWholesale.aboutBusiness}</div>
+
+                {/* Application Details Section */}
+                <div className="wholesale-modal-section">
+                  <div className="section-header">
+                    <FaCalendarAlt className="section-icon" />
+                    <h5 className="section-title">Application Details</h5>
+                  </div>
+                  <div className="section-content">
+                    <div className="info-item">
+                      <div className="info-label">
+                        <FaClock className="info-icon" />
+                        <span>Submitted</span>
+                      </div>
+                      <div className="info-value">
+                        {new Date(selectedWholesale.createdAt).toLocaleString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </div>
+                    </div>
+                    <div className="info-item">
+                      <div className="info-label">
+                        {selectedWholesale.status === 'approved' ? (
+                          <FaCheckCircle className="info-icon text-success" />
+                        ) : selectedWholesale.status === 'rejected' ? (
+                          <FaTimesCircle className="info-icon text-danger" />
+                        ) : (
+                          <FaClock className="info-icon text-warning" />
+                        )}
+                        <span>Status</span>
+                      </div>
+                      <div className="info-value">
+                        <Badge bg={getStatusBadge(selectedWholesale.status)} className="status-badge-large">
+                          {selectedWholesale.status}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </Modal.Body>
             <Modal.Footer>
@@ -478,6 +795,133 @@ export const CMSWholesale: React.FC = () => {
           </Modal>
         );
       })()}
+
+      {/* CAC Verification Result Modal */}
+      <Modal 
+        show={showCacModal} 
+        onHide={() => setShowCacModal(false)} 
+        size="lg"
+        className="cac-verification-modal"
+      >
+        <Modal.Header closeButton className="cac-modal-header">
+          <Modal.Title>
+            <FaFileAlt className="me-2" />
+            CAC Verification Result
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {cacResult ? (
+            cacResult.success ? (
+              <div>
+                {cacResult.message && (
+                  <Alert variant="success" className="mb-3">
+                    <strong>✓ {cacResult.message}</strong>
+                  </Alert>
+                )}
+                {cacResult.data ? (
+                  <div>
+                    {Array.isArray(cacResult.data) && cacResult.data.length > 0 ? (
+                      <div className="cac-results-container">
+                        {cacResult.data.map((company: any, index: number) => (
+                          <div key={company.id || index} className="cac-company-card">
+                            <div className="cac-company-header">
+                              <h5 className="cac-company-name">{company.approvedName || 'N/A'}</h5>
+                              <Badge 
+                                bg={company.status === 'ACTIVE' ? 'success' : 'secondary'}
+                                className="cac-status-badge"
+                              >
+                                {company.status || 'UNKNOWN'}
+                              </Badge>
+                            </div>
+                            
+                            <div className="cac-company-details">
+                              <div className="cac-detail-row">
+                                <span className="cac-detail-label">RC Number:</span>
+                                <span className="cac-detail-value">{company.rcNumber || 'N/A'}</span>
+                              </div>
+                              
+                              <div className="cac-detail-row">
+                                <span className="cac-detail-label">Company ID:</span>
+                                <span className="cac-detail-value">{company.companyId || company.id || 'N/A'}</span>
+                              </div>
+                              
+                              <div className="cac-detail-row">
+                                <span className="cac-detail-label">Nature of Business:</span>
+                                <span className="cac-detail-value">{company.natureOfBusiness || 'N/A'}</span>
+                              </div>
+                              
+                              <div className="cac-detail-row">
+                                <span className="cac-detail-label">Classification:</span>
+                                <span className="cac-detail-value">
+                                  {formatClassification(company.classificationName)}
+                                </span>
+                              </div>
+                              
+                              {company.companyRegistrationDate && (
+                                <div className="cac-detail-row">
+                                  <span className="cac-detail-label">Registration Date:</span>
+                                  <span className="cac-detail-value">
+                                    {new Date(company.companyRegistrationDate).toLocaleDateString('en-US', {
+                                      year: 'numeric',
+                                      month: 'long',
+                                      day: 'numeric'
+                                    })}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="cac-results-container">
+                        <div className="cac-company-card">
+                          <div className="cac-company-details">
+                            <pre style={{ whiteSpace: 'pre-wrap', fontSize: '0.9rem', margin: 0 }}>
+                              {JSON.stringify(cacResult.data, null, 2)}
+                            </pre>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <Alert variant="info">No data returned from search.</Alert>
+                )}
+              </div>
+            ) : (
+              <div>
+                {cacResult.notVerified ? (
+                  <Alert variant="warning" className="cac-not-verified-alert">
+                    <div className="d-flex align-items-center mb-2">
+                      <FaTimesCircle className="me-2" style={{ fontSize: '1.5rem' }} />
+                      <strong style={{ fontSize: '1.125rem' }}>Not Verified</strong>
+                    </div>
+                    <div className="mt-2">
+                      <p className="mb-1"><strong>Status:</strong> CAC registration number could not be verified</p>
+                      <p className="mb-0 text-muted" style={{ fontSize: '0.875rem' }}>
+                        {cacResult.message || cacResult.error || 'The provided CAC registration number was not found in the CAC registry or could not be verified at this time.'}
+                      </p>
+                    </div>
+                  </Alert>
+                ) : (
+                  <Alert variant="danger">
+                    <strong>✗ Verification Failed</strong>
+                    <div className="mt-2">{cacResult.error || cacResult.message || 'Verification failed'}</div>
+                  </Alert>
+                )}
+              </div>
+            )
+          ) : (
+            <div>No results available</div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowCacModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </CMSLayout>
   );
 };

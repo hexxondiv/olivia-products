@@ -235,6 +235,55 @@ function sendWholesaleAcknowledgementToCustomer($wholesaleData) {
 }
 
 /**
+ * Send wholesale application status update email to customer
+ */
+function sendWholesaleStatusUpdateToCustomer($wholesaleData, $newStatus, $oldStatus = null) {
+    if (!isset($wholesaleData['email'])) {
+        throw new Exception("Customer email is required for status update");
+    }
+    
+    if (empty($wholesaleData['email'])) {
+        throw new Exception("Customer email cannot be empty");
+    }
+    
+    $customerEmail = $wholesaleData['email'];
+    $formType = ucfirst(strtolower($wholesaleData['formType']));
+    $businessName = $wholesaleData['businessName'];
+    
+    // Status-specific subject lines
+    $statusSubjects = [
+        'new' => 'Application Received - ' . $formType . ' Partnership',
+        'reviewing' => 'Application Under Review - ' . $formType . ' Partnership',
+        'approved' => 'Congratulations! Your ' . $formType . ' Partnership Application Has Been Approved',
+        'rejected' => 'Application Status Update - ' . $formType . ' Partnership',
+        'archived' => 'Application Archived - ' . $formType . ' Partnership'
+    ];
+    
+    $subject = ($statusSubjects[$newStatus] ?? 'Application Status Update - ' . $formType . ' Partnership') . ' - Olivia Products';
+    
+    // Generate email templates
+    $htmlBody = getWholesaleStatusUpdateEmailTemplate($wholesaleData, $newStatus, $oldStatus);
+    $textBody = getWholesaleStatusUpdateEmailTextTemplate($wholesaleData, $newStatus, $oldStatus);
+    
+    // Validate templates were generated
+    if (empty($htmlBody)) {
+        throw new Exception("Failed to generate status update email HTML template");
+    }
+    
+    if (empty($textBody)) {
+        throw new Exception("Failed to generate status update email text template");
+    }
+    
+    error_log("Sending wholesale status update email to: $customerEmail");
+    error_log("Email subject: $subject");
+    error_log("Status changed from: " . ($oldStatus ?? 'N/A') . " to: $newStatus");
+    error_log("HTML body length: " . strlen($htmlBody) . " characters");
+    error_log("Text body length: " . strlen($textBody) . " characters");
+    
+    return sendMailgunEmail($customerEmail, $subject, $htmlBody, $textBody);
+}
+
+/**
  * Send order status update email to customer
  */
 function sendOrderStatusUpdateToCustomer($orderData, $newStatus, $oldStatus = null) {

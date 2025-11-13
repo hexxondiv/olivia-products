@@ -138,6 +138,7 @@ CREATE TABLE IF NOT EXISTS wholesale_submissions (
     website VARCHAR(500),
     companyLogo VARCHAR(500) NULL,
     cacRegistrationNumber VARCHAR(100) NULL,
+    businessPhysicalAddress TEXT NULL,
     city VARCHAR(100) NOT NULL,
     state VARCHAR(100) NOT NULL,
     country VARCHAR(100) NOT NULL,

@@ -421,6 +421,82 @@
   }
 }
 
+// CAC Verification Button and Loader Styles
+.cms-modal-wholesale-details {
+  .modal-body {
+    // CAC Verification Button Styling
+    .btn {
+      &.cac-verifying {
+        position: relative;
+        cursor: wait;
+        pointer-events: none;
+        user-select: none;
+        
+        // Pulsing animation for verifying state
+        animation: cacVerifyingPulse 2s ease-in-out infinite;
+        
+        // Background glow effect
+        &::before {
+          content: '';
+          position: absolute;
+          inset: -2px;
+          border-radius: inherit;
+          background: linear-gradient(135deg, rgba(#00a3c4, 0.3), rgba(#00a3c4, 0.1));
+          opacity: 0;
+          animation: cacGlow 2s ease-in-out infinite;
+          z-index: -1;
+        }
+        
+        .spinner-border {
+          width: 0.875rem;
+          height: 0.875rem;
+          border-width: 0.15rem;
+          border-color: currentColor;
+          border-right-color: transparent;
+          animation: spinner-border 0.75s linear infinite;
+          margin-right: 0.5rem;
+          vertical-align: middle;
+          display: inline-block;
+        }
+        
+        // Text styling
+        span {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+      }
+    }
+  }
+}
+
+@keyframes cacVerifyingPulse {
+  0%, 100% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.01);
+  }
+}
+
+@keyframes cacGlow {
+  0%, 100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes spinner-border {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
 // Print Styles
 @media print {
   .cms-btn-group,

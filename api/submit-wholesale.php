@@ -74,7 +74,7 @@ if (!$wholesaleData) {
 }
 
 // Validate required fields
-$requiredFields = ['formType', 'firstName', 'email', 'phone', 'businessName', 'city', 'state', 'country', 'aboutBusiness'];
+$requiredFields = ['formType', 'firstName', 'email', 'phone', 'businessName', 'businessPhysicalAddress', 'city', 'state', 'country', 'aboutBusiness'];
 foreach ($requiredFields as $field) {
     if (empty($wholesaleData[$field])) {
         ob_clean();
@@ -150,41 +150,73 @@ try {
     }
     
     // Save wholesale submission to database
+    $wholesaleId = false;
+    $databaseError = null;
     try {
-        $wholesaleSql = "INSERT INTO wholesale_submissions (formType, firstName, lastName, email, phone, 
-                        businessName, website, companyLogo, cacRegistrationNumber, city, state, country, aboutBusiness, businessTypes, 
-                        status, submittedVia, wholesaleEmailSent, acknowledgementEmailSent) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', ?, ?, ?)";
+        // Get database connection directly to get better error messages
+        $pdo = getDBConnection();
         
-        $wholesaleParams = [
-            strtolower($wholesaleData['formType']),
-            $wholesaleData['firstName'],
-            $wholesaleData['lastName'] ?? null,
-            $wholesaleData['email'],
-            $wholesaleData['phone'],
-            $wholesaleData['businessName'],
-            $wholesaleData['website'] ?? null,
-            $wholesaleData['companyLogo'] ?? null,
-            $wholesaleData['cacRegistrationNumber'] ?? null,
-            $wholesaleData['city'],
-            $wholesaleData['state'],
-            $wholesaleData['country'],
-            $wholesaleData['aboutBusiness'],
-            json_encode($wholesaleData['businessTypes'] ?? []),
-            $wholesaleData['submittedVia'] ?? 'email',
-            $wholesaleEmailResult ? 1 : 0,
-            $acknowledgementEmailResult ? 1 : 0
-        ];
-        
-        $wholesaleId = dbExecute($wholesaleSql, $wholesaleParams);
-        if ($wholesaleId) {
-            error_log("Wholesale submission saved to database with ID: $wholesaleId");
+        if (!$pdo) {
+            $databaseError = "Database connection failed. Check database configuration.";
+            error_log("Database connection failed in submit-wholesale.php");
         } else {
-            error_log("Failed to save wholesale submission to database");
+            $wholesaleSql = "INSERT INTO wholesale_submissions (formType, firstName, lastName, email, phone, 
+                            businessName, website, companyLogo, cacRegistrationNumber, businessPhysicalAddress, city, state, country, aboutBusiness, businessTypes, 
+                            status, submittedVia, wholesaleEmailSent, acknowledgementEmailSent) 
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', ?, ?, ?)";
+            
+            $wholesaleParams = [
+                strtolower($wholesaleData['formType']),
+                $wholesaleData['firstName'],
+                $wholesaleData['lastName'] ?? null,
+                $wholesaleData['email'],
+                $wholesaleData['phone'],
+                $wholesaleData['businessName'],
+                $wholesaleData['website'] ?? null,
+                $wholesaleData['companyLogo'] ?? null,
+                $wholesaleData['cacRegistrationNumber'] ?? null,
+                $wholesaleData['businessPhysicalAddress'],
+                $wholesaleData['city'],
+                $wholesaleData['state'],
+                $wholesaleData['country'],
+                $wholesaleData['aboutBusiness'],
+                json_encode($wholesaleData['businessTypes'] ?? []),
+                $wholesaleData['submittedVia'] ?? 'email',
+                $wholesaleEmailResult ? 1 : 0,
+                $acknowledgementEmailResult ? 1 : 0
+            ];
+            
+            try {
+                $stmt = $pdo->prepare($wholesaleSql);
+                $stmt->execute($wholesaleParams);
+                $wholesaleId = $pdo->lastInsertId();
+                error_log("Wholesale submission saved to database with ID: $wholesaleId");
+            } catch (PDOException $e) {
+                $databaseError = $e->getMessage();
+                error_log("PDO Error saving wholesale submission: " . $databaseError);
+                error_log("SQL: " . $wholesaleSql);
+                error_log("Params: " . json_encode($wholesaleParams));
+                error_log("Error Code: " . $e->getCode());
+            }
         }
     } catch (Exception $e) {
-        error_log("Error saving wholesale submission to database: " . $e->getMessage());
-        // Continue even if database save fails
+        $databaseError = $e->getMessage();
+        error_log("Exception saving wholesale submission to database: " . $databaseError);
+        error_log("Stack trace: " . $e->getTraceAsString());
+    }
+    
+    // If database save failed, return error
+    if ($wholesaleId === false) {
+        ob_clean();
+        http_response_code(500);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Failed to save wholesale submission to database. ' . ($databaseError ?: 'Unknown database error'),
+            'wholesaleEmailSent' => $wholesaleEmailResult,
+            'acknowledgementEmailSent' => $acknowledgementEmailResult
+        ]);
+        ob_end_flush();
+        exit();
     }
     
     // Return success response

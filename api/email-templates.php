@@ -659,6 +659,7 @@ function getWholesaleFormEmailTemplate($wholesaleData) {
     $phone = htmlspecialchars($wholesaleData['phone']);
     $businessName = htmlspecialchars($wholesaleData['businessName']);
     $website = !empty($wholesaleData['website']) ? htmlspecialchars($wholesaleData['website']) : 'Not provided';
+    $businessPhysicalAddress = !empty($wholesaleData['businessPhysicalAddress']) ? nl2br(htmlspecialchars($wholesaleData['businessPhysicalAddress'])) : 'Not provided';
     $city = htmlspecialchars($wholesaleData['city']);
     $state = htmlspecialchars($wholesaleData['state']);
     $country = htmlspecialchars($wholesaleData['country']);
@@ -744,6 +745,10 @@ function getWholesaleFormEmailTemplate($wholesaleData) {
                             <span class="info-value">' . ($website !== 'Not provided' ? '<a href="' . $website . '" target="_blank">' . $website . '</a>' : $website) . '</span>
                         </div>
                         <div class="info-row">
+                            <span class="info-label">Business Physical Address:</span>
+                            <span class="info-value">' . $businessPhysicalAddress . '</span>
+                        </div>
+                        <div class="info-row">
                             <span class="info-label">Location:</span>
                             <span class="info-value">' . $city . ', ' . $state . ', ' . $country . '</span>
                         </div>
@@ -812,6 +817,8 @@ function getWholesaleFormEmailTextTemplate($wholesaleData) {
     $text .= "--------------------\n";
     $text .= "Business Name: $businessName\n";
     $text .= "Website: $website\n";
+    $businessPhysicalAddress = !empty($wholesaleData['businessPhysicalAddress']) ? $wholesaleData['businessPhysicalAddress'] : 'Not provided';
+    $text .= "Business Physical Address: $businessPhysicalAddress\n";
     $text .= "Location: $city, $state, $country\n\n";
     
     if (!empty($businessTypes)) {
@@ -1628,6 +1635,272 @@ function getContactReplyEmailTextTemplate($contactData, $replyMessage, $adminNam
     $text .= "Best regards,\n";
     $text .= "$adminName\n";
     $text .= "Olivia Products Team\n";
+    
+    return $text;
+}
+
+/**
+ * Get wholesale application status update email template for customer (HTML with Bootstrap)
+ */
+function getWholesaleStatusUpdateEmailTemplate($wholesaleData, $newStatus, $oldStatus = null) {
+    $formType = ucfirst(strtolower($wholesaleData['formType']));
+    $firstName = htmlspecialchars($wholesaleData['firstName']);
+    $lastName = !empty($wholesaleData['lastName']) ? htmlspecialchars($wholesaleData['lastName']) : '';
+    $fullName = trim($firstName . ' ' . $lastName);
+    $businessName = htmlspecialchars($wholesaleData['businessName']);
+    $submittedAt = date('F j, Y \a\t g:i A', strtotime($wholesaleData['createdAt']));
+    
+    // Status-specific content
+    $statusConfig = [
+        'new' => [
+            'title' => 'Application Received',
+            'icon' => '📋',
+            'message' => 'We have received your ' . strtolower($formType) . ' partnership application and it is currently being reviewed.',
+            'nextSteps' => [
+                'Our partnership team will review your application within 5-7 business days',
+                'We\'ll evaluate your business profile and partnership potential',
+                'You\'ll receive updates as we review your application',
+                'If you have any questions, please contact us'
+            ],
+            'color' => '#17a2b8'
+        ],
+        'reviewing' => [
+            'title' => 'Application Under Review',
+            'icon' => '🔍',
+            'message' => 'Great news! Your ' . strtolower($formType) . ' partnership application is now under active review by our team.',
+            'nextSteps' => [
+                'Our partnership team is carefully evaluating your application',
+                'We\'re reviewing your business profile and partnership potential',
+                'You\'ll receive a response via email or phone regarding the next steps',
+                'This process typically takes 5-7 business days',
+                'If you have any questions, please contact us'
+            ],
+            'color' => '#ffc107'
+        ],
+        'approved' => [
+            'title' => 'Application Approved!',
+            'icon' => '✓',
+            'message' => 'Congratulations! Your ' . strtolower($formType) . ' partnership application has been approved!',
+            'nextSteps' => [
+                'Our partnership team will contact you within 2-3 business days',
+                'We\'ll discuss partnership terms, benefits, and next steps',
+                'You\'ll receive detailed information about pricing and product availability',
+                'We\'re excited to begin this partnership with you!',
+                'If you have any questions, please contact us immediately'
+            ],
+            'color' => '#28a745'
+        ],
+        'rejected' => [
+            'title' => 'Application Status Update',
+            'icon' => 'ℹ️',
+            'message' => 'Thank you for your interest in becoming a ' . strtolower($formType) . ' partner with Olivia Products.',
+            'nextSteps' => [
+                'Unfortunately, we are unable to proceed with your application at this time',
+                'This decision was based on our current partnership criteria and business needs',
+                'We encourage you to reapply in the future as our requirements may change',
+                'If you have any questions about this decision, please contact us',
+                'We appreciate your interest in Olivia Products'
+            ],
+            'color' => '#dc3545'
+        ],
+        'archived' => [
+            'title' => 'Application Archived',
+            'icon' => '📁',
+            'message' => 'Your ' . strtolower($formType) . ' partnership application has been archived.',
+            'nextSteps' => [
+                'Your application has been moved to our archives',
+                'If you wish to reactivate your application, please contact us',
+                'We may reach out to you in the future if opportunities arise',
+                'Thank you for your interest in Olivia Products'
+            ],
+            'color' => '#6c757d'
+        ]
+    ];
+    
+    $config = $statusConfig[$newStatus] ?? $statusConfig['new'];
+    
+    $nextStepsHtml = '';
+    foreach ($config['nextSteps'] as $step) {
+        $nextStepsHtml .= '<li style="margin-bottom: 8px;">' . htmlspecialchars($step) . '</li>';
+    }
+    
+    return '
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>' . $config['title'] . ' - ' . $formType . ' Partnership</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f5f5f5; }
+        .email-container { max-width: 800px; margin: 0 auto; background-color: #ffffff; }
+        .header { background: linear-gradient(135deg, #003057 0%, #4b3d97 100%); color: #ffffff; padding: 40px 30px; text-align: center; }
+        .status-icon { font-size: 60px; margin-bottom: 20px; }
+        .content { padding: 30px; }
+        .status-badge { display: inline-block; background-color: ' . $config['color'] . '; color: #ffffff; padding: 10px 20px; border-radius: 25px; font-weight: bold; margin-bottom: 20px; font-size: 1.1em; text-transform: uppercase; }
+        .info-box { background-color: #f5f9ff; border-left: 4px solid ' . $config['color'] . '; padding: 20px; margin: 20px 0; border-radius: 4px; }
+        .next-steps { background-color: #fff9e6; border: 2px solid ' . $config['color'] . '; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .footer { background-color: #f8f9fa; padding: 30px; text-align: center; color: #6c757d; }
+        .btn { display: inline-block; padding: 12px 30px; background-color: #7bbd21; color: #ffffff; text-decoration: none; border-radius: 25px; font-weight: 600; margin: 10px 5px; }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <div class="status-icon">' . $config['icon'] . '</div>
+            <h1 style="margin: 0; font-size: 32px;">' . $config['title'] . '</h1>
+            <p style="margin: 15px 0 0 0; font-size: 18px;">' . $formType . ' Partnership Application</p>
+        </div>
+        
+        <div class="content">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <div class="status-badge">' . ucfirst($newStatus) . '</div>
+                <p style="color: #6c757d; margin: 10px 0;">Application Submitted: ' . $submittedAt . '</p>
+            </div>
+            
+            <div class="info-box">
+                <h3 style="margin-top: 0; color: #003057;">Hello ' . $firstName . '!</h3>
+                <p style="margin: 0; line-height: 1.6; font-size: 1.1em;">' . $config['message'] . '</p>
+            </div>
+            
+            <div class="info-box">
+                <h4 style="margin-top: 0; color: #003057;">Application Details</h4>
+                <p style="margin: 5px 0;"><strong>Business Name:</strong> ' . $businessName . '</p>
+                <p style="margin: 5px 0;"><strong>Application Type:</strong> ' . $formType . '</p>
+                <p style="margin: 5px 0;"><strong>Status:</strong> <span style="color: ' . $config['color'] . '; font-weight: bold;">' . ucfirst($newStatus) . '</span></p>
+            </div>
+            
+            <div class="next-steps">
+                <h4 style="margin-top: 0; color: #003057;">What\'s Next?</h4>
+                <ul style="margin: 10px 0; padding-left: 20px; line-height: 1.8;">
+                    ' . $nextStepsHtml . '
+                </ul>
+            </div>
+            
+            <div class="info-box">
+                <h4 style="margin-top: 0; color: #003057;">Our Contact Information</h4>
+                <p style="margin: 5px 0;"><strong>Email:</strong> <a href="mailto:' . MAILGUN_REPLY_TO . '">' . MAILGUN_REPLY_TO . '</a></p>
+                <p style="margin: 5px 0;"><strong>Phone (Lagos):</strong> +234 901 419 6902</p>
+                <p style="margin: 5px 0;"><strong>WhatsApp:</strong> +234 912 350 9090</p>
+                <p style="margin: 5px 0;"><strong>Business Hours:</strong> Monday - Friday, 8am - 5pm</p>
+                <p style="margin: 5px 0;"><strong>Location:</strong> Okaka plaza suite 1 first Avenue festac town, Lagos State</p>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="https://celineolivia.com" class="btn">Visit Our Website</a>
+                <a href="mailto:' . MAILGUN_REPLY_TO . '" class="btn" style="background-color: #003057;">Contact Us</a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p style="margin: 0; font-weight: 600; color: #003057;">Olivia Products</p>
+            <p style="margin: 5px 0;">We appreciate your interest in partnering with us!</p>
+            <p style="margin: 10px 0 0 0; font-size: 0.9em;">This is an automated status update email. Please do not reply to this email.</p>
+        </div>
+    </div>
+</body>
+</html>';
+}
+
+/**
+ * Get wholesale application status update email template for customer (Plain Text)
+ */
+function getWholesaleStatusUpdateEmailTextTemplate($wholesaleData, $newStatus, $oldStatus = null) {
+    $formType = ucfirst(strtolower($wholesaleData['formType']));
+    $firstName = $wholesaleData['firstName'];
+    $businessName = $wholesaleData['businessName'];
+    $submittedAt = date('F j, Y \a\t g:i A', strtotime($wholesaleData['createdAt']));
+    
+    // Status-specific content
+    $statusConfig = [
+        'new' => [
+            'title' => 'APPLICATION RECEIVED',
+            'message' => 'We have received your ' . strtolower($formType) . ' partnership application and it is currently being reviewed.',
+            'nextSteps' => [
+                'Our partnership team will review your application within 5-7 business days',
+                'We\'ll evaluate your business profile and partnership potential',
+                'You\'ll receive updates as we review your application',
+                'If you have any questions, please contact us'
+            ]
+        ],
+        'reviewing' => [
+            'title' => 'APPLICATION UNDER REVIEW',
+            'message' => 'Great news! Your ' . strtolower($formType) . ' partnership application is now under active review by our team.',
+            'nextSteps' => [
+                'Our partnership team is carefully evaluating your application',
+                'We\'re reviewing your business profile and partnership potential',
+                'You\'ll receive a response via email or phone regarding the next steps',
+                'This process typically takes 5-7 business days',
+                'If you have any questions, please contact us'
+            ]
+        ],
+        'approved' => [
+            'title' => 'APPLICATION APPROVED!',
+            'message' => 'Congratulations! Your ' . strtolower($formType) . ' partnership application has been approved!',
+            'nextSteps' => [
+                'Our partnership team will contact you within 2-3 business days',
+                'We\'ll discuss partnership terms, benefits, and next steps',
+                'You\'ll receive detailed information about pricing and product availability',
+                'We\'re excited to begin this partnership with you!',
+                'If you have any questions, please contact us immediately'
+            ]
+        ],
+        'rejected' => [
+            'title' => 'APPLICATION STATUS UPDATE',
+            'message' => 'Thank you for your interest in becoming a ' . strtolower($formType) . ' partner with Olivia Products.',
+            'nextSteps' => [
+                'Unfortunately, we are unable to proceed with your application at this time',
+                'This decision was based on our current partnership criteria and business needs',
+                'We encourage you to reapply in the future as our requirements may change',
+                'If you have any questions about this decision, please contact us',
+                'We appreciate your interest in Olivia Products'
+            ]
+        ],
+        'archived' => [
+            'title' => 'APPLICATION ARCHIVED',
+            'message' => 'Your ' . strtolower($formType) . ' partnership application has been archived.',
+            'nextSteps' => [
+                'Your application has been moved to our archives',
+                'If you wish to reactivate your application, please contact us',
+                'We may reach out to you in the future if opportunities arise',
+                'Thank you for your interest in Olivia Products'
+            ]
+        ]
+    ];
+    
+    $config = $statusConfig[$newStatus] ?? $statusConfig['new'];
+    
+    $text = $config['title'] . "\n";
+    $text .= str_repeat("=", strlen($config['title'])) . "\n\n";
+    $text .= "Hello $firstName!\n\n";
+    $text .= $config['message'] . "\n\n";
+    
+    $text .= "APPLICATION DETAILS\n";
+    $text .= "-------------------\n";
+    $text .= "Business Name: $businessName\n";
+    $text .= "Application Type: $formType\n";
+    $text .= "Status: " . ucfirst($newStatus) . "\n";
+    $text .= "Application Submitted: $submittedAt\n\n";
+    
+    $text .= "WHAT'S NEXT?\n";
+    $text .= "------------\n";
+    foreach ($config['nextSteps'] as $step) {
+        $text .= "- $step\n";
+    }
+    $text .= "\n";
+    
+    $text .= "OUR CONTACT INFORMATION\n";
+    $text .= "-----------------------\n";
+    $text .= "Email: " . MAILGUN_REPLY_TO . "\n";
+    $text .= "Phone (Lagos): +234 901 419 6902\n";
+    $text .= "WhatsApp: +234 912 350 9090\n";
+    $text .= "Business Hours: Monday - Friday, 8am - 5pm\n";
+    $text .= "Location: Okaka plaza suite 1 first Avenue festac town, Lagos State\n\n";
+    
+    $text .= "We appreciate your interest in partnering with us!\n\n";
+    $text .= "Olivia Products\n";
+    $text .= "This is an automated status update email. Please do not reply to this email.\n";
     
     return $text;
 }

@@ -1,10 +1,6 @@
 import React from "react";
 import Video from "../../assets/images/home-video.mp4";
 
-import Testifier from "../../assets/images/fast.avif";
-import Testifier2 from "../../assets/images/oprah.avif";
-import Testifier3 from "../../assets/images/corp.avif";
-import Testifier4 from "../../assets/images/today.avif";
 import MissionImg from "../../assets/images/group6.png";
 import CountUp from "react-countup";
 import { ProductsSlide } from "./ProductsSlide/ProductsSlide";
@@ -15,6 +11,7 @@ import Carousel from "react-bootstrap/Carousel";
 import "./home.scss";
 import { Link } from "react-router-dom";
 import TestimonialCarousel from "./Testimonials";
+import WholesaleCarousel from "./WholesaleCarousel";
 import { TabletAndBelow } from "../../Utils/mediaQueries";
 import { HomeSlide } from "./HomeSlide/HomeSlide";
 import FBSocials from "./FBSocials";
@@ -78,39 +75,15 @@ export const Home = () => {
         <SampleSlide />
       </div>
 
-      {/* Testifiers Section */}
-      <div className="testifiers-div d-md-flex">
-        <div className="col-12 col-md-6 d-flex">
-          <div className="col-6 testifiers">
-            <center>
-              <h5>"Best sustainable cleaning products”</h5>
-              <img src={Testifier} alt="Testifier 1" width="154px" />
-            </center>
-          </div>
-          <div className="col-6  testifiers">
-            <center>
-              <h5>Best for the Environment</h5>
-              <img src={Testifier2} alt="Testifier 2" width="154px" />
-            </center>
-          </div>
-        </div>
-        <div className="col-12 col-md-6 d-flex">
-          {" "}
-          <div className="col-6 testifiers">
-            <center>
-              <h5>
-                "Tried the whole line and absolutely love it. It's genius"
-              </h5>
-              <img src={Testifier3} alt="Testifier 3" width="104px" />
-            </center>
-          </div>
-          <div className="col-6 testifiers">
-            <center>
-              <h5>World Changing Ideas</h5>
-              <img src={Testifier4} alt="Testifier 4" width="104px" />
-            </center>
-          </div>
-        </div>
+      {/* Approved Wholesale Partners Section */}
+      <div className="wholesale-partners-section">
+        <center>
+          <h2>Our Approved Partners</h2>
+          <p style={{ color: "#4b3d97", marginBottom: "40px" }}>
+            Trusted businesses partnering with Olivia Products
+          </p>
+        </center>
+        <WholesaleCarousel />
       </div>
 
       {/* Bestsellers Section */}
