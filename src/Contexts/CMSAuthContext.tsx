@@ -15,6 +15,7 @@ interface CMSAuthContextType {
   logout: () => void;
   isAuthenticated: boolean;
   loading: boolean;
+  updateUser: (userData: Partial<User>) => void;
 }
 
 const CMSAuthContext = createContext<CMSAuthContextType | undefined>(undefined);
@@ -119,6 +120,17 @@ export const CMSAuthProvider: React.FC<CMSAuthProviderProps> = ({ children }) =>
     localStorage.removeItem('cms_token');
   };
 
+  const updateUser = (userData: Partial<User>) => {
+    if (user) {
+      const updatedUser = { ...user, ...userData };
+      setUser(updatedUser);
+      // Update token if provided
+      if (userData.token) {
+        localStorage.setItem('cms_token', userData.token);
+      }
+    }
+  };
+
   return (
     <CMSAuthContext.Provider
       value={{
@@ -127,6 +139,7 @@ export const CMSAuthProvider: React.FC<CMSAuthProviderProps> = ({ children }) =>
         logout,
         isAuthenticated: !!user,
         loading,
+        updateUser,
       }}
     >
       {children}

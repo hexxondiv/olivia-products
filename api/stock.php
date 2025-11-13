@@ -154,7 +154,8 @@ function handleGet() {
 
 function handleAdjustStock() {
     // Require authentication
-    requireRole(['admin', 'manager']);
+    // Only admin and sales can manage stock
+    requireRole(['admin', 'sales']);
     
     global $data;
     
@@ -225,7 +226,8 @@ function handleAdjustStock() {
 
 function handleGetAlerts() {
     // Require authentication for alerts
-    requireRole(['admin', 'manager', 'staff']);
+    // All roles can view stock alerts and reports
+    requireRole(['admin', 'sales', 'support']);
     
     $alertType = isset($_GET['type']) ? $_GET['type'] : null;
     $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 100;
@@ -241,7 +243,8 @@ function handleGetAlerts() {
 
 function handleResolveAlert($alertId) {
     // Require authentication
-    requireRole(['admin', 'manager']);
+    // Only admin and sales can manage stock
+    requireRole(['admin', 'sales']);
     
     global $data;
     
@@ -266,7 +269,8 @@ function handleResolveAlert($alertId) {
 
 function handleGetReports() {
     // Require authentication
-    requireRole(['admin', 'manager', 'staff']);
+    // All roles can view stock alerts and reports
+    requireRole(['admin', 'sales', 'support']);
     
     $reportType = isset($_GET['type']) ? $_GET['type'] : 'movements';
     $startDate = isset($_GET['startDate']) ? $_GET['startDate'] : null;

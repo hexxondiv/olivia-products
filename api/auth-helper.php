@@ -35,9 +35,13 @@ function verifyAuthToken($token) {
         return false;
     }
     
-    // Get user from database
+    // Get user from database with role name
     $user = dbQueryOne(
-        "SELECT id, username, email, fullName, role, isActive FROM admin_users WHERE id = ? AND isActive = 1",
+        "SELECT au.id, au.username, au.email, au.fullName, au.isActive, 
+                COALESCE(r.name, au.role) as role, r.id as roleId, r.name as roleName
+         FROM admin_users au
+         LEFT JOIN roles r ON au.roleId = r.id
+         WHERE au.id = ? AND au.isActive = 1",
         [$data['userId']]
     );
     
@@ -55,9 +59,13 @@ function authenticateAdmin($username, $password) {
         return false;
     }
     
-    // Get user from database
+    // Get user from database with role name
     $user = dbQueryOne(
-        "SELECT id, username, email, passwordHash, fullName, role, isActive FROM admin_users WHERE (username = ? OR email = ?) AND isActive = 1",
+        "SELECT au.id, au.username, au.email, au.passwordHash, au.fullName, au.isActive,
+                COALESCE(r.name, au.role) as role, r.id as roleId, r.name as roleName
+         FROM admin_users au
+         LEFT JOIN roles r ON au.roleId = r.id
+         WHERE (au.username = ? OR au.email = ?) AND au.isActive = 1",
         [$username, $username]
     );
     
@@ -152,18 +160,37 @@ function hasRole($user, $requiredRole) {
 
 /**
  * Require specific role for API endpoint
- * @param string|array $requiredRole Required role(s)
+ * @param string|array $requiredRole Required role(s) - accepts 'admin', 'sales', 'support' or old roles ('manager', 'staff')
  * @return array User data
  */
 function requireRole($requiredRole) {
     $user = requireAuth();
     
-    if (!hasRole($user, $requiredRole)) {
+    // Map old role names to new ones for backward compatibility
+    $roleMapping = [
+        'manager' => 'admin',  // Manager maps to admin for full access
+        'staff' => 'support'    // Staff maps to support
+    ];
+    
+    // Normalize required roles
+    $normalizedRoles = [];
+    if (is_array($requiredRole)) {
+        foreach ($requiredRole as $role) {
+            $normalizedRoles[] = isset($roleMapping[$role]) ? $roleMapping[$role] : $role;
+        }
+    } else {
+        $normalizedRoles[] = isset($roleMapping[$requiredRole]) ? $roleMapping[$requiredRole] : $requiredRole;
+    }
+    
+    // Get user's role (should already be normalized from database)
+    $userRole = $user['role'] ?? null;
+    
+    if (!hasRole($user, $normalizedRoles)) {
         http_response_code(403);
         header('Content-Type: application/json');
         echo json_encode([
             'success' => false,
-            'message' => 'Insufficient permissions'
+            'message' => 'Insufficient permissions. Required role: ' . (is_array($requiredRole) ? implode(' or ', $requiredRole) : $requiredRole)
         ]);
         exit();
     }

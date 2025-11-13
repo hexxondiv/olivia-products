@@ -31,7 +31,11 @@ function seedAdmin() {
         $email = 'admin@celineolivia.com';
         $password = 'admin123'; // CHANGE THIS!
         $fullName = 'Administrator';
-        $role = 'admin';
+        $roleName = 'admin';
+        
+        // Get role ID from roles table (or use default if roles table doesn't exist yet)
+        $role = dbQueryOne("SELECT id FROM roles WHERE name = ?", [$roleName]);
+        $roleId = $role ? $role['id'] : null;
         
         // Generate password hash
         $passwordHash = password_hash($password, PASSWORD_DEFAULT);
@@ -44,21 +48,43 @@ function seedAdmin() {
         
         if ($existing) {
             // Update existing admin user
-            $sql = "UPDATE admin_users SET 
-                    email = ?, 
-                    passwordHash = ?, 
-                    fullName = ?, 
-                    role = ?,
-                    isActive = 1
-                    WHERE username = ?";
-            
-            $result = dbExecute($sql, [
-                $email,
-                $passwordHash,
-                $fullName,
-                $role,
-                $username
-            ]);
+            if ($roleId) {
+                // Use roleId if roles table exists
+                $sql = "UPDATE admin_users SET 
+                        email = ?, 
+                        passwordHash = ?, 
+                        fullName = ?, 
+                        roleId = ?,
+                        role = ?,
+                        isActive = 1
+                        WHERE username = ?";
+                
+                $result = dbExecute($sql, [
+                    $email,
+                    $passwordHash,
+                    $fullName,
+                    $roleId,
+                    $roleName,
+                    $username
+                ]);
+            } else {
+                // Fallback to old role column
+                $sql = "UPDATE admin_users SET 
+                        email = ?, 
+                        passwordHash = ?, 
+                        fullName = ?, 
+                        role = ?,
+                        isActive = 1
+                        WHERE username = ?";
+                
+                $result = dbExecute($sql, [
+                    $email,
+                    $passwordHash,
+                    $fullName,
+                    $roleName,
+                    $username
+                ]);
+            }
             
             if ($result !== false) {
                 return [
@@ -73,16 +99,32 @@ function seedAdmin() {
             }
         } else {
             // Create new admin user
-            $sql = "INSERT INTO admin_users (username, email, passwordHash, fullName, role, isActive) 
-                    VALUES (?, ?, ?, ?, ?, 1)";
-            
-            $id = dbExecute($sql, [
-                $username,
-                $email,
-                $passwordHash,
-                $fullName,
-                $role
-            ]);
+            if ($roleId) {
+                // Use roleId if roles table exists
+                $sql = "INSERT INTO admin_users (username, email, passwordHash, fullName, roleId, role, isActive) 
+                        VALUES (?, ?, ?, ?, ?, ?, 1)";
+                
+                $id = dbExecute($sql, [
+                    $username,
+                    $email,
+                    $passwordHash,
+                    $fullName,
+                    $roleId,
+                    $roleName
+                ]);
+            } else {
+                // Fallback to old role column
+                $sql = "INSERT INTO admin_users (username, email, passwordHash, fullName, role, isActive) 
+                        VALUES (?, ?, ?, ?, ?, 1)";
+                
+                $id = dbExecute($sql, [
+                    $username,
+                    $email,
+                    $passwordHash,
+                    $fullName,
+                    $roleName
+                ]);
+            }
             
             if ($id) {
                 return [

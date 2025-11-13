@@ -367,7 +367,8 @@ function handleGet() {
 
 function handlePut() {
     // Require authentication
-    requireRole(['admin', 'manager']);
+    // Only admin and sales can update wholesale
+    requireRole(['admin', 'sales']);
     
     global $data;
     $id = isset($_GET['id']) ? (int)$_GET['id'] : null;

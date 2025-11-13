@@ -64,7 +64,8 @@ ob_end_flush();
 
 function handleGet() {
     // Require authentication
-    requireRole(['admin', 'manager', 'staff']);
+    // All roles can view submitted questions
+    requireRole(['admin', 'sales', 'support']);
     
     $id = isset($_GET['id']) ? (int)$_GET['id'] : null;
     $status = isset($_GET['status']) ? $_GET['status'] : null;
@@ -109,7 +110,8 @@ function handleGet() {
 
 function handlePut() {
     // Require authentication - this also returns the user
-    $user = requireRole(['admin', 'manager']);
+    // Only admin and support can answer questions
+    $user = requireRole(['admin', 'support']);
     
     global $data;
     $id = isset($_GET['id']) ? (int)$_GET['id'] : null;

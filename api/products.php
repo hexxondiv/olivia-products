@@ -173,8 +173,8 @@ function handleGet() {
 }
 
 function handlePost() {
-    // Require authentication
-    requireRole(['admin', 'manager']);
+    // Require authentication - only admin and sales can create products
+    requireRole(['admin', 'sales']);
     
     global $data;
     
@@ -263,8 +263,8 @@ function handlePost() {
 }
 
 function handlePut() {
-    // Require authentication
-    requireRole(['admin', 'manager']);
+    // Require authentication - only admin and sales can update products
+    requireRole(['admin', 'sales']);
     
     global $data;
     $id = isset($_GET['id']) ? (int)$_GET['id'] : null;

@@ -14,9 +14,11 @@ import {
   FaWarehouse,
   FaStar,
   FaBolt,
-  FaQuestionCircle
+  FaQuestionCircle,
+  FaUser
 } from 'react-icons/fa';
 import { getApiUrl } from '../../Utils/apiConfig';
+import { canAccessRoute } from '../../Utils/rolePermissions';
 import './cms-layout.scss';
 
 interface CMSLayoutProps {
@@ -297,62 +299,86 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({ children }) => {
           <Navbar.Toggle aria-controls="cms-navbar-nav" />
           <Navbar.Collapse id="cms-navbar-nav">
             <Nav className="me-auto">
-              <Nav.Link as={Link} to="/cms" active={isActive('/cms')} onClick={handleNavClick}>
-                <FaChartBar className="me-1" />
-                Dashboard
-              </Nav.Link>
-              <Nav.Link as={Link} to="/cms/products" active={isActive('/cms/products')} onClick={handleNavClick}>
-                <FaBox className="me-1" />
-                Products
-              </Nav.Link>
-              <Nav.Link as={Link} to="/cms/orders" active={isActive('/cms/orders')} onClick={handleNavClick}>
-                <FaShoppingCart className="me-1" />
-                Orders
-                {newOrdersCount > 0 && (
-                  <Badge bg="success" className="ms-2" pill>
-                    {newOrdersCount}
-                  </Badge>
-                )}
-              </Nav.Link>
-              <Nav.Link as={Link} to="/cms/contacts" active={isActive('/cms/contacts')} onClick={handleNavClick}>
-                <FaEnvelope className="me-1" />
-                Contacts
-                {newContactsCount > 0 && (
-                  <Badge bg="info" className="ms-2" pill>
-                    {newContactsCount}
-                  </Badge>
-                )}
-              </Nav.Link>
-              <Nav.Link as={Link} to="/cms/wholesale" active={isActive('/cms/wholesale')} onClick={handleNavClick}>
-                <FaHandshake className="me-1" />
-                Wholesale
-                {newWholesaleCount > 0 && (
-                  <Badge bg="warning" className="ms-2" pill>
-                    {newWholesaleCount}
-                  </Badge>
-                )}
-              </Nav.Link>
-              <Nav.Link as={Link} to="/cms/stock" active={isActive('/cms/stock')} onClick={handleNavClick}>
-                <FaWarehouse className="me-1" />
-                Stock
-                {stockAlertsCount > 0 && (
-                  <Badge bg="danger" className="ms-2" pill>
-                    {stockAlertsCount}
-                  </Badge>
-                )}
-              </Nav.Link>
-              <Nav.Link as={Link} to="/cms/testimonials" active={isActive('/cms/testimonials')} onClick={handleNavClick}>
-                <FaStar className="me-1" />
-                Testimonials
-              </Nav.Link>
-              <Nav.Link as={Link} to="/cms/flash-info" active={isActive('/cms/flash-info')} onClick={handleNavClick}>
-                <FaBolt className="me-1" />
-                Flash Info
-              </Nav.Link>
-              <Nav.Link as={Link} to="/cms/faqs" active={isActive('/cms/faqs')} onClick={handleNavClick}>
-                <FaQuestionCircle className="me-1" />
-                FAQs
-              </Nav.Link>
+              {canAccessRoute(user?.role as any, '/cms') && (
+                <Nav.Link as={Link} to="/cms" active={isActive('/cms')} onClick={handleNavClick}>
+                  <FaChartBar className="me-1" />
+                  Dashboard
+                </Nav.Link>
+              )}
+              {canAccessRoute(user?.role as any, '/cms/products') && (
+                <Nav.Link as={Link} to="/cms/products" active={isActive('/cms/products')} onClick={handleNavClick}>
+                  <FaBox className="me-1" />
+                  Products
+                </Nav.Link>
+              )}
+              {canAccessRoute(user?.role as any, '/cms/orders') && (
+                <Nav.Link as={Link} to="/cms/orders" active={isActive('/cms/orders')} onClick={handleNavClick}>
+                  <FaShoppingCart className="me-1" />
+                  Orders
+                  {newOrdersCount > 0 && (
+                    <Badge bg="success" className="ms-2" pill>
+                      {newOrdersCount}
+                    </Badge>
+                  )}
+                </Nav.Link>
+              )}
+              {canAccessRoute(user?.role as any, '/cms/contacts') && (
+                <Nav.Link as={Link} to="/cms/contacts" active={isActive('/cms/contacts')} onClick={handleNavClick}>
+                  <FaEnvelope className="me-1" />
+                  Contacts
+                  {newContactsCount > 0 && (
+                    <Badge bg="info" className="ms-2" pill>
+                      {newContactsCount}
+                    </Badge>
+                  )}
+                </Nav.Link>
+              )}
+              {canAccessRoute(user?.role as any, '/cms/wholesale') && (
+                <Nav.Link as={Link} to="/cms/wholesale" active={isActive('/cms/wholesale')} onClick={handleNavClick}>
+                  <FaHandshake className="me-1" />
+                  Wholesale
+                  {newWholesaleCount > 0 && (
+                    <Badge bg="warning" className="ms-2" pill>
+                      {newWholesaleCount}
+                    </Badge>
+                  )}
+                </Nav.Link>
+              )}
+              {canAccessRoute(user?.role as any, '/cms/stock') && (
+                <Nav.Link as={Link} to="/cms/stock" active={isActive('/cms/stock')} onClick={handleNavClick}>
+                  <FaWarehouse className="me-1" />
+                  Stock
+                  {stockAlertsCount > 0 && (
+                    <Badge bg="danger" className="ms-2" pill>
+                      {stockAlertsCount}
+                    </Badge>
+                  )}
+                </Nav.Link>
+              )}
+              {canAccessRoute(user?.role as any, '/cms/testimonials') && (
+                <Nav.Link as={Link} to="/cms/testimonials" active={isActive('/cms/testimonials')} onClick={handleNavClick}>
+                  <FaStar className="me-1" />
+                  Testimonials
+                </Nav.Link>
+              )}
+              {canAccessRoute(user?.role as any, '/cms/flash-info') && (
+                <Nav.Link as={Link} to="/cms/flash-info" active={isActive('/cms/flash-info')} onClick={handleNavClick}>
+                  <FaBolt className="me-1" />
+                  Flash Info
+                </Nav.Link>
+              )}
+              {canAccessRoute(user?.role as any, '/cms/faqs') && (
+                <Nav.Link as={Link} to="/cms/faqs" active={isActive('/cms/faqs')} onClick={handleNavClick}>
+                  <FaQuestionCircle className="me-1" />
+                  FAQs
+                </Nav.Link>
+              )}
+              {canAccessRoute(user?.role as any, '/cms/admin-users') && (
+                <Nav.Link as={Link} to="/cms/admin-users" active={isActive('/cms/admin-users')} onClick={handleNavClick}>
+                  <FaUser className="me-1" />
+                  Users
+                </Nav.Link>
+              )}
             </Nav>
             <Nav>
               <NavDropdown title={
@@ -361,6 +387,11 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({ children }) => {
                   {user?.role === 'admin' && <Badge bg="danger" className="ms-2">Admin</Badge>}
                 </>
               } id="user-dropdown">
+                <NavDropdown.Item as={Link} to="/cms/profile" onClick={handleNavClick}>
+                  <FaUser className="me-2" />
+                  Profile
+                </NavDropdown.Item>
+                <NavDropdown.Divider />
                 <NavDropdown.Item onClick={handleLogout}>
                   <FaSignOutAlt className="me-2" />
                   Logout

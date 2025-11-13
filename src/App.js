@@ -20,6 +20,8 @@ import { CMSStock } from "./Pages/CMS/CMSStock";
 import { CMSTestimonials } from "./Pages/CMS/CMSTestimonials";
 import { CMSFlashInfo } from "./Pages/CMS/CMSFlashInfo";
 import { CMSFAQs } from "./Pages/CMS/CMSFAQs";
+import { CMSProfile } from "./Pages/CMS/CMSProfile";
+import { CMSAdminUsers } from "./Pages/CMS/CMSAdminUsers";
 import { PublicRoutes } from "./Pages/PublicRoutes";
 
 function GlobalCart() {
@@ -141,6 +143,22 @@ function App() {
             element={
               <CMSProtectedRoute>
                 <CMSFAQs />
+              </CMSProtectedRoute>
+            }
+          />
+          <Route
+            path="/cms/profile"
+            element={
+              <CMSProtectedRoute>
+                <CMSProfile />
+              </CMSProtectedRoute>
+            }
+          />
+          <Route
+            path="/cms/admin-users"
+            element={
+              <CMSProtectedRoute>
+                <CMSAdminUsers />
               </CMSProtectedRoute>
             }
           />

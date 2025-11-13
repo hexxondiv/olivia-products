@@ -130,7 +130,8 @@ function handleGet() {
 
 function handlePost() {
     // Require authentication
-    requireRole(['admin', 'manager']);
+    // Only admin and support can manage FAQs
+    requireRole(['admin', 'support']);
     
     global $data;
     
@@ -182,7 +183,8 @@ function handlePost() {
 
 function handlePut() {
     // Require authentication
-    requireRole(['admin', 'manager']);
+    // Only admin and support can manage FAQs
+    requireRole(['admin', 'support']);
     
     global $data;
     $id = isset($_GET['id']) ? (int)$_GET['id'] : null;

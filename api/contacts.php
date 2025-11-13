@@ -152,7 +152,8 @@ function handleGet() {
 
 function handlePut() {
     // Require authentication
-    requireRole(['admin', 'manager']);
+    // All roles can reply to contacts
+    requireRole(['admin', 'sales', 'support']);
     
     global $data;
     $id = isset($_GET['id']) ? (int)$_GET['id'] : null;

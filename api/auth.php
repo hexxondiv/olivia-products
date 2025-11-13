@@ -4,6 +4,7 @@
  * POST /api/auth.php - Login
  * POST /api/auth.php?action=logout - Logout (requires auth)
  * GET  /api/auth.php?action=me - Get current user (requires auth)
+ * PUT  /api/auth.php?action=profile - Update profile (name and/or password, requires auth)
  */
 
 ob_start();
@@ -13,7 +14,7 @@ ini_set('log_errors', 1);
 
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Methods: GET, POST, PUT, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
 ob_clean();
@@ -44,6 +45,9 @@ try {
     } elseif ($method === 'POST' && $action === 'logout') {
         // Logout
         handleLogout();
+    } elseif ($method === 'PUT' && $action === 'profile') {
+        // Update profile
+        handleUpdateProfile();
     } else {
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'Invalid request']);
@@ -101,6 +105,77 @@ function handleLogout() {
     echo json_encode([
         'success' => true,
         'message' => 'Logged out successfully'
+    ]);
+}
+
+function handleUpdateProfile() {
+    global $data;
+    $user = requireAuth();
+    
+    if (!$data) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'No data provided']);
+        return;
+    }
+    
+    $updates = [];
+    $params = [];
+    
+    // Update full name if provided
+    if (isset($data['fullName']) && !empty(trim($data['fullName']))) {
+        $updates[] = "fullName = ?";
+        $params[] = trim($data['fullName']);
+    }
+    
+    // Update password if provided
+    if (isset($data['currentPassword']) && isset($data['newPassword'])) {
+        // Verify current password first
+        $currentUser = dbQueryOne(
+            "SELECT passwordHash FROM admin_users WHERE id = ?",
+            [$user['id']]
+        );
+        
+        if (!$currentUser || !password_verify($data['currentPassword'], $currentUser['passwordHash'])) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Current password is incorrect']);
+            return;
+        }
+        
+        // Validate new password
+        $newPassword = trim($data['newPassword']);
+        if (strlen($newPassword) < 6) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'New password must be at least 6 characters long']);
+            return;
+        }
+        
+        $updates[] = "passwordHash = ?";
+        $params[] = password_hash($newPassword, PASSWORD_DEFAULT);
+    }
+    
+    if (empty($updates)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'No valid updates provided']);
+        return;
+    }
+    
+    // Add user ID to params for WHERE clause
+    $params[] = $user['id'];
+    
+    // Build and execute update query
+    $sql = "UPDATE admin_users SET " . implode(', ', $updates) . " WHERE id = ?";
+    dbExecute($sql, $params);
+    
+    // Get updated user data
+    $updatedUser = dbQueryOne(
+        "SELECT id, username, email, fullName, role, isActive FROM admin_users WHERE id = ?",
+        [$user['id']]
+    );
+    
+    echo json_encode([
+        'success' => true,
+        'message' => 'Profile updated successfully',
+        'user' => $updatedUser
     ]);
 }
 

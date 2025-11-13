@@ -133,6 +133,23 @@ CREATE TABLE IF NOT EXISTS contact_submissions (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Admin Users Table (for CMS authentication)
+-- Roles table (must be created before admin_users)
+CREATE TABLE IF NOT EXISTS roles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) UNIQUE NOT NULL,
+    description VARCHAR(255),
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_name (name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Insert default roles
+INSERT INTO roles (name, description) VALUES
+('admin', 'Administrator with full access'),
+('sales', 'Sales team member'),
+('support', 'Customer support team member')
+ON DUPLICATE KEY UPDATE name=name;
+
 -- Created before contact_replies because contact_replies has a foreign key to admin_users
 CREATE TABLE IF NOT EXISTS admin_users (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -140,13 +157,16 @@ CREATE TABLE IF NOT EXISTS admin_users (
     email VARCHAR(255) UNIQUE NOT NULL,
     passwordHash VARCHAR(255) NOT NULL,
     fullName VARCHAR(255),
-    role ENUM('admin', 'manager', 'staff') DEFAULT 'staff',
+    role ENUM('admin', 'manager', 'staff') DEFAULT 'staff',  -- Kept for backward compatibility
+    roleId INT NOT NULL,  -- References roles table
     isActive BOOLEAN DEFAULT TRUE,
     lastLogin TIMESTAMP NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_username (username),
-    INDEX idx_email (email)
+    INDEX idx_email (email),
+    INDEX idx_roleId (roleId),
+    FOREIGN KEY (roleId) REFERENCES roles(id) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Contact Replies Table (stores all replies sent to contact submissions)
@@ -281,11 +301,49 @@ INSERT IGNORE INTO testimonials (name, comment, rating, backgroundColor, display
 ('Adeola Olaiya', 'Excellent! Will definitely buy again.', 5, '#fde2e4', 3, TRUE),
 ('Muhammad Usman', 'Very helpful customer support.', 4, '#dbeafe', 4, TRUE);
 
+-- FAQs Table (for published FAQ items)
+-- Must be created after admin_users (has foreign key to admin_users)
+CREATE TABLE IF NOT EXISTS faqs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    question TEXT NOT NULL,
+    answer TEXT NOT NULL,
+    backgroundColor VARCHAR(7) DEFAULT '#f5f7fa',
+    displayOrder INT DEFAULT 0,
+    isActive BOOLEAN DEFAULT TRUE,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_isActive (isActive),
+    INDEX idx_displayOrder (displayOrder),
+    FULLTEXT idx_search (question, answer)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Submitted Questions Table (for questions submitted by users)
+-- Must be created after admin_users (has foreign key to admin_users)
+CREATE TABLE IF NOT EXISTS submitted_questions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    question TEXT NOT NULL,
+    email VARCHAR(255),
+    name VARCHAR(255),
+    phone VARCHAR(50),
+    status ENUM('pending', 'answered', 'archived') DEFAULT 'pending',
+    answer TEXT NULL,
+    answeredBy INT NULL,
+    answeredAt TIMESTAMP NULL,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (answeredBy) REFERENCES admin_users(id) ON DELETE SET NULL,
+    INDEX idx_status (status),
+    INDEX idx_createdAt (createdAt),
+    INDEX idx_email (email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Create default admin user (password: admin123 - CHANGE THIS!)
 -- Note: Use seed-admin.php to create/update admin user with proper password hash
 -- This INSERT will create the user if it doesn't exist, but won't update password if user exists
 -- Run: php api/seed-admin.php to ensure password hash is correct
-INSERT INTO admin_users (username, email, passwordHash, fullName, role) 
-VALUES ('admin', 'admin@celineolivia.com', '$2y$12$GnPmpJfz7JNR1bIuTGW/yudJ9VY5e0Uk0ypIJYCo8TpZ91EX/J/3W', 'Administrator', 'admin')
+-- Get admin role ID for the foreign key
+SET @admin_role_id = (SELECT id FROM roles WHERE name = 'admin' LIMIT 1);
+INSERT INTO admin_users (username, email, passwordHash, fullName, role, roleId) 
+VALUES ('admin', 'admin@celineolivia.com', '$2y$12$GnPmpJfz7JNR1bIuTGW/yudJ9VY5e0Uk0ypIJYCo8TpZ91EX/J/3W', 'Administrator', 'admin', @admin_role_id)
 ON DUPLICATE KEY UPDATE username=username;
 

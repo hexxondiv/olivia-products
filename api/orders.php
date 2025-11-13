@@ -245,7 +245,8 @@ function handleGet() {
 
 function handlePut() {
     // Require authentication
-    requireRole(['admin', 'manager']);
+    // Only admin and sales can update orders
+    requireRole(['admin', 'sales']);
     
     global $data;
     $orderId = isset($_GET['id']) ? $_GET['id'] : null;
