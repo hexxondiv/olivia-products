@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { SEO } from "../../Components/SEO/SEO";
 
 import Product1 from "../../assets/images/product1.avif";
 import Product2 from "../../assets/images/product2.avif";
@@ -84,7 +85,15 @@ export const About = () => {
   const paragraphsRef = useRef([]);
 
   return (
-    <div className="home-div">
+    <>
+      <SEO
+        title="About Us"
+        description="Olivia Products Nigeria Ltd is one of the largest manufacturer and distributor of Laundry, Hygiene and Hair Care products in Nigeria. Established in 2009, with over 15 years of operations in Lagos."
+        keywords="Olivia Products, about Olivia Fresh, manufacturing Nigeria, laundry products manufacturer, hygiene products Nigeria, company history, Lagos manufacturing"
+        url="/about-us"
+        type="website"
+      />
+      <div className="home-div">
       {/* Video Section */}
       <div className="banner">
         <div className="col-md-5 offset-md-2">
@@ -264,5 +273,6 @@ export const About = () => {
         <FactTab tabs={tabs} />
       </div>
     </div>
+    </>
   );
 };

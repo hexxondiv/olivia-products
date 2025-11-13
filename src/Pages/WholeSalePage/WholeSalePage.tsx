@@ -4,6 +4,7 @@ import Logo from "../../assets/images/logo.png";
 import { Row, Col, Alert } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { FaWhatsapp } from "react-icons/fa";
+import { SEO } from "../../Components/SEO/SEO";
 
 interface Option {
   id: string;
@@ -436,7 +437,15 @@ export const WholeSalePage: React.FC = () => {
   };
 
   return (
-    <div className="app-form-cover">
+    <>
+      <SEO
+        title="Wholesale & Distribution"
+        description="Become an approved wholesale partner with Olivia Products. Join our network of distributors and retailers across Nigeria. Apply for wholesale pricing and distribution opportunities."
+        keywords="Olivia Products wholesale, wholesale application, distribution partners, bulk orders, retailer application, Nigeria wholesale"
+        url="/wholesale-page"
+        type="website"
+      />
+      <div className="app-form-cover">
       <div className="wholesale-page col-md-6 offset-md-3">
         <form ref={formRef} onSubmit={handleSubmit}>
           <div className="col-md-2 col-4">
@@ -828,5 +837,6 @@ export const WholeSalePage: React.FC = () => {
         </form>
       </div>
     </div>
+    </>
   );
 };

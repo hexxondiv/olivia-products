@@ -6,6 +6,7 @@ import "./collection.scss";
 import SelectDrop from "../../Components/SelectDrop/SelectDrop";
 import PurchaseType from "../../Components/PurchaseType/PurchaseType";
 import { useProducts } from "../../ProductsContext";
+import { SEO } from "../../Components/SEO/SEO";
 
 export const Collections: React.FC = () => {
   const location = useLocation();
@@ -47,7 +48,15 @@ export const Collections: React.FC = () => {
   const itemCount = filteredProducts.length;
 
   return (
-    <div className="col-md-12 collection-section line">
+    <>
+      <SEO
+        title={rawCategory ? `${categoryHeading} - Collections` : "Shop All Products - Collections"}
+        description={categoryIntro}
+        keywords={`${categoryHeading}, ${rawCategory || 'all products'}, Olivia Fresh, ${rawCategory ? rawCategory + ' collection' : 'product collections'}, Nigeria, buy online`}
+        url={`/collections${rawCategory ? `?category=${encodeURIComponent(rawCategory)}` : ''}`}
+        type="website"
+      />
+      <div className="col-md-12 collection-section line">
       <h2>{categoryHeading}</h2>
 
       <p className="col-md-5 animate-charcter lineUp">{categoryIntro}</p>
@@ -115,5 +124,6 @@ export const Collections: React.FC = () => {
         purchaseType={purchaseType}
       />
     </div>
+    </>
   );
 };

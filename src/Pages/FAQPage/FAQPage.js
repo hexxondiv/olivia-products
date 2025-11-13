@@ -4,6 +4,7 @@ import { IoSearch } from "react-icons/io5";
 import { FaArrowRight } from "react-icons/fa6";
 import AskQuestion from "./AskQuestion";
 import Questions from "./Questions";
+import { SEO } from "../../Components/SEO/SEO";
 const faqs = [
   {
     question: "How can I track my order?",
@@ -66,7 +67,15 @@ const faqs = [
 ];
 export const FAQPage = () => {
   return (
-    <div className="faq-div ">
+    <>
+      <SEO
+        title="Frequently Asked Questions"
+        description="Find answers to common questions about Olivia Fresh products, ordering, shipping, returns, and more. Get help with your questions about our laundry, hygiene, and hair care products."
+        keywords="Olivia Fresh FAQ, frequently asked questions, product questions, shipping questions, return policy, customer support"
+        url="/faqs"
+        type="website"
+      />
+      <div className="faq-div ">
       <div className="faq-banner d-md-flex">
         <div className="col-md-8">
           <h1>
@@ -110,5 +119,6 @@ export const FAQPage = () => {
         ))}
       </div>
     </div>
+    </>
   );
 };

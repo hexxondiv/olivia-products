@@ -9,6 +9,7 @@ import { Desktop, TabletAndBelow } from "../../Utils/mediaQueries";
 import { Spinner, Alert } from "react-bootstrap";
 import { ProductReviews } from "./ProductReviews";
 import { ReviewForm } from "./ReviewForm";
+import { SEO } from "../../Components/SEO/SEO";
 
 const PRODUCT_DETAIL_BASE = "/product";
 
@@ -268,8 +269,33 @@ export const ViewProductPage: React.FC = () => {
     return null;
   };
 
+  const productName = product ? formatProductName() : "";
+  const productDescription = product?.detail || product?.moreDetail || `Shop ${productName} from Olivia Fresh. Premium quality ${product?.category?.[0] || 'product'} available in Nigeria.`;
+  const productPrice = product ? calculatePriceForQuantity(product, 1) : 0;
+  const productImage = product?.firstImg || '/assets/images/logo512.png';
+  const productCategory = product?.category?.[0] || '';
+
   return (
     <>
+      {product && (
+        <SEO
+          title={productName}
+          description={productDescription}
+          keywords={`${productName}, Olivia Fresh, ${productCategory}, ${product?.category?.join(', ') || ''}, Nigeria, buy online`}
+          image={productImage}
+          url={`/product/${product.id}`}
+          type="product"
+          product={{
+            name: productName,
+            price: productPrice,
+            currency: 'NGN',
+            availability: isAvailable() ? 'InStock' : 'OutOfStock',
+            brand: 'Olivia Fresh',
+            category: productCategory,
+          }}
+          canonical={`https://celineolivia.com/product/${product.id}`}
+        />
+      )}
       <div className="product-detail d-md-flex col-md-10 offset-md-1">
         <TabletAndBelow> {primaryCategory && (
             <div className="mt-3 all-sections">

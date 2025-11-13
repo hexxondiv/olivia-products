@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./contact-us.scss";
 import { FaPaperclip, FaWhatsapp } from "react-icons/fa"; // Using an icon from react-icons
 import Hero from "../../assets/images/contact-icons.png";
+import { SEO } from "../../Components/SEO/SEO";
 
 import { Col, Row, Alert } from "react-bootstrap";
 export const ContactUs = () => {
@@ -187,6 +188,14 @@ export const ContactUs = () => {
   };
 
   return (
+    <>
+      <SEO
+        title="Contact Us"
+        description="Get in touch with Olivia Fresh. Contact us for inquiries about our laundry, hygiene, and hair care products. We're here to help with customer service, wholesale inquiries, and product information."
+        keywords="contact Olivia Fresh, customer service, product inquiries, wholesale contact, Nigeria, Olivia Products support"
+        url="/contact-us"
+        type="website"
+      />
     <div className="col-md-12">
       <div className="contact-hero d-flex">
         <h1 className="offset-md-1">Contact Us</h1>
@@ -326,5 +335,6 @@ export const ContactUs = () => {
         ></iframe>
       </div>
     </div>
+    </>
   );
 };

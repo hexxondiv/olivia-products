@@ -1,6 +1,7 @@
 import React from "react";
 import "./our-mission.scss";
 import LogoAnime from "../../assets/images/logo-anime.gif";
+import { SEO } from "../../Components/SEO/SEO";
 import MissionImg from "../../assets/images/mission-img.avif";
 import Flower1 from "../../assets/images/flower.jpg";
 import Flower2 from "../../assets/images/flower2.jpeg";
@@ -45,7 +46,15 @@ export const OurMission = () => {
   ];
 
   return (
-    <div className="home-div">
+    <>
+      <SEO
+        title="Our Mission & Impact"
+        description="Olivia Products is dedicated to making a difference through Oliviacare. We focus on empowering youth, nurturing talent, and supporting education to help build brighter futures in Nigeria."
+        keywords="Olivia Products mission, Oliviacare, community impact, youth empowerment, education support, corporate social responsibility, Nigeria"
+        url="/our-mission"
+        type="website"
+      />
+      <div className="home-div">
       <div className="mission-landing">
         <h1 className="col-md-4 offset-md-2">Our Mission & Impact</h1>
       </div>
@@ -224,5 +233,6 @@ export const OurMission = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };

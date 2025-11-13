@@ -19,13 +19,22 @@ import FBSocials from "./FBSocials";
 import TwitterHandle from "./TwitterHandle/TwitterHandle";
 import YouTube from "./Youtube";
 import SampleSlide from "./ProductsSlide/ProductsSlide";
+import { SEO } from "../../Components/SEO/SEO";
 const OPTIONS = { loop: true };
 const SLIDE_COUNT = 5;
 const SLIDES = Array.from(Array(SLIDE_COUNT).keys());
 
 export const Home = () => {
   return (
-    <div className="home-div">
+    <>
+      <SEO
+        title="Home"
+        description="One of the largest manufacturer and distributor of Laundry, Hygiene and Hair Care products in Nigeria. Shop premium quality products including hair care, skin care, dish wash, fabric cleaner, and more."
+        keywords="Olivia Fresh, laundry products, hygiene products, hair care, Nigeria, fabric cleaner, dish wash, car wash, air fresheners, cleaning products, best sellers"
+        url="/"
+        type="website"
+      />
+      <div className="home-div">
       <HomeSlide />
       <FlashInfoModal />
 
@@ -158,5 +167,6 @@ export const Home = () => {
       </center>
       <TestimonialCarousel />
     </div>
+    </>
   );
 };

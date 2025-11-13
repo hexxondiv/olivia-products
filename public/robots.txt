@@ -1,3 +1,27 @@
 # https://www.robotstxt.org/robotstxt.html
+# Robots.txt for Olivia Fresh - celineolivia.com
+
+# Allow all search engines
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /cms/
+Disallow: /api/
+Disallow: /checkout
+Disallow: /order-success
+
+# Allow important pages
+Allow: /
+Allow: /collections
+Allow: /product/
+Allow: /about-us
+Allow: /contact-us
+Allow: /faqs
+Allow: /our-mission
+Allow: /careers
+Allow: /wholesale-page
+
+# Sitemap location
+Sitemap: https://celineolivia.com/sitemap.xml
+
+# Crawl-delay (optional, adjust as needed)
+Crawl-delay: 1

@@ -1,9 +1,18 @@
 import React from "react";
 import "./careers.scss";
+import { SEO } from "../../Components/SEO/SEO";
 
 export const Careers = () => {
   return (
-    <div className="home-div">
+    <>
+      <SEO
+        title="Careers"
+        description="Join the Olivia Products team. Build your career with one of Nigeria's leading manufacturers of consumer care products. We offer growth opportunities, competitive benefits, and a dynamic work environment."
+        keywords="Olivia Products careers, jobs Nigeria, manufacturing careers, consumer products jobs, Lagos jobs, career opportunities"
+        url="/careers"
+        type="website"
+      />
+      <div className="home-div">
       <div className="careers-landing">
         <h1 className="col-md-4 offset-md-2">Join Our Team</h1>
       </div>
@@ -106,6 +115,7 @@ export const Careers = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
