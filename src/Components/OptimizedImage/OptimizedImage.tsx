@@ -131,6 +131,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     ...style,
     objectFit,
     transition: 'opacity 0.3s ease-in-out',
+    // Opacity for fade-in effect (can be overridden by CSS classes with !important)
     opacity: isLoaded ? 1 : 0,
   };
 
@@ -142,34 +143,37 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
         position: 'relative',
         width: width || '100%',
         height: height || 'auto',
-        backgroundColor: '#f0f0f0',
+        backgroundColor: isLoaded ? '#000000' : '#f0f0f0', // Use black after image loads
         overflow: 'hidden',
+        transition: 'background-color 0.3s ease-in-out',
+        ...style, // Merge custom styles to allow absolute positioning
       }}
       onClick={onClick}
     >
-      {/* Loading placeholder */}
+      {/* Loading skeleton */}
       {!isLoaded && !hasError && (
         <div
+          className="skeleton-loader"
           style={{
             position: 'absolute',
             top: 0,
             left: 0,
             width: '100%',
             height: '100%',
-            backgroundColor: '#f0f0f0',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            backgroundColor: '#f0f0f0', // Light gray base for skeleton
+            overflow: 'hidden',
           }}
         >
           <div
+            className="skeleton-shimmer"
             style={{
-              width: '40px',
-              height: '40px',
-              border: '3px solid #e0e0e0',
-              borderTop: '3px solid #7bbd21',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite',
+              position: 'absolute',
+              top: 0,
+              left: '-100%',
+              width: '100%',
+              height: '100%',
+              background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent)',
+              animation: 'shimmer 1.5s infinite',
             }}
           />
         </div>
@@ -184,7 +188,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
             left: 0,
             width: '100%',
             height: '100%',
-            backgroundColor: '#f0f0f0',
+            backgroundColor: '#000000', // Use black for error state
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -216,9 +220,13 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
       )}
 
       <style>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
+        @keyframes shimmer {
+          0% {
+            left: -100%;
+          }
+          100% {
+            left: 100%;
+          }
         }
       `}</style>
     </div>

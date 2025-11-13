@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../../CartContext";
 import { useProducts } from "../../ProductsContext";
 import { calculatePriceForQuantity } from "../../Utils/pricingUtils";
+import { OptimizedImage } from "../OptimizedImage/OptimizedImage";
 import "./cart-list.scss";
 import { MdDelete } from "react-icons/md";
 import { BiSearch } from "react-icons/bi";
@@ -238,10 +239,15 @@ const CartOffcanvas: React.FC = () => {
                   className="item-list-content"
                   style={{ textDecoration: "none", color: "inherit" }}
                 >
-                  <img
+                  <OptimizedImage
                     className="item-image"
                     src={item.firstImg}
                     alt={formatProductName(item)}
+                    width="70px"
+                    height="70px"
+                    objectFit="cover"
+                    loading="lazy"
+                    priority={false}
                   />
                   <div className="item-details">
                     <p className="item-name">{formatProductName(item)}</p>

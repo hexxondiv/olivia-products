@@ -30,16 +30,16 @@
   }
 
   .hidden {
-    opacity: 0;
+    opacity: 0 !important;
   }
 
   .visible {
-    opacity: 1;
+    opacity: 1 !important;
   }
   
   // Image zoom on hover
   .product-container:hover & .product-image {
-    transform: scale(1.5);
+    transform: scale(1.3);
   }
 }
 

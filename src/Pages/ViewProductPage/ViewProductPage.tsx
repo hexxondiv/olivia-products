@@ -21,7 +21,7 @@ export const ViewProductPage: React.FC = () => {
   const [transitionDirection, setTransitionDirection] = useState<"left" | "right">("right");
   const [quantity, setQuantity] = useState(1);
   const [reviewRefreshTrigger, setReviewRefreshTrigger] = useState(0);
-  const [isProductDetailsExpanded, setIsProductDetailsExpanded] = useState(false);
+  const [isProductDetailsExpanded, setIsProductDetailsExpanded] = useState(true);
   const [productLoading, setProductLoading] = useState(false);
   const [productError, setProductError] = useState<string | null>(null);
   const [directProduct, setDirectProduct] = useState<any>(null);
@@ -116,7 +116,7 @@ export const ViewProductPage: React.FC = () => {
 
   useEffect(() => {
     setActiveImage(0);
-    setIsProductDetailsExpanded(false);
+    setIsProductDetailsExpanded(true);
     // Sync quantity with cart item if it exists
     if (product) {
       const cartItem = cart.find((item) => item.id === product.id);

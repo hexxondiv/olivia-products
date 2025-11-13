@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useCart } from "../../CartContext";
 import { useProducts } from "../../ProductsContext";
 import { calculatePriceForQuantity, getPricingTier } from "../../Utils/pricingUtils";
+import { OptimizedImage } from "../../Components/OptimizedImage/OptimizedImage";
 import "./checkout-page.scss";
 import { MdDelete, MdEmail } from "react-icons/md";
 import { FaWhatsapp } from "react-icons/fa";
@@ -742,10 +743,15 @@ export const CheckoutPage: React.FC = () => {
                 {cart.map((item) => (
                   <div key={item.id} className="order-item">
                     <div className="item-image-wrapper">
-                      <img
+                      <OptimizedImage
                         src={item.firstImg}
                         alt={formatProductName(item)}
                         className="item-image"
+                        width="100%"
+                        height="100%"
+                        objectFit="cover"
+                        loading="lazy"
+                        priority={false}
                       />
                     </div>
                     <div className="item-details">

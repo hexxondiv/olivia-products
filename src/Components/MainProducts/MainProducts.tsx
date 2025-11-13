@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Offcanvas, Badge } from "react-bootstrap"; // Assuming you're using Bootstrap's Offcanvas component
 import { Link } from "react-router-dom";
 import { Desktop } from "../../Utils/mediaQueries";
+import { OptimizedImage } from "../OptimizedImage/OptimizedImage";
 import "./main-product.scss";
 
 // Star Rating Component
@@ -134,18 +135,40 @@ const MainProduct: React.FC<ProductProps> = ({
             </div>
           )}
           {" "}
-          <img
-            className={`product-image ${isHovered ? "hidden" : "visible"}`}
+          <OptimizedImage
             src={firstImg}
-            alt="Product"
+            alt={`${productName} - Product`}
+            className={`product-image ${isHovered ? "hidden" : "visible"}`}
             width="100%"
+            height="100%"
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+            }}
+            objectFit="contain"
+            loading="lazy"
+            priority={false}
           />
           <Link to={`/product/${id}`}>
-            <img
-              className={`product-image ${isHovered ? "visible" : "hidden"}`}
+            <OptimizedImage
               src={hoverImg}
-              alt="Product Hover"
+              alt={`${productName} - Product Hover`}
+              className={`product-image ${isHovered ? "visible" : "hidden"}`}
               width="100%"
+              height="100%"
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+              }}
+              objectFit="contain"
+              loading="lazy"
+              priority={false}
             />
           </Link>
         </div>

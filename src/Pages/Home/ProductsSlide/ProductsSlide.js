@@ -5,12 +5,8 @@ import Product2 from "../../../assets/images/hand-group-no-bg.png";
 import Product3 from "../../../assets/images/dish-group-no-bg.png";
 import Product4 from "../../../assets/images/car-group-no-bg.png";
 import Product5 from "../../../assets/images/liquid-no-bg.png";
-import Bg from "../../../assets/images/flower5.jpg";
-import Bg2 from "../../../assets/images/flower2.jpeg";
-import Bg3 from "../../../assets/images/flower4.webp";
-import Bg4 from "../../../assets/images/flower-bg.jpg";
+import Bg3 from "../../../assets/images/f.jpg";
 import "./products-slide.scss";
-const backgrounds = [Bg4, Bg2, Bg, Bg3, Bg2];
 // const backgrounds = [];
 const images = [Product1, Product2, Product3, Product4, Product5];
 const ProductsSlide = () => {
@@ -74,7 +70,7 @@ const ProductsSlide = () => {
                 backgroundRepeat: "no-repeat",
                 backgroundSize: "cover",
                 backgroundImage: `url(${
-                  backgrounds[index % backgrounds.length]
+                  Bg3
                 })`,
               }}
             >
