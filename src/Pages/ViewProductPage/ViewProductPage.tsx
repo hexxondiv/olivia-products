@@ -257,20 +257,18 @@ export const ViewProductPage: React.FC = () => {
 
             <button
               className="prev-arrow"
-              style={{ height: 40, width: 40, fontSize: 14 }}
               onClick={() => setActiveImage((prev) => (prev - 1 + images.length) % images.length)}
               aria-label="Previous image"
             >
-              &#10094;
+              <span className="arrow-icon">←</span>
             </button>
 
             <button
               className="next-arrow"
-              style={{ height: 40, width: 40, fontSize: 14 }}
               onClick={() => setActiveImage((prev) => (prev + 1) % images.length)}
               aria-label="Next image"
             >
-              &#10095;
+              <span className="arrow-icon">→</span>
             </button>
           </div>
         </div>
