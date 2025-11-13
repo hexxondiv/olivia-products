@@ -1,6 +1,6 @@
 .banner {
   height: 500px;
-  background: url("../../assets/images/about-1.jpg");
+  background: url("../../assets/images/abt.png");
   background-repeat: no-repeat;
   background-size: cover;
   padding-top: 200px;
@@ -264,3 +264,35 @@ p {
     }
   }
  }
+
+// Our Story & Impact Section
+.our-story-impact-section {
+  width: 100%;
+  background: #EFF5FF;
+  padding-top: 120px;
+  padding-bottom: 60px;
+
+  @media (max-width: 768px) {
+    padding-top: 80px;
+    padding-bottom: 40px;
+  }
+
+  .our-story-impact-title {
+    font-family: sailecBold, sans-serif;
+    font-size: 48px;
+    color: #003057;
+    margin-bottom: 50px;
+    font-weight: bold;
+
+    @media (max-width: 768px) {
+      font-size: 32px;
+      margin-bottom: 30px;
+      padding: 0 15px;
+    }
+
+    @media (max-width: 576px) {
+      font-size: 28px;
+      margin-bottom: 25px;
+    }
+  }
+}

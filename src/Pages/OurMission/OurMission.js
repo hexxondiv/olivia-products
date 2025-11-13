@@ -24,7 +24,7 @@ const EducationSupportImg = "https://images.unsplash.com/photo-1580582932707-520
 // African youth in training/workshop - Youth Empowerment (Black youth)
 // Replace with actual image URL showing black/African youth in training
 // Recommended search: Unsplash "African youth" or Pexels "black youth training"
-const YouthEmpowermentImg = "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800&h=600&fit=crop&q=80";
+const YouthEmpowermentImg = "https://www.dbsa.org/sites/default/files/media/images/2022-06/Ways%20To%20Empower%20Our%20Youth%20to%20Ensure%20Africa%27s%20Ongoing%20Development.jpg";
 
 export const OurMission = () => {
   const communityImages = [
@@ -190,37 +190,6 @@ export const OurMission = () => {
         </div>
       </div>
 
-      <div className="galleries-section">
-        <div className="col-md-10 offset-md-2">
-          <h1 className="gallery-title">Community Impact Gallery</h1>
-          <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 galleries">
-            {communityImages.map((item, index) => (
-              <div key={index} className="col img-outer">
-                <div className="img-div">
-                  <img src={item.src} alt={item.title} />
-                </div>
-                <p><strong>{item.title}</strong></p>
-                <p className="img-description">{item.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* <div className="col-md-10 offset-md-2 mt-5">
-          <h1 className="gallery-title">Our Facilities & Operations</h1>
-          <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 galleries">
-            {facilityImages.map((item, index) => (
-              <div key={index} className="col img-outer">
-                <div className="img-div">
-                  <img src={item.src} alt={item.title} />
-                </div>
-                <p><strong>{item.title}</strong></p>
-                <p className="img-description">{item.description}</p>
-              </div>
-            ))}
-          </div>
-        </div> */}
-      </div>
 
       <div className="call-to-action-section">
         <div className="col-md-8 offset-md-2 text-center">

@@ -1,22 +1,165 @@
-.tab-content {
-  padding-top: 30px;
-@media screen and (max-width:820px){
-  padding-left:10px;
-}
-  .left-content {
-    padding-right: 10px;
+.fact-tab-container {
+  width: 100%;
+  padding: 40px 0;
+
+  // Tab Headers
+  .fact-tab-headers {
+    gap: 0;
+    margin-bottom: 20px;
+
+    @media (max-width: 768px) {
+      gap: 10px;
+      margin-bottom: 15px;
+    }
   }
-  .right-content {
-    padding-left: 10px;
-    // margin-top: 30px;
-  }
-  img {
-    border-radius: 10px;
-    z-index: -1;
+
+  .fact-tab-button {
+    padding: 12px 24px;
+    font-family: sailecBold, sans-serif;
+    border: none;
+    border-bottom: 3px solid transparent;
+    background-color: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 16px;
+    color: #333;
+    white-space: nowrap;
     position: relative;
+
+    @media (max-width: 768px) {
+      padding: 10px 16px;
+      font-size: 14px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    &:hover {
+      color: #007bff;
+      border-bottom-color: rgba(0, 123, 255, 0.3);
+    }
+
+    &.active {
+      color: #007bff;
+      border-bottom-color: #007bff;
+      font-weight: bold;
+    }
   }
-  h6 {
-    margin-top: 40px;
+
+  // Divider
+  .fact-tab-divider {
+    width: 100%;
+    height: 2px;
+    background-color: #dee2e6;
+    margin: 20px 0 30px;
+
+    @media (max-width: 768px) {
+      margin: 15px 0 20px;
+    }
+  }
+
+  // Tab Content
+  .fact-tab-content {
+    padding-top: 30px;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+
+    &.fade-out {
+      opacity: 0;
+      transform: scale(0.98);
+    }
+
+    &.fade-in {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    @media (max-width: 768px) {
+      padding-top: 20px;
+    }
+  }
+
+  .fact-tab-image-wrapper {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+
+    @media (max-width: 768px) {
+      margin-bottom: 20px;
+    }
+  }
+
+  .fact-tab-image {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    object-fit: cover;
+    transition: transform 0.3s ease;
+
+    &:hover {
+      transform: scale(1.02);
+    }
+
+    @media (max-width: 768px) {
+      border-radius: 8px;
+      max-height: 300px;
+      object-fit: cover;
+    }
+  }
+
+  .fact-tab-text-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    @media (max-width: 768px) {
+      padding: 0 15px;
+    }
+  }
+
+  .fact-tab-heading {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-family: sailecBold, sans-serif;
+    font-size: 24px;
+    color: #003057;
     text-decoration: underline;
+    text-underline-offset: 8px;
+    line-height: 1.3;
+
+    @media (max-width: 768px) {
+      font-size: 20px;
+      margin-bottom: 12px;
+      text-underline-offset: 6px;
+    }
+
+    &:first-child {
+      margin-top: 0;
+    }
+
+    &:not(:first-child) {
+      margin-top: 30px;
+
+      @media (max-width: 768px) {
+        margin-top: 25px;
+      }
+    }
+  }
+
+  .fact-tab-description {
+    margin-bottom: 20px;
+    font-family: sailecRegular, sans-serif;
+    font-size: 16px;
+    color: #555;
+    line-height: 1.7;
+
+    @media (max-width: 768px) {
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 15px;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 }

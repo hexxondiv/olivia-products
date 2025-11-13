@@ -2,33 +2,33 @@
 @use "../../_variables" as *;
 
 .faq-div {
-  padding: $spacing-xl $spacing-md;
-  margin-top: $spacing-2xl;
+  padding: $spacing-lg $spacing-md;
+  margin-top: $spacing-xl;
 
   .faq-banner {
     background: $color-sky;
-    margin-top: $spacing-2xl;
-    padding: clamp($spacing-2xl, 5vw, $spacing-4xl) clamp($spacing-xl, 4vw, $spacing-3xl);
+    margin-top: $spacing-xl;
+    padding: clamp($spacing-lg, 3vw, $spacing-2xl) clamp($spacing-md, 3vw, $spacing-xl);
     border-radius: 1.75rem;
     box-shadow: $shadow-card;
     min-height: auto;
 
     @media (min-width: 768px) {
-      min-height: 400px;
+      min-height: 280px;
     }
 
     h1 {
-      font-size: clamp($font-size-2xl, 4vw, $font-size-4xl);
+      font-size: clamp($font-size-xl, 3vw, $font-size-3xl);
       font-family: $font-heading;
       color: $color-charcoal;
-      margin-bottom: $spacing-lg;
+      margin-bottom: $spacing-md;
       line-height: $line-height-tight;
     }
 
     p {
-      font-size: clamp($font-size-base, 2vw, $font-size-xl);
-      margin-top: $spacing-lg;
-      line-height: $line-height-relaxed;
+      font-size: clamp($font-size-sm, 1.5vw, $font-size-lg);
+      margin-top: $spacing-md;
+      line-height: $line-height-normal;
       color: $body-text-color;
     }
   }
@@ -73,13 +73,13 @@
   }
 
   .action-buttons {
-    margin-top: $spacing-2xl;
+    margin-top: $spacing-xl;
   }
 
   .question-btn {
-    min-height: 10px;
+    min-height: auto;
     border-radius: 2.25rem;
-    padding: $spacing-xl $spacing-xl;
+    padding: $spacing-md $spacing-lg;
     cursor: pointer;
     align-items: center;
     transition: all $transition-base;
@@ -101,7 +101,7 @@
     p,
     > span:first-child {
       margin: 0;
-      font-size: clamp($font-size-base, 1.5vw, $font-size-xl);
+      font-size: clamp($font-size-sm, 1.2vw, $font-size-base);
       flex-grow: 1;
       font-family: inherit;
       font-weight: inherit;
@@ -131,7 +131,7 @@
     border: 3px solid color.scale($color-indigo, $lightness: 20%);
     background: #fff;
     color: $color-indigo;
-    font-size: clamp($font-size-base, 1.5vw, $font-size-xl);
+    font-size: clamp($font-size-sm, 1.2vw, $font-size-base);
 
     &:hover {
       border-color: $color-indigo;
@@ -147,7 +147,7 @@
   .box-2 {
     background: $color-indigo;
     color: #fff;
-    font-size: clamp($font-size-base, 1.5vw, $font-size-xl);
+    font-size: clamp($font-size-sm, 1.2vw, $font-size-base);
 
     &:hover {
       background: color.scale($color-indigo, $lightness: -10%);
@@ -165,7 +165,7 @@
     color: #fff;
     border: none;
     justify-content:flex-start;
-    gap: 15%;
+    gap: $spacing-md;
     box-shadow: 0 4px 12px rgba(37, 211, 102, 0.25);
     position: relative;
     overflow: hidden;
@@ -205,7 +205,7 @@
     }
 
     .whatsapp-icon {
-      font-size: clamp($font-size-xl, 2vw, $font-size-2xl);
+      font-size: clamp($font-size-lg, 1.5vw, $font-size-xl);
       flex-shrink: 0;
       animation: pulse 2s ease-in-out infinite;
       position: relative;
@@ -214,7 +214,7 @@
     }
 
     .whatsapp-text {
-      font-size: clamp($font-size-base, 1.5vw, $font-size-xl);
+      font-size: clamp($font-size-sm, 1.2vw, $font-size-base);
       font-weight: 600;
       letter-spacing: 0.01em;
       position: relative;
@@ -222,7 +222,7 @@
       white-space: nowrap;
 
       @media (max-width: 576px) {
-        font-size: $font-size-base;
+        font-size: $font-size-sm;
         white-space: nowrap;
       }
     }
@@ -265,16 +265,16 @@
 
 .flip-card {
   background-color: transparent;
-  height: 200px;
+  height: 160px;
   perspective: 1000px;
   width: 100%;
 
   @media (min-width: 768px) {
-    height: 220px;
+    height: 170px;
   }
 
   @media (min-width: 992px) {
-    height: 240px;
+    height: 180px;
   }
 }
 
@@ -296,12 +296,12 @@
   position: absolute;
   width: 100%;
   height: 100%;
-  padding: $spacing-xl $spacing-lg;
+  padding: $spacing-md $spacing-sm;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  border-radius: 1.25rem;
+  border-radius: 1rem;
   box-shadow: $shadow-card;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
@@ -314,10 +314,10 @@
 
   h3 {
     font-family: $font-heading;
-    font-size: clamp($font-size-base, 2vw, $font-size-lg);
+    font-size: clamp($font-size-sm, 1.5vw, $font-size-base);
     color: inherit;
     margin: 0;
-    line-height: $line-height-tight;
+    line-height: 1.2;
   }
 }
 
@@ -328,13 +328,13 @@
 
   p {
     color: #fff !important;
-    font-size: clamp($font-size-sm, 1.5vw, $font-size-base);
+    font-size: clamp($font-size-xs, 1.2vw, $font-size-sm);
     margin: 0;
-    line-height: $line-height-relaxed;
+    line-height: $line-height-normal;
   }
 }
 
 .questions-cover {
-  margin: $spacing-4xl 0;
-  padding-top: $spacing-2xl;
+  margin: $spacing-2xl 0;
+  padding-top: $spacing-xl;
 }

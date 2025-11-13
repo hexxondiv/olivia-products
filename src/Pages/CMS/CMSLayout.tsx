@@ -13,7 +13,8 @@ import {
   FaExclamationTriangle,
   FaWarehouse,
   FaStar,
-  FaBolt
+  FaBolt,
+  FaQuestionCircle
 } from 'react-icons/fa';
 import { getApiUrl } from '../../Utils/apiConfig';
 import './cms-layout.scss';
@@ -347,6 +348,10 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({ children }) => {
               <Nav.Link as={Link} to="/cms/flash-info" active={isActive('/cms/flash-info')} onClick={handleNavClick}>
                 <FaBolt className="me-1" />
                 Flash Info
+              </Nav.Link>
+              <Nav.Link as={Link} to="/cms/faqs" active={isActive('/cms/faqs')} onClick={handleNavClick}>
+                <FaQuestionCircle className="me-1" />
+                FAQs
               </Nav.Link>
             </Nav>
             <Nav>

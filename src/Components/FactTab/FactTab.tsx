@@ -32,55 +32,49 @@ const FactTab: React.FC<{ tabs: Tab[] }> = ({ tabs }) => {
   };
 
   return (
-    <div style={{ width: "100%" }}>
+    <div className="fact-tab-container">
       {/* Tab Headers */}
-      <div
-        className="col-md-4 offset-md-4 d-md-flex"
-        style={{ display: "flex" }}
-      >
-        {tabs.map((tab, index) => (
-          <button
-            key={index}
-            onClick={() => handleTabClick(index)}
-            style={{
-              padding: "10px 20px",
-              fontFamily: "sailecBold",
-              border: "none",
-              borderBottom:
-                activeIndex === index ? "3px solid #007bff" : "none",
-              backgroundColor: "transparent",
-              cursor: "pointer",
-              transition: "all 0.7s ease",
-              fontWeight: activeIndex === index ? "bold" : "normal",
-            }}
-          >
-            {tab.label}
-          </button>
-        ))}
+      <div className="container">
+        <div className="row justify-content-center">
+          <div className="col-12 col-md-10 col-lg-8">
+            <div className="fact-tab-headers d-flex justify-content-center flex-wrap">
+              {tabs.map((tab, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleTabClick(index)}
+                  className={`fact-tab-button ${activeIndex === index ? "active" : ""}`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Tab Content */}
-      <div style={{ borderBottom: "2px solid #ccc" }} />
-      <div
-        className="col-md-4 offset-md-4 tab-content d-md-flex"
-        style={{
-          opacity: fade ? 0 : 1,
-          transform: fade ? "scale(0.95)" : "scale(1)",
-          transition: "opacity 0.7s ease, transform 0.7s ease",
-        }}
-      >
-        <div className="left-content">
-          <img
-            src={tabs[activeIndex].content.image}
-            alt={tabs[activeIndex].content.heading}
-            style={{ width: "100%", height: "auto", marginBottom: "15px" }}
-          />
-        </div>
-        <div className="right-content" style={{ flex: 1 }}>
-          <h6>{tabs[activeIndex].content.heading}</h6>
-          <p>{tabs[activeIndex].content.description}</p>{" "}
-          <h6>{tabs[activeIndex].content.heading2}</h6>
-          <p>{tabs[activeIndex].content.description2}</p>
+      <div className="fact-tab-divider"></div>
+      <div className="container">
+        <div className="row justify-content-center">
+          <div className="col-12 col-md-10 col-lg-8">
+            <div className={`fact-tab-content ${fade ? "fade-out" : "fade-in"}`}>
+              <div className="row g-4">
+                <div className="col-12 col-md-5 fact-tab-image-wrapper">
+                  <img
+                    src={tabs[activeIndex].content.image}
+                    alt={tabs[activeIndex].content.heading}
+                    className="fact-tab-image img-fluid"
+                  />
+                </div>
+                <div className="col-12 col-md-7 fact-tab-text-wrapper">
+                  <h6 className="fact-tab-heading">{tabs[activeIndex].content.heading}</h6>
+                  <p className="fact-tab-description">{tabs[activeIndex].content.description}</p>
+                  <h6 className="fact-tab-heading">{tabs[activeIndex].content.heading2}</h6>
+                  <p className="fact-tab-description">{tabs[activeIndex].content.description2}</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

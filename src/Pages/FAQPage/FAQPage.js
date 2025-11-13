@@ -1,72 +1,69 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./faq-page.scss";
 import { IoSearch } from "react-icons/io5";
 import { FaWhatsapp } from "react-icons/fa";
+import { Spinner } from "react-bootstrap";
 import AskQuestion from "./AskQuestion";
 import Questions from "./Questions";
 import { SEO } from "../../Components/SEO/SEO";
-const faqs = [
-  {
-    question: "How can I track my order?",
-    answer:
-      "You will receive a tracking number via email once your order ships.",
-    bg1: "#F2E7FF",
-  },
-  {
-    question: "What is your return policy?",
-    answer: "Our return policy lasts 30 days with a full refund.",
-    bg1: "#DEEAFF",
-  },
-  {
-    question: "Do you offer international shipping?",
-    answer: "Yes, we ship to over 50 countries worldwide.",
-    bg1: "#FFF2DF",
-  },
-  {
-    question: "How can I track my order?",
-    answer:
-      "You will receive a tracking number via email once your order ships.",
-    bg1: "#F2E7FF",
-  },
-  {
-    question: "Do you offer international shipping?",
-    answer: "Yes, we ship to over 50 countries worldwide.",
-    bg1: "#FFF2DF",
-  },
-  {
-    question: "What is your return policy?",
-    answer: "Our return policy lasts 30 days with a full refund.",
-    bg1: "#DEEAFF",
-  },
-  {
-    question: "How can I track my order?",
-    answer:
-      "You will receive a tracking number via email once your order ships.",
-    bg1: "#F2E7FF",
-  },
-  {
-    question: "What is your return policy?",
-    answer: "Our return policy lasts 30 days with a full refund.",
-    bg1: "#C0BFFF",
-  },
-  {
-    question: "What is your return policy?",
-    answer: "Our return policy lasts 30 days with a full refund.",
-    bg1: "#DEEAFF",
-  },
-  {
-    question: "What is your return policy?",
-    answer: "Our return policy lasts 30 days with a full refund.",
-    bg1: "#C0BFFF",
-  },
-  {
-    question: "Do you offer international shipping?",
-    answer: "Yes, we ship to over 50 countries worldwide.",
-    bg1: "#FFF2DF",
-  },
-];
+import { getApiUrl } from "../../Utils/apiConfig";
 
 export const FAQPage = () => {
+  const [faqs, setFaqs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredFaqs, setFilteredFaqs] = useState([]);
+
+  useEffect(() => {
+    fetchFAQs();
+  }, []);
+
+  useEffect(() => {
+    // Filter FAQs based on search term
+    if (!searchTerm.trim()) {
+      setFilteredFaqs(faqs);
+    } else {
+      const search = searchTerm.toLowerCase();
+      const filtered = faqs.filter(
+        (faq) =>
+          faq.question.toLowerCase().includes(search) ||
+          faq.answer.toLowerCase().includes(search)
+      );
+      setFilteredFaqs(filtered);
+    }
+  }, [searchTerm, faqs]);
+
+  const fetchFAQs = async () => {
+    try {
+      const apiUrl = getApiUrl();
+      const response = await fetch(`${apiUrl}/faqs.php?activeOnly=true`);
+      const data = await response.json();
+
+      if (data.success) {
+        // Map API data to component format
+        const formattedFaqs = (data.data || []).map((faq) => ({
+          question: faq.question,
+          answer: faq.answer,
+          bg1: faq.backgroundColor || "#f5f7fa",
+        }));
+        setFaqs(formattedFaqs);
+        setFilteredFaqs(formattedFaqs);
+      } else {
+        console.error("Failed to load FAQs");
+        // Fallback to empty array
+        setFaqs([]);
+        setFilteredFaqs([]);
+      }
+    } catch (err) {
+      console.error("Failed to load FAQs:", err);
+      // Fallback to empty array
+      setFaqs([]);
+      setFilteredFaqs([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleWhatsAppClick = () => {
     // Get WhatsApp number from environment variable, same as other pages
     const envWhatsApp = process.env.REACT_APP_SALES_WHATSAPP_NUMBER;
@@ -87,6 +84,10 @@ export const FAQPage = () => {
     
     // Open WhatsApp in new tab
     window.open(whatsappUrl, "_blank");
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
   };
 
   return (
@@ -114,12 +115,17 @@ export const FAQPage = () => {
               </div>
               <div className="offset-md-1 col-md-3 input-divd d-flex align-items-center">
                 <IoSearch className="icon" />
-                <input type="search" placeholder="Search" />
+                <input
+                  type="search"
+                  placeholder="Search"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                />
               </div>
             </div>
             <div className="row row-cols-1 row-cols-md-2 g-3 g-md-4 action-buttons">
               <div className="col">
-                <AskQuestion />
+                <AskQuestion onQuestionSubmitted={fetchFAQs} />
               </div>
               <div className="col">
                 <div className="d-flex question-btn whatsapp-btn" onClick={handleWhatsAppClick} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleWhatsAppClick(); } }}>
@@ -128,16 +134,27 @@ export const FAQPage = () => {
                 </div>
               </div>
             </div>
-            <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3 g-lg-4 questions-cover">
-              {faqs.map((faq, index) => (
-                <Questions
-                  key={index}
-                  question={faq.question}
-                  answer={faq.answer}
-                  bg1={faq.bg1}
-                />
-              ))}
-            </div>
+            {loading ? (
+              <div className="text-center py-5">
+                <Spinner animation="border" />
+              </div>
+            ) : filteredFaqs.length === 0 ? (
+              <div className="text-center py-5">
+                <p>No FAQs found{searchTerm ? ` matching "${searchTerm}"` : ""}.</p>
+              </div>
+            ) : (
+              <div className="row row-cols-1 row-cols-md-2 g-2 g-lg-3 questions-cover">
+                {filteredFaqs.map((faq, index) => (
+                  <div key={index} className="col">
+                    <Questions
+                      question={faq.question}
+                      answer={faq.answer}
+                      bg1={faq.bg1}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

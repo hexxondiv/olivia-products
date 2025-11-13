@@ -2,7 +2,7 @@
 -- Run this SQL to create the database and tables
 
 -- CREATE DATABASE IF NOT EXISTS olivia_products CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE celicoyh_olivia;
+USE olivia_products;
 
 -- Products Table
 CREATE TABLE IF NOT EXISTS products (

@@ -23,7 +23,7 @@ import Abt1 from "../../assets/images/abt1.avif";
 import Mission from "../../assets/images/mission.png";
 import Vision from "../../assets/images/vision.png";
 import Abt2 from "../../assets/images/abt2.avif";
-import Abt3 from "../../assets/images/abt3.avif";
+import Abt3 from "../../assets/images/vaseline-open.png";
 import "./about.scss";
 import { Link } from "react-router-dom";
 import FactTab from "../../Components/FactTab/FactTab";
@@ -61,7 +61,7 @@ const tabs = [
       heading2: "OUR IMPACT",
       description: "We are the leading manufacturer of petroleum jelly in Nigeria, with a diverse portfolio of premium brands.",
       description2:
-        "Our brands including Viva, Siri, Fizz, Oracare, Biotol, Sabil, Family Care, Baby & Me, Manuka & MP3 are trusted by millions. We continue to raise consumer satisfaction and market standards through innovation and world-class manufacturing practices.",
+        "Through our trusted brand portfolio including Family Care, Baby & Me, Hair Care, Skin Care, Dish Wash, Fabric Cleaner, Tile and Toilet Wash, Car Wash, Window Cleaner, and Air Fresheners, we've become a household name across Nigeria. Each brand represents our unwavering commitment to excellence, delivering premium quality products that millions of families rely on daily. By combining innovative formulations with rigorous quality control, we consistently exceed consumer expectations and set new benchmarks in the consumer care industry.",
     },
   },
 ];
@@ -173,7 +173,7 @@ export const About = () => {
         </div>
       </div>
 
-      <div className="col-md-8 d-md-flex offset-md-2 directors-corner">
+      {/* <div className="col-md-8 d-md-flex offset-md-2 directors-corner">
         <div className="col-md-5">
           <h2>Board of Directors</h2>
           <p>
@@ -205,9 +205,9 @@ export const About = () => {
             </div>
           </div>
         </div>{" "}
-      </div>
+      </div> */}
 
-      <div className="facilities-corner">
+      {/* <div className="facilities-corner">
         <div className="facility-bg"></div>
         <div className="overlay">
           <div className="col-md-10 offset-md-2 d-md-flex">
@@ -258,18 +258,15 @@ export const About = () => {
             </div>
           </div>
         </div>
-      </div>
-      <div
-        style={{
-          width: "100%",
-          background: "#EFF5FF",
-          paddingTop: "120px",
-          paddingBottom: "40px",
-        }}
-      >
-        <center>
-          <h1>Our Story & Impact</h1>
-        </center>
+      </div> */}
+      <div className="our-story-impact-section">
+        <div className="container">
+          <div className="row">
+            <div className="col-12 text-center">
+              <h1 className="our-story-impact-title">Our Story & Impact</h1>
+            </div>
+          </div>
+        </div>
         <FactTab tabs={tabs} />
       </div>
     </div>
