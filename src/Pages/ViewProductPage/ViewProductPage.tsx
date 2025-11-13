@@ -179,6 +179,61 @@ export const ViewProductPage: React.FC = () => {
       return newQty;
     });
   };
+
+  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    
+    // Allow empty input while typing
+    if (inputValue === '') {
+      setQuantity(1);
+      return;
+    }
+    
+    const numValue = parseInt(inputValue, 10);
+    
+    // Check if it's a valid number
+    if (isNaN(numValue) || numValue < 1) {
+      return;
+    }
+    
+    // Check stock limit if stock tracking is enabled
+    let maxQty = Infinity;
+    if (product.stockEnabled && product.stockQuantity !== undefined) {
+      maxQty = product.stockQuantity;
+      // Allow backorders if enabled
+      if (product.allowBackorders && product.stockQuantity === 0) {
+        maxQty = Infinity;
+      }
+    }
+    
+    const newQty = Math.min(Math.max(1, numValue), maxQty);
+    
+    // Update cart if item exists
+    if (product) {
+      const cartItem = cart.find((item) => item.id === product.id);
+      if (cartItem) {
+        const newPrice = calculatePriceForQuantity(product, newQty);
+        updateQuantity(product.id, newQty);
+        // Update price in cart
+        addToCart({
+          id: product.id,
+          productName: formatProductName(),
+          productPrice: newPrice,
+          firstImg: product.firstImg,
+          quantity: newQty,
+        });
+      }
+    }
+    
+    setQuantity(newQty);
+  };
+
+  const getMaxQuantity = () => {
+    if (!product.stockEnabled) return undefined;
+    if (product.stockQuantity === undefined) return undefined;
+    if (product.allowBackorders && product.stockQuantity === 0) return undefined;
+    return product.stockQuantity;
+  };
   
   // Check if product is available for purchase
   const isAvailable = () => {
@@ -314,7 +369,21 @@ export const ViewProductPage: React.FC = () => {
             <span onClick={dec} className="decrement-btn" style={{ cursor: "pointer" }}>
               –
             </span>
-            <span>{quantity}</span>
+            <input
+              type="number"
+              min="1"
+              max={getMaxQuantity()}
+              value={quantity}
+              onChange={handleQuantityChange}
+              onBlur={(e) => {
+                // Ensure minimum of 1 on blur
+                if (e.target.value === '' || parseInt(e.target.value, 10) < 1) {
+                  setQuantity(1);
+                }
+              }}
+              className="quantity-input"
+              aria-label="Quantity"
+            />
             <span 
               onClick={inc} 
               className="increment-btn" 

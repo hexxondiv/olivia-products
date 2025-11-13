@@ -103,6 +103,68 @@ const CartOffcanvas: React.FC = () => {
     }
   };
 
+  const handleQuantityChange = (item: any, e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    
+    // Allow empty input while typing
+    if (inputValue === '') {
+      return;
+    }
+    
+    const numValue = parseInt(inputValue, 10);
+    
+    // Check if it's a valid number
+    if (isNaN(numValue) || numValue < 1) {
+      return;
+    }
+    
+    const product = getProductById(item.id);
+    
+    // Check stock limit if stock tracking is enabled
+    let maxQty = Infinity;
+    if (product && product.stockEnabled && product.stockQuantity !== undefined) {
+      maxQty = product.stockQuantity;
+      // Allow backorders if enabled
+      if (product.allowBackorders && product.stockQuantity === 0) {
+        maxQty = Infinity;
+      }
+    }
+    
+    const newQuantity = Math.min(Math.max(1, numValue), maxQty);
+    
+    if (product) {
+      const newPrice = calculatePriceForQuantity(product, newQuantity);
+      addToCart({
+        id: item.id,
+        productName: item.productName,
+        productPrice: newPrice,
+        firstImg: item.firstImg,
+        quantity: newQuantity,
+      });
+    } else {
+      // Fallback to increment/decrement if product not found
+      if (newQuantity > item.quantity) {
+        for (let i = item.quantity; i < newQuantity; i++) {
+          incrementQuantity(item.id);
+        }
+      } else if (newQuantity < item.quantity) {
+        for (let i = item.quantity; i > newQuantity; i--) {
+          if (item.quantity > 1) {
+            decrementQuantity(item.id);
+          }
+        }
+      }
+    }
+  };
+
+  const getMaxQuantity = (item: any) => {
+    const product = getProductById(item.id);
+    if (!product || !product.stockEnabled) return undefined;
+    if (product.stockQuantity === undefined) return undefined;
+    if (product.allowBackorders && product.stockQuantity === 0) return undefined;
+    return product.stockQuantity;
+  };
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-NG', {
       style: 'currency',
@@ -196,7 +258,36 @@ const CartOffcanvas: React.FC = () => {
                     >
                       +
                     </button>
-                    <span className="quantity-value">{item.quantity}</span>
+                    <input
+                      type="number"
+                      min="1"
+                      max={getMaxQuantity(item)}
+                      value={item.quantity}
+                      onChange={(e) => handleQuantityChange(item, e)}
+                      onBlur={(e) => {
+                        // Ensure minimum of 1 on blur
+                        if (e.target.value === '' || parseInt(e.target.value, 10) < 1) {
+                          const product = getProductById(item.id);
+                          if (product) {
+                            const newPrice = calculatePriceForQuantity(product, 1);
+                            addToCart({
+                              id: item.id,
+                              productName: item.productName,
+                              productPrice: newPrice,
+                              firstImg: item.firstImg,
+                              quantity: 1,
+                            });
+                          } else {
+                            // Reset to 1 using increment/decrement
+                            while (item.quantity > 1) {
+                              decrementQuantity(item.id);
+                            }
+                          }
+                        }
+                      }}
+                      className="quantity-input"
+                      aria-label="Quantity"
+                    />
                     <button
                       type="button"
                       className="increment-btn"

@@ -98,7 +98,7 @@ export const TopNav = () => {
             className={`justify-content-lg-end ${isOpen ? 'show' : ''}`}
           >
             <Nav className="align-items-lg-center gap-lg-3 top-nav__links">
-              {primaryLinks.map((link) => (
+              {primaryLinks.slice(0, 4).map((link) => (
                 <Nav.Link 
                   key={link.label} 
                   as={NavLink} 
@@ -126,6 +126,17 @@ export const TopNav = () => {
                   </NavDropdown.Item>
                 ))}
               </NavDropdown>
+              {primaryLinks.slice(4).map((link) => (
+                <Nav.Link 
+                  key={link.label} 
+                  as={NavLink} 
+                  to={link.to} 
+                  end
+                  onClick={handleNavClick}
+                >
+                  {link.label}
+                </Nav.Link>
+              ))}
             </Nav>
             <div className="d-none d-lg-inline-block ms-lg-4">
               <CartButton />

@@ -205,7 +205,7 @@ export const ProductsHolder = ({
           {sortedProducts.map((product, index) => (
             <div key={index} className="mb-4">
               <MainProduct
-                productName={product.name}
+                productName={product.name + ' '+product.sufix}
                 productPrice={getDisplayPrice(product)}
                 firstImg={product.firstImg}
                 hoverImg={product.hoverImg}
