@@ -1,5 +1,40 @@
 <?php
 
+require_once __DIR__ . '/config.php';
+
+/**
+ * Convert relative image URL to absolute URL for email
+ * @param string $imagePath Relative path like /assets/images/product.png
+ * @return string Absolute URL like https://celineolivia.com/assets/images/product.png
+ */
+if (!function_exists('getAbsoluteImageUrl')) {
+    function getAbsoluteImageUrl($imagePath) {
+        if (empty($imagePath)) {
+            return '';
+        }
+        
+        // If already an absolute URL, return as-is
+        if (preg_match('/^https?:\/\//', $imagePath)) {
+            return $imagePath;
+        }
+        
+        // Get domain from config or determine from server
+        $domain = defined('SITE_DOMAIN') ? SITE_DOMAIN : 'celineolivia.com';
+        
+        // Ensure domain has protocol
+        if (!preg_match('/^https?:\/\//', $domain)) {
+            $domain = 'https://' . $domain;
+        }
+        
+        // Ensure image path starts with /
+        if (substr($imagePath, 0, 1) !== '/') {
+            $imagePath = '/' . $imagePath;
+        }
+        
+        return $domain . $imagePath;
+    }
+}
+
 /**
  * Format product name for display
  * Ensures "Olivia" prefix and proper formatting
@@ -39,7 +74,7 @@ function getSalesOrderEmailTemplate($orderData) {
         $itemsHtml .= '
         <tr>
             <td style="padding: 12px; border-bottom: 1px solid #e0e0e0;">
-                <img src="' . htmlspecialchars($item['firstImg']) . '" alt="' . htmlspecialchars($formattedName) . '" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 2px solid #e0e0e0;">
+                <img src="' . htmlspecialchars(getAbsoluteImageUrl($item['firstImg'])) . '" alt="' . htmlspecialchars($formattedName) . '" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 2px solid #e0e0e0;">
             </td>
             <td style="padding: 12px; border-bottom: 1px solid #e0e0e0;">
                 <strong>' . htmlspecialchars($formattedName) . '</strong>' . $tierInfo . '
@@ -229,7 +264,7 @@ function getCustomerOrderEmailTemplate($orderData) {
         $itemsHtml .= '
         <tr>
             <td style="padding: 12px; border-bottom: 1px solid #e0e0e0;">
-                <img src="' . htmlspecialchars($item['firstImg']) . '" alt="' . htmlspecialchars($formattedName) . '" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 2px solid #e0e0e0;">
+                <img src="' . htmlspecialchars(getAbsoluteImageUrl($item['firstImg'])) . '" alt="' . htmlspecialchars($formattedName) . '" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 2px solid #e0e0e0;">
             </td>
             <td style="padding: 12px; border-bottom: 1px solid #e0e0e0;">
                 <strong>' . htmlspecialchars($formattedName) . '</strong>' . $tierInfo . '
@@ -1041,7 +1076,7 @@ function getCustomerStatusUpdateEmailTemplate($orderData, $newStatus, $oldStatus
         $itemsHtml .= '
         <tr>
             <td style="padding: 12px; border-bottom: 1px solid #e0e0e0;">
-                <img src="' . htmlspecialchars($item['firstImg']) . '" alt="' . htmlspecialchars($formattedName) . '" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 2px solid #e0e0e0;">
+                <img src="' . htmlspecialchars(getAbsoluteImageUrl($item['firstImg'])) . '" alt="' . htmlspecialchars($formattedName) . '" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 2px solid #e0e0e0;">
             </td>
             <td style="padding: 12px; border-bottom: 1px solid #e0e0e0;">
                 <strong>' . htmlspecialchars($formattedName) . '</strong>' . $tierInfo . '
@@ -1327,7 +1362,7 @@ function getCustomerPaymentStatusEmailTemplate($orderData, $isPaid) {
         $itemsHtml .= '
         <tr>
             <td style="padding: 12px; border-bottom: 1px solid #e0e0e0;">
-                <img src="' . htmlspecialchars($item['firstImg']) . '" alt="' . htmlspecialchars($formattedName) . '" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 2px solid #e0e0e0;">
+                <img src="' . htmlspecialchars(getAbsoluteImageUrl($item['firstImg'])) . '" alt="' . htmlspecialchars($formattedName) . '" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 2px solid #e0e0e0;">
             </td>
             <td style="padding: 12px; border-bottom: 1px solid #e0e0e0;">
                 <strong>' . htmlspecialchars($formattedName) . '</strong>' . $tierInfo . '

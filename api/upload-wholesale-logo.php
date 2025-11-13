@@ -104,14 +104,23 @@ try {
     $baseName = preg_replace('/[^a-zA-Z0-9_-]/', '_', $pathInfo['filename']);
     $uniqueName = 'wholesale_logo_' . time() . '_' . uniqid() . '.' . $extension;
     
-    // Determine upload directory (public/assets/images)
-    $uploadDir = dirname(__DIR__) . '/public/assets/images/';
+    // Determine upload directory
+    // In production: web root/assets/images/ (e.g., /home/user/public_html/assets/images/)
+    // In development: project root/public/assets/images/
+    $webRoot = dirname(__DIR__); // Go up from api/ to project root
+    
+    // Try web root/assets/images/ first (production)
+    $uploadDir = $webRoot . '/assets/images/';
+    if (!is_dir($uploadDir)) {
+        // Fallback to public/assets/images/ (development)
+        $uploadDir = $webRoot . '/public/assets/images/';
+    }
     
     // Create directory if it doesn't exist
     if (!is_dir($uploadDir)) {
         if (!mkdir($uploadDir, 0775, true)) {
             $error = error_get_last();
-            throw new Exception('Failed to create upload directory: ' . ($error['message'] ?? 'Unknown error'));
+            throw new Exception('Failed to create upload directory: ' . $uploadDir . '. Error: ' . ($error['message'] ?? 'Unknown error'));
         }
     }
     

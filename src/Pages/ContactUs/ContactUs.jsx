@@ -69,10 +69,13 @@ export const ContactUs = () => {
     setSubmitMessage("");
 
     try {
-      // Determine API endpoint URL - use same pattern as checkout page
-      const apiUrl = process.env.REACT_APP_API_URL 
-        ? process.env.REACT_APP_API_URL.replace(/submit-order\.php$/, 'submit-contact.php')
-        : '/api/submit-contact.php';
+      // Determine API endpoint URL
+      // In production, always use relative path
+      let apiUrl = '/api/submit-contact.php';
+      if (process.env.NODE_ENV === 'development' && process.env.REACT_APP_API_URL) {
+        // Only use env var in development
+        apiUrl = process.env.REACT_APP_API_URL.replace(/submit-order\.php$/, 'submit-contact.php') || '/api/submit-contact.php';
+      }
       
       const response = await fetch(apiUrl, {
         method: "POST",

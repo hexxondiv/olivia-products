@@ -17,8 +17,9 @@ public_html/  ← Most common name (check your hosting control panel)
 ├── static/                      ← From build/static/
 │   ├── css/
 │   ├── js/
-│   └── media/
-├── assets/                      ← From build/assets/ (if exists)
+│   └── media/                   ← React component images (webpack processed)
+├── assets/                      ← From build/assets/
+│   └── images/                  ← Static images + user uploads (must be writable!)
 └── api/                         ← Upload entire api/ directory
     ├── config.php               ← Update with production values
     ├── products.php
@@ -26,10 +27,15 @@ public_html/  ← Most common name (check your hosting control panel)
     └── ... (all other PHP files)
 ```
 
+**Important:** Set `assets/images/` directory permissions to 755 or 775 for CMS uploads to work.
+
 ### 3. Configure Database
-1. Create database on hosting server
-2. Import `api/schema.sql`
-3. Update `api/config.php` with database credentials
+1. Update `api/config.php` with database credentials (DB_HOST, DB_NAME, DB_USER, DB_PASS)
+2. Create database on hosting server (or let script create it)
+3. Import schema using one of these methods:
+   - **Easiest:** Visit `https://celineolivia.com/api/install-schema.php?run=1`
+   - **Alternative:** Use phpMyAdmin to import `api/schema.sql`
+   - **Command line:** `mysql -u user -p database < api/schema.sql`
 
 ### 4. Update API Configuration
 Edit `api/config.php`:

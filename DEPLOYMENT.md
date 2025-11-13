@@ -30,12 +30,31 @@ This will create a `build` directory with optimized production files.
 
 ### 2. Configure Database
 
-1. Create a MySQL database on your shared hosting server
-2. Import the database schema:
+1. Create a MySQL database on your shared hosting server (or let the script create it)
+2. Update database credentials in `api/config.php`
+3. Import the database schema using one of these methods:
+
+   **Option A: Via URL (Easiest)**
+   - Visit: `https://celineolivia.com/api/install-schema.php?run=1`
+   - This will create the database and all tables automatically
+   - Make sure `api/config.php` has correct database credentials first
+   
+   **Option B: Via phpMyAdmin**
+   - Log into phpMyAdmin
+   - Select or create your database
+   - Go to "Import" tab
+   - Choose `api/schema.sql` file
+   - Click "Go"
+   
+   **Option C: Via Command Line**
    ```bash
    mysql -u your_username -p your_database < api/schema.sql
    ```
-   Or use phpMyAdmin to import `api/schema.sql`
+   
+   **Option D: Via PHP Script (Command Line)**
+   ```bash
+   php api/install-schema.php
+   ```
 
 3. Run any necessary migrations (check `api/` directory for migration files)
 
@@ -85,6 +104,11 @@ If deploying to the root of your domain:
      - Check your hosting control panel to confirm the exact directory name
    - Upload the `api` directory to your web root
    - Upload the `.htaccess` file to your web root
+   - **Important for media files:**
+     - `build/static/` → contains processed React component images
+     - `build/assets/` → contains static images (and will store user uploads)
+     - Ensure `assets/images/` directory is writable (755 or 775 permissions) for CMS uploads
+     - See `MEDIA_FILES_GUIDE.md` for detailed media file information
 
 2. **Directory Structure:**
    ```

@@ -34,6 +34,37 @@ require_once __DIR__ . '/database.php';
 require_once __DIR__ . '/auth-helper.php';
 require_once __DIR__ . '/mailgun-helper.php';
 
+/**
+ * Convert relative image URL to absolute URL
+ * @param string $imagePath Relative path like /assets/images/logo.png
+ * @return string Absolute URL like https://celineolivia.com/assets/images/logo.png
+ */
+function getAbsoluteImageUrl($imagePath) {
+    if (empty($imagePath)) {
+        return '';
+    }
+    
+    // If already an absolute URL, return as-is
+    if (preg_match('/^https?:\/\//', $imagePath)) {
+        return $imagePath;
+    }
+    
+    // Get domain from config
+    $domain = defined('SITE_DOMAIN') ? SITE_DOMAIN : 'celineolivia.com';
+    
+    // Ensure domain has protocol
+    if (!preg_match('/^https?:\/\//', $domain)) {
+        $domain = 'https://' . $domain;
+    }
+    
+    // Ensure image path starts with /
+    if (substr($imagePath, 0, 1) !== '/') {
+        $imagePath = '/' . $imagePath;
+    }
+    
+    return $domain . $imagePath;
+}
+
 $method = $_SERVER['REQUEST_METHOD'];
 $input = file_get_contents('php://input');
 $data = json_decode($input, true);
@@ -270,6 +301,11 @@ function handleGet() {
         $wholesale['wholesaleEmailSent'] = (bool)$wholesale['wholesaleEmailSent'];
         $wholesale['acknowledgementEmailSent'] = (bool)$wholesale['acknowledgementEmailSent'];
         
+        // Convert companyLogo to absolute URL if present
+        if (!empty($wholesale['companyLogo'])) {
+            $wholesale['companyLogo'] = getAbsoluteImageUrl($wholesale['companyLogo']);
+        }
+        
         echo json_encode(['success' => true, 'data' => $wholesale]);
     } else {
         // Get all submissions
@@ -311,6 +347,11 @@ function handleGet() {
             $submission['businessTypes'] = json_decode($submission['businessTypes'] ?? '[]', true);
             $submission['wholesaleEmailSent'] = (bool)$submission['wholesaleEmailSent'];
             $submission['acknowledgementEmailSent'] = (bool)$submission['acknowledgementEmailSent'];
+            
+            // Convert companyLogo to absolute URL if present
+            if (!empty($submission['companyLogo'])) {
+                $submission['companyLogo'] = getAbsoluteImageUrl($submission['companyLogo']);
+            }
         }
         
         echo json_encode([

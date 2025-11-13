@@ -84,7 +84,14 @@ export const ProductsProvider: React.FC<ProductsProviderProps> = ({
       const data = await response.json();
       
       if (data.success && data.data) {
-        setProducts(data.data);
+        // Ensure IDs are numbers (API might return them as strings)
+        const productsWithNumericIds = Array.isArray(data.data)
+          ? data.data.map((p: any) => ({
+              ...p,
+              id: typeof p.id === 'string' ? parseInt(p.id, 10) : p.id
+            }))
+          : data.data;
+        setProducts(productsWithNumericIds);
       } else {
         throw new Error(data.message || 'Failed to load products');
       }

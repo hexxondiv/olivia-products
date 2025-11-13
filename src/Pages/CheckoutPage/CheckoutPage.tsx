@@ -193,7 +193,10 @@ export const CheckoutPage: React.FC = () => {
     try {
       // Determine API endpoint URL
       // For submit-order.php, we need the full endpoint URL, not just the base
-      const baseApiUrl = process.env.REACT_APP_API_URL || '/api';
+      // In production, always use relative path
+      const baseApiUrl = (process.env.NODE_ENV === 'production') 
+        ? '/api' 
+        : (process.env.REACT_APP_API_URL || '/api');
       // If it's already a full URL with submit-order.php, use it; otherwise append
       const submitUrl = baseApiUrl.includes('submit-order.php') 
         ? baseApiUrl 
@@ -441,7 +444,13 @@ export const CheckoutPage: React.FC = () => {
 
     try {
       // Determine API endpoint URL
-      const apiUrl = process.env.REACT_APP_API_URL || '/api/submit-order.php';
+      // In production, always use relative path
+      // In development, use /api which will be proxied
+      let apiUrl = '/api/submit-order.php';
+      if (process.env.NODE_ENV === 'development' && process.env.REACT_APP_API_URL) {
+        // Only use env var in development
+        apiUrl = process.env.REACT_APP_API_URL.replace(/submit-order\.php$/, 'submit-order.php') || '/api/submit-order.php';
+      }
       
       // Send order to PHP backend
       const response = await fetch(apiUrl, {

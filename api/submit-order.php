@@ -225,6 +225,12 @@ try {
         $customer = $orderData['customer'];
         $items = $orderData['items']; // Already corrected above
         
+        // Get database connection to check if it's working
+        $pdo = getDBConnection();
+        if (!$pdo) {
+            throw new Exception('Database connection failed');
+        }
+        
         // Insert order
         $orderSql = "INSERT INTO orders (orderId, customerName, customerEmail, customerPhone, 
                     customerAddress, customerCity, customerState, customerPostalCode, customerNotes, 
@@ -248,6 +254,25 @@ try {
         ];
         
         $orderInserted = dbExecute($orderSql, $orderParams);
+        
+        // Check for failure (false or 0 for INSERT means failure)
+        if ($orderInserted === false) {
+            // Get the actual error from PDO
+            $errorInfo = $pdo->errorInfo();
+            $errorMsg = $errorInfo[2] ?? 'Unknown database error';
+            error_log("Order insert failed - PDO Error: " . $errorMsg);
+            error_log("Order insert failed - SQL: " . $orderSql);
+            error_log("Order insert failed - Params: " . json_encode($orderParams));
+            throw new Exception('Failed to insert order: ' . $errorMsg);
+        }
+        
+        // For INSERT, lastInsertId should return a positive integer
+        if ($orderInserted <= 0) {
+            $errorInfo = $pdo->errorInfo();
+            $errorMsg = $errorInfo[2] ?? 'Insert returned invalid ID';
+            error_log("Order insert returned invalid ID ($orderInserted) - PDO Error: " . $errorMsg);
+            throw new Exception('Failed to insert order: ' . $errorMsg);
+        }
         
         if ($orderInserted) {
             // Insert order items (with corrected prices) and deduct stock
@@ -284,13 +309,19 @@ try {
                     }
                 }
             }
-            error_log("Order saved to database: $orderId");
+            error_log("Order saved to database: $orderId (Insert ID: $orderInserted)");
         } else {
-            error_log("Failed to save order to database: $orderId");
+            $errorInfo = $pdo->errorInfo();
+            $errorMsg = $errorInfo[2] ?? 'Unknown error';
+            error_log("Failed to save order to database: $orderId. Error: $errorMsg");
+            throw new Exception("Failed to save order: $errorMsg");
         }
     } catch (Exception $e) {
-        error_log("Error saving order to database: " . $e->getMessage());
-        // Continue even if database save fails
+        $errorMsg = "Error saving order to database: " . $e->getMessage();
+        error_log($errorMsg);
+        error_log("Stack trace: " . $e->getTraceAsString());
+        // Re-throw the exception so it's included in the response
+        throw $e;
     }
     
     // Prepare response message
@@ -323,6 +354,25 @@ try {
     ]);
     
 } catch (Exception $e) {
+    // Check if this is a database error that occurred after emails were sent
+    // In that case, we should still return success but with a warning
+    if (strpos($e->getMessage(), 'database') !== false && isset($orderId)) {
+        error_log("Database error after order processing started: " . $e->getMessage());
+        ob_clean();
+        http_response_code(200);
+        echo json_encode([
+            'success' => true,
+            'message' => 'Order processed but database save failed. Order ID: ' . $orderId,
+            'orderId' => $orderId,
+            'salesEmailSent' => $salesEmailResult ?? false,
+            'salesEmailError' => $salesEmailError ?? null,
+            'customerEmailSent' => $customerEmailResult ?? false,
+            'customerEmailError' => $customerEmailError ?? null,
+            'warnings' => array_merge($warnings ?? [], ['Database save failed: ' . $e->getMessage()])
+        ]);
+        ob_end_flush();
+        exit();
+    }
     // Clear any output
     ob_clean();
     

@@ -22,6 +22,9 @@ export const ViewProductPage: React.FC = () => {
   const [quantity, setQuantity] = useState(1);
   const [reviewRefreshTrigger, setReviewRefreshTrigger] = useState(0);
   const [isProductDetailsExpanded, setIsProductDetailsExpanded] = useState(false);
+  const [productLoading, setProductLoading] = useState(false);
+  const [productError, setProductError] = useState<string | null>(null);
+  const [directProduct, setDirectProduct] = useState<any>(null);
   const { addToCart, cart, updateQuantity } = useCart();
   const { getProductById, products: allProductsData, loading, error } = useProducts();
 
@@ -29,8 +32,62 @@ export const ViewProductPage: React.FC = () => {
   const product = useMemo(() => {
     const pid = Number(id);
     if (Number.isNaN(pid)) return undefined;
-    return getProductById(pid);
-  }, [id, getProductById]);
+    // First try to get from loaded products
+    const foundProduct = getProductById(pid);
+    if (foundProduct) return foundProduct;
+    // If not found and we have a directly fetched product, use that
+    if (directProduct && directProduct.id === pid) return directProduct;
+    return undefined;
+  }, [id, getProductById, directProduct]);
+
+  // Fetch product directly by ID if not found in the list
+  useEffect(() => {
+    const pid = Number(id);
+    if (Number.isNaN(pid)) return;
+    
+    // Only fetch if product is not in the loaded list and we haven't fetched it directly yet
+    const foundProduct = getProductById(pid);
+    if (foundProduct || directProduct) return;
+    
+    // Fetch product directly from API
+    const fetchProduct = async () => {
+      setProductLoading(true);
+      setProductError(null);
+      try {
+        const { getApiUrl } = await import('../../Utils/apiConfig');
+        const apiUrl = getApiUrl();
+        const response = await fetch(`${apiUrl}/products.php?id=${pid}`);
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch product: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.success && data.data) {
+          // Ensure ID is a number (API might return it as a string)
+          const product = {
+            ...data.data,
+            id: typeof data.data.id === 'string' ? parseInt(data.data.id, 10) : data.data.id
+          };
+          setDirectProduct(product);
+        } else {
+          setProductError(data.message || 'Product not found');
+        }
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to load product';
+        setProductError(errorMessage);
+        console.error('Error fetching product:', err);
+      } finally {
+        setProductLoading(false);
+      }
+    };
+    
+    // Only fetch if products have finished loading and product wasn't found
+    if (!loading && !foundProduct) {
+      fetchProduct();
+    }
+  }, [id, loading, getProductById, directProduct]);
 
   const images = useMemo(() => {
     if (!product) return [];
@@ -40,7 +97,7 @@ export const ViewProductPage: React.FC = () => {
   // Clean categories (ignore empty strings)
   const cleanCats = useMemo<string[]>(() => {
     const cats = (product?.category || []).filter(Boolean);
-    return cats.map((c) => c.toLowerCase());
+    return cats.map((c: string) => c.toLowerCase());
   }, [product]);
 
   const related = useMemo(() => {
@@ -73,7 +130,7 @@ export const ViewProductPage: React.FC = () => {
   const primaryCategory = cleanCats[0] || "";
 
   // Handle loading state
-  if (loading) {
+  if (loading || productLoading) {
     return (
       <div className="container py-5 text-center">
         <Spinner animation="border" variant="primary" />
@@ -83,12 +140,12 @@ export const ViewProductPage: React.FC = () => {
   }
 
   // Handle error state
-  if (error) {
+  if (error || productError) {
     return (
       <div className="container py-5">
         <Alert variant="danger">
           <Alert.Heading>Error loading product</Alert.Heading>
-          <p>{error}</p>
+          <p>{error || productError}</p>
           <button className="btn btn-outline-secondary" onClick={() => navigate(-1)}>
             Go back
           </button>
@@ -101,10 +158,18 @@ export const ViewProductPage: React.FC = () => {
   if (!product) {
     return (
       <div className="container py-5">
-        <p>That product wasn't found.</p>
-        <button className="btn btn-outline-secondary" onClick={() => navigate(-1)}>
-          Go back
-        </button>
+        <Alert variant="warning">
+          <Alert.Heading>Product Not Found</Alert.Heading>
+          <p>That product wasn't found. It may have been removed or is currently unavailable.</p>
+          <div className="mt-3">
+            <button className="btn btn-outline-secondary me-2" onClick={() => navigate(-1)}>
+              Go back
+            </button>
+            <button className="btn btn-primary" onClick={() => navigate('/collections')}>
+              Browse Products
+            </button>
+          </div>
+        </Alert>
       </div>
     );
   }

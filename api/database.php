@@ -101,21 +101,37 @@ function dbQueryOne($sql, $params = []) {
 function dbExecute($sql, $params = []) {
     $pdo = getDBConnection();
     if (!$pdo) {
+        error_log("dbExecute: No database connection available");
         return false;
     }
     
     try {
         $stmt = $pdo->prepare($sql);
-        $stmt->execute($params);
+        $result = $stmt->execute($params);
+        
+        if (!$result) {
+            $errorInfo = $stmt->errorInfo();
+            error_log("dbExecute: Statement execution failed - " . ($errorInfo[2] ?? 'Unknown error'));
+            error_log("dbExecute: SQL - " . $sql);
+            error_log("dbExecute: Params - " . json_encode($params));
+            return false;
+        }
         
         // Return last insert ID for INSERT, affected rows for others
         if (stripos($sql, 'INSERT') === 0) {
-            return $pdo->lastInsertId();
+            $insertId = $pdo->lastInsertId();
+            if ($insertId === false || $insertId === '0') {
+                error_log("dbExecute: Warning - lastInsertId returned false or 0 for INSERT statement");
+                error_log("dbExecute: SQL - " . $sql);
+            }
+            return $insertId;
         }
         return $stmt->rowCount();
     } catch (PDOException $e) {
-        error_log("Database execute error: " . $e->getMessage());
-        error_log("SQL: " . $sql);
+        error_log("dbExecute: PDO Exception - " . $e->getMessage());
+        error_log("dbExecute: SQL - " . $sql);
+        error_log("dbExecute: Params - " . json_encode($params));
+        error_log("dbExecute: Error Code - " . $e->getCode());
         return false;
     }
 }

@@ -131,7 +131,9 @@ export const WholeSalePage: React.FC = () => {
       formData.append('logo', file);
 
       const apiUrl = process.env.REACT_APP_API_URL
-        ? process.env.REACT_APP_API_URL.replace(/submit-(order|contact|wholesale)\.php$/, "upload-wholesale-logo.php")
+        ? (process.env.NODE_ENV === 'development' 
+            ? process.env.REACT_APP_API_URL.replace(/submit-(order|contact|wholesale)\.php$/, "upload-wholesale-logo.php")
+            : "/api/upload-wholesale-logo.php")
         : "/api/upload-wholesale-logo.php";
 
       const response = await fetch(apiUrl, {
@@ -249,10 +251,13 @@ export const WholeSalePage: React.FC = () => {
     setSubmitMessage("");
 
     try {
-      // Determine API endpoint URL - use same pattern as contact form
-      const apiUrl = process.env.REACT_APP_API_URL
-        ? process.env.REACT_APP_API_URL.replace(/submit-(order|contact)\.php$/, "submit-wholesale.php")
-        : "/api/submit-wholesale.php";
+      // Determine API endpoint URL
+      // In production, always use relative path
+      let apiUrl = '/api/submit-wholesale.php';
+      if (process.env.NODE_ENV === 'development' && process.env.REACT_APP_API_URL) {
+        // Only use env var in development
+        apiUrl = process.env.REACT_APP_API_URL.replace(/submit-(order|contact)\.php$/, 'submit-wholesale.php') || '/api/submit-wholesale.php';
+      }
 
       const response = await fetch(apiUrl, {
         method: "POST",

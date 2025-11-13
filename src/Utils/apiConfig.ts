@@ -9,6 +9,12 @@
  */
 
 export const getApiUrl = (): string => {
+  // In production, always use relative path /api
+  // In development, use /api which will be proxied by setupProxy.js
+  if (process.env.NODE_ENV === 'production') {
+    return '/api';
+  }
+  
   // If REACT_APP_API_URL is set, use it (for custom configurations)
   // Otherwise, use /api which works with the proxy setup
   let apiUrl = process.env.REACT_APP_API_URL || '/api';
@@ -19,7 +25,7 @@ export const getApiUrl = (): string => {
     // The env var is set to a specific endpoint file
     // For CMS, we always want the base /api path which the proxy will handle
     apiUrl = '/api';
-  } else if (apiUrl.startsWith('http://localhost') || apiUrl.startsWith('http://127.0.0.1')) {
+  } else if (apiUrl.startsWith('http://localhost') || apiUrl.startsWith('http://127.0.0.1') || apiUrl.startsWith('https://localhost')) {
     // If it's a full localhost URL without a PHP file, extract the path
     // But if it contains /olivia-products/api, use /api for proxy compatibility
     try {

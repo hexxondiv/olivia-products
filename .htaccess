@@ -85,3 +85,9 @@ Options -Indexes
   Deny from all
 </FilesMatch>
 
+# Protect installation scripts after use (uncomment after installation)
+# <FilesMatch "^(install-schema\.php|seed-admin\.php)$">
+#   Order allow,deny
+#   Deny from all
+# </FilesMatch>
+

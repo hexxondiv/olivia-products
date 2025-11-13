@@ -1,8 +1,8 @@
 -- Olivia Products CMS Database Schema
 -- Run this SQL to create the database and tables
 
-CREATE DATABASE IF NOT EXISTS olivia_products CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE olivia_products;
+-- CREATE DATABASE IF NOT EXISTS olivia_products CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE celicoyh_olivia;
 
 -- Products Table
 CREATE TABLE IF NOT EXISTS products (
@@ -90,6 +90,29 @@ CREATE TABLE IF NOT EXISTS order_items (
     INDEX idx_productId (productId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Product Reviews Table
+-- Must be created after orders table (has foreign key to orders)
+CREATE TABLE IF NOT EXISTS product_reviews (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    productId INT NOT NULL,
+    orderId VARCHAR(50) NOT NULL,
+    customerName VARCHAR(255) NOT NULL,
+    customerEmail VARCHAR(255) NOT NULL,
+    rating INT NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    reviewText TEXT,
+    isApproved BOOLEAN DEFAULT TRUE,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (productId) REFERENCES products(id) ON DELETE CASCADE,
+    FOREIGN KEY (orderId) REFERENCES orders(orderId) ON DELETE CASCADE,
+    INDEX idx_productId (productId),
+    INDEX idx_orderId (orderId),
+    INDEX idx_isApproved (isApproved),
+    INDEX idx_createdAt (createdAt),
+    -- Prevent duplicate reviews from same order for same product
+    UNIQUE KEY unique_order_product (orderId, productId)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Contact Form Submissions Table
 CREATE TABLE IF NOT EXISTS contact_submissions (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -109,7 +132,25 @@ CREATE TABLE IF NOT EXISTS contact_submissions (
     INDEX idx_email (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Admin Users Table (for CMS authentication)
+-- Created before contact_replies because contact_replies has a foreign key to admin_users
+CREATE TABLE IF NOT EXISTS admin_users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(100) UNIQUE NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    passwordHash VARCHAR(255) NOT NULL,
+    fullName VARCHAR(255),
+    role ENUM('admin', 'manager', 'staff') DEFAULT 'staff',
+    isActive BOOLEAN DEFAULT TRUE,
+    lastLogin TIMESTAMP NULL,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_username (username),
+    INDEX idx_email (email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Contact Replies Table (stores all replies sent to contact submissions)
+-- Must be created after contact_submissions and admin_users (has foreign keys to both)
 CREATE TABLE IF NOT EXISTS contact_replies (
     id INT AUTO_INCREMENT PRIMARY KEY,
     contactId INT NOT NULL,
@@ -156,22 +197,6 @@ CREATE TABLE IF NOT EXISTS wholesale_submissions (
     INDEX idx_status (status),
     INDEX idx_formType (formType),
     INDEX idx_createdAt (createdAt),
-    INDEX idx_email (email)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Admin Users Table (for CMS authentication)
-CREATE TABLE IF NOT EXISTS admin_users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(100) UNIQUE NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    passwordHash VARCHAR(255) NOT NULL,
-    fullName VARCHAR(255),
-    role ENUM('admin', 'manager', 'staff') DEFAULT 'staff',
-    isActive BOOLEAN DEFAULT TRUE,
-    lastLogin TIMESTAMP NULL,
-    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_username (username),
     INDEX idx_email (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
