@@ -7,6 +7,8 @@ import { calculatePriceForQuantity } from "../../Utils/pricingUtils";
 import "./view-product.scss";
 import { Desktop, TabletAndBelow } from "../../Utils/mediaQueries";
 import { Spinner, Alert } from "react-bootstrap";
+import { ProductReviews } from "./ProductReviews";
+import { ReviewForm } from "./ReviewForm";
 
 const PRODUCT_DETAIL_BASE = "/product";
 
@@ -17,6 +19,7 @@ export const ViewProductPage: React.FC = () => {
   const [activeImage, setActiveImage] = useState(0);
   const [transitionDirection, setTransitionDirection] = useState<"left" | "right">("right");
   const [quantity, setQuantity] = useState(1);
+  const [reviewRefreshTrigger, setReviewRefreshTrigger] = useState(0);
   const { addToCart, cart, updateQuantity } = useCart();
   const { getProductById, products: allProductsData, loading, error } = useProducts();
 
@@ -377,6 +380,18 @@ export const ViewProductPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Reviews Section */}
+      <div className="container col-md-10 offset-md-1 mt-5">
+        <ProductReviews productId={product.id} refreshTrigger={reviewRefreshTrigger} />
+        <ReviewForm 
+          productId={product.id} 
+          productName={formatProductName()}
+          onReviewSubmitted={() => {
+            // Trigger a refresh of reviews
+            setReviewRefreshTrigger(prev => prev + 1);
+          }}
+        />
+      </div>
       
     </>
   );
