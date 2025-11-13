@@ -11,7 +11,8 @@ import {
   FaSignOutAlt,
   FaChartBar,
   FaExclamationTriangle,
-  FaWarehouse
+  FaWarehouse,
+  FaStar
 } from 'react-icons/fa';
 import { getApiUrl } from '../../Utils/apiConfig';
 import './cms-layout.scss';
@@ -337,6 +338,10 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({ children }) => {
                     {stockAlertsCount}
                   </Badge>
                 )}
+              </Nav.Link>
+              <Nav.Link as={Link} to="/cms/testimonials" active={isActive('/cms/testimonials')} onClick={handleNavClick}>
+                <FaStar className="me-1" />
+                Testimonials
               </Nav.Link>
             </Nav>
             <Nav>

@@ -17,6 +17,7 @@ import { CMSOrders } from "./Pages/CMS/CMSOrders";
 import { CMSContacts } from "./Pages/CMS/CMSContacts";
 import { CMSWholesale } from "./Pages/CMS/CMSWholesale";
 import { CMSStock } from "./Pages/CMS/CMSStock";
+import { CMSTestimonials } from "./Pages/CMS/CMSTestimonials";
 import { PublicRoutes } from "./Pages/PublicRoutes";
 
 function GlobalCart() {
@@ -114,6 +115,14 @@ function App() {
             element={
               <CMSProtectedRoute>
                 <CMSStock />
+              </CMSProtectedRoute>
+            }
+          />
+          <Route
+            path="/cms/testimonials"
+            element={
+              <CMSProtectedRoute>
+                <CMSTestimonials />
               </CMSProtectedRoute>
             }
           />

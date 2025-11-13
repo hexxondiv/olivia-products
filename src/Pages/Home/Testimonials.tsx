@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { getApiUrl } from "../../Utils/apiConfig";
 
 interface Testimonial {
   name: string;
@@ -13,10 +14,27 @@ const TestimonialCarousel: React.FC = () => {
   const autoPlayInterval = 5000; // Auto-play interval (in milliseconds)
 
   useEffect(() => {
-    fetch("/testimonialData.json")
-      .then((response) => response.json())
-      .then((data) => setTestimonials(data))
-      .catch((error) => console.error("Error fetching testimonials:", error));
+    const fetchTestimonials = async () => {
+      try {
+        const apiUrl = getApiUrl();
+        const response = await fetch(`${apiUrl}/testimonials.php?activeOnly=true`);
+        const data = await response.json();
+        
+        if (data.success && data.data) {
+          setTestimonials(data.data);
+        } else {
+          console.error("Error fetching testimonials:", data.message);
+          // Fallback to empty array
+          setTestimonials([]);
+        }
+      } catch (error) {
+        console.error("Error fetching testimonials:", error);
+        // Fallback to empty array
+        setTestimonials([]);
+      }
+    };
+
+    fetchTestimonials();
   }, []);
 
   useEffect(() => {

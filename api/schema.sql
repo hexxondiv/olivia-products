@@ -211,6 +211,30 @@ CREATE TABLE IF NOT EXISTS stock_alerts (
     INDEX idx_createdAt (createdAt)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Testimonials Table
+CREATE TABLE IF NOT EXISTS testimonials (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    comment TEXT NOT NULL,
+    rating INT NOT NULL DEFAULT 5,
+    backgroundColor VARCHAR(7) DEFAULT '#f5f7fa',
+    displayOrder INT DEFAULT 0,
+    isActive BOOLEAN DEFAULT TRUE,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_isActive (isActive),
+    INDEX idx_displayOrder (displayOrder)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Seed initial testimonials data
+-- Note: This will insert default testimonials. If you need to re-seed, delete existing records first or use seed-testimonials.php
+INSERT IGNORE INTO testimonials (name, comment, rating, backgroundColor, displayOrder, isActive) VALUES
+('Miriam Nwoba', 'This product is amazing! Highly recommend it to everyone.', 5, '#f5f7fa', 0, TRUE),
+('Grace Oluwakayode', 'Great service and fast delivery. I''m very satisfied.', 4, '#e3fcec', 1, TRUE),
+('Olatunji Ayodele', 'Good quality, but it took a while to arrive.', 3, '#fef3c7', 2, TRUE),
+('Adeola Olaiya', 'Excellent! Will definitely buy again.', 5, '#fde2e4', 3, TRUE),
+('Muhammad Usman', 'Very helpful customer support.', 4, '#dbeafe', 4, TRUE);
+
 -- Create default admin user (password: admin123 - CHANGE THIS!)
 -- Note: Use seed-admin.php to create/update admin user with proper password hash
 -- This INSERT will create the user if it doesn't exist, but won't update password if user exists
