@@ -485,14 +485,30 @@ export const CMSOrders: React.FC = () => {
                         : ` (${item.pricingTierDisplay} Pricing)`)
                     : '';
                   return (
-                    <div key={idx} className="order-item" style={{ marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid #e0e0e0' }}>
-                      <p style={{ marginBottom: '0.5rem' }}>
-                        <strong>{item.productName}</strong>
-                        {tierInfo && <span style={{ fontSize: '0.85rem', color: '#6c757d', marginLeft: '0.5rem' }}>{tierInfo}</span>}
-                      </p>
-                      <p style={{ marginBottom: 0, fontSize: '0.9rem', color: '#666' }}>
-                        Quantity: {item.quantity} × ₦{item.productPrice.toLocaleString()} = ₦{(item.quantity * item.productPrice).toLocaleString()}
-                      </p>
+                    <div key={idx} className="order-item" style={{ marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid #e0e0e0', display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+                      {item.firstImg && (
+                        <img 
+                          src={item.firstImg} 
+                          alt={item.productName} 
+                          style={{ 
+                            width: '80px', 
+                            height: '80px', 
+                            objectFit: 'cover', 
+                            borderRadius: '8px', 
+                            border: '2px solid #e0e0e0',
+                            flexShrink: 0
+                          }} 
+                        />
+                      )}
+                      <div style={{ flex: 1 }}>
+                        <p style={{ marginBottom: '0.5rem' }}>
+                          <strong>{item.productName}</strong>
+                          {tierInfo && <span style={{ fontSize: '0.85rem', color: '#6c757d', marginLeft: '0.5rem' }}>{tierInfo}</span>}
+                        </p>
+                        <p style={{ marginBottom: 0, fontSize: '0.9rem', color: '#666' }}>
+                          Quantity: {item.quantity} × ₦{item.productPrice.toLocaleString()} = ₦{(item.quantity * item.productPrice).toLocaleString()}
+                        </p>
+                      </div>
                     </div>
                   );
                 })}

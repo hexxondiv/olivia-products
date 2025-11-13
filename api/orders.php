@@ -139,6 +139,8 @@ function handleGet() {
         foreach ($order['items'] as &$item) {
             $item['productPrice'] = (float)$item['productPrice'];
             $item['quantity'] = (int)$item['quantity'];
+            // Map productImage to firstImg for consistency with frontend
+            $item['firstImg'] = $item['productImage'] ?? null;
             
             // Determine pricing tier if productId exists
             if (!empty($item['productId'])) {
@@ -166,6 +168,11 @@ function handleGet() {
                     $item['pricingTierMinQty'] = $tierInfo['minQty'];
                     // Update productPrice to match the tier-corrected price for display
                     $item['productPrice'] = $tierInfo['pricePerUnit'];
+                    
+                    // If firstImg is not set from productImage, use product's firstImg
+                    if (empty($item['firstImg']) && !empty($product['firstImg'])) {
+                        $item['firstImg'] = $product['firstImg'];
+                    }
                 }
             }
         }
