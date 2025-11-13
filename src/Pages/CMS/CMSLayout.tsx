@@ -1,7 +1,7 @@
 import React, { ReactNode, useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useCMSAuth } from '../../Contexts/CMSAuthContext';
-import { Container, Navbar, Nav, NavDropdown, Badge } from 'react-bootstrap';
+import { Container, Navbar, Nav, NavDropdown, Badge, Toast, ToastContainer } from 'react-bootstrap';
 import { 
   FaHome, 
   FaBox, 
@@ -27,6 +27,15 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({ children }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navbarRef = useRef<HTMLDivElement>(null);
   const [stockAlertsCount, setStockAlertsCount] = useState(0);
+  const [newContactsCount, setNewContactsCount] = useState(0);
+  const [newOrdersCount, setNewOrdersCount] = useState(0);
+  const [newWholesaleCount, setNewWholesaleCount] = useState(0);
+  const [toasts, setToasts] = useState<Array<{ id: string; title: string; message: string; variant: string }>>([]);
+  const lastCheckedRef = useRef<{ contacts: string; orders: string; wholesale: string }>({
+    contacts: new Date().toISOString(),
+    orders: new Date().toISOString(),
+    wholesale: new Date().toISOString()
+  });
 
   const handleLogout = () => {
     logout();
@@ -76,11 +85,65 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({ children }) => {
 
   useEffect(() => {
     if (isAuthenticated) {
+      // Load last checked timestamps from localStorage
+      const savedLastChecked = localStorage.getItem('cms_last_checked');
+      if (savedLastChecked) {
+        try {
+          const parsed = JSON.parse(savedLastChecked);
+          // Ensure all fields exist (for backward compatibility)
+          lastCheckedRef.current = {
+            contacts: parsed.contacts || new Date().toISOString(),
+            orders: parsed.orders || new Date().toISOString(),
+            wholesale: parsed.wholesale || new Date().toISOString()
+          };
+        } catch (e) {
+          // If parsing fails, use current time
+          lastCheckedRef.current = {
+            contacts: new Date().toISOString(),
+            orders: new Date().toISOString(),
+            wholesale: new Date().toISOString()
+          };
+        }
+      }
+
+      // Initial fetch
       fetchStockAlerts();
-      const interval = setInterval(fetchStockAlerts, 60000); // Refresh every minute
-      return () => clearInterval(interval);
+      fetchNotifications();
+
+      // Set up polling intervals
+      const stockInterval = setInterval(fetchStockAlerts, 60000); // Every minute
+      const notificationInterval = setInterval(fetchNotifications, 30000); // Every 30 seconds
+
+      return () => {
+        clearInterval(stockInterval);
+        clearInterval(notificationInterval);
+      };
     }
   }, [isAuthenticated]);
+
+  // Update last checked time when visiting the respective pages to prevent duplicate toasts
+  useEffect(() => {
+    if (location.pathname === '/cms/contacts') {
+      // Update last checked time to now when visiting contacts page
+      // This prevents showing toast notifications for items that were already visible
+      const now = new Date().toISOString();
+      lastCheckedRef.current.contacts = now;
+      localStorage.setItem('cms_last_checked', JSON.stringify(lastCheckedRef.current));
+      // Don't reset count - it should reflect actual new items
+    } else if (location.pathname === '/cms/orders') {
+      // Update last checked time to now when visiting orders page
+      const now = new Date().toISOString();
+      lastCheckedRef.current.orders = now;
+      localStorage.setItem('cms_last_checked', JSON.stringify(lastCheckedRef.current));
+      // Don't reset count - it should reflect actual pending orders
+    } else if (location.pathname === '/cms/wholesale') {
+      // Update last checked time to now when visiting wholesale page
+      const now = new Date().toISOString();
+      lastCheckedRef.current.wholesale = now;
+      localStorage.setItem('cms_last_checked', JSON.stringify(lastCheckedRef.current));
+      // Don't reset count - it should reflect actual new wholesale applications
+    }
+  }, [location.pathname]);
 
   const fetchStockAlerts = async () => {
     try {
@@ -104,6 +167,107 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({ children }) => {
       // Silently fail - don't show errors for alerts
       console.error('Failed to fetch stock alerts:', err);
     }
+  };
+
+  const fetchNotifications = async () => {
+    try {
+      const apiUrl = getApiUrl();
+      const now = new Date().toISOString();
+
+      // Fetch new contacts (created after last check)
+      const contactsResponse = await fetch(
+        `${apiUrl}/contacts.php?status=new&limit=100`
+      );
+      
+      // Fetch new orders (created after last check, status pending)
+      const ordersResponse = await fetch(
+        `${apiUrl}/orders.php?status=pending&limit=100`
+      );
+
+      // Fetch new wholesale applications (created after last check, status new)
+      const wholesaleResponse = await fetch(
+        `${apiUrl}/wholesale.php?status=new&limit=100`
+      );
+
+      if (contactsResponse.ok && ordersResponse.ok && wholesaleResponse.ok) {
+        const contactsData = await contactsResponse.json();
+        const ordersData = await ordersResponse.json();
+        const wholesaleData = await wholesaleResponse.json();
+
+        // Filter contacts created after last check
+        const lastContactsCheck = new Date(lastCheckedRef.current.contacts);
+        const newContacts = (contactsData.data || []).filter((contact: any) => {
+          const createdAt = new Date(contact.createdAt || contact.submittedAt);
+          return createdAt > lastContactsCheck;
+        });
+
+        // Filter orders created after last check
+        const lastOrdersCheck = new Date(lastCheckedRef.current.orders);
+        const newOrders = (ordersData.data || []).filter((order: any) => {
+          const createdAt = new Date(order.createdAt || order.orderDate);
+          return createdAt > lastOrdersCheck;
+        });
+
+        // Filter wholesale applications created after last check
+        const lastWholesaleCheck = new Date(lastCheckedRef.current.wholesale);
+        const newWholesale = (wholesaleData.data || []).filter((wholesale: any) => {
+          const createdAt = new Date(wholesale.createdAt || wholesale.submittedAt);
+          return createdAt > lastWholesaleCheck;
+        });
+
+        // Update counts
+        const totalNewContacts = contactsData.total || 0;
+        const totalNewOrders = ordersData.total || 0;
+        const totalNewWholesale = wholesaleData.total || 0;
+        
+        setNewContactsCount(totalNewContacts);
+        setNewOrdersCount(totalNewOrders);
+        setNewWholesaleCount(totalNewWholesale);
+
+        // Show toast notifications for newly arrived items
+        if (newContacts.length > 0) {
+          addToast(
+            'New Contact',
+            `${newContacts.length} new contact message${newContacts.length > 1 ? 's' : ''} received`,
+            'info'
+          );
+          lastCheckedRef.current.contacts = now;
+        }
+
+        if (newOrders.length > 0) {
+          addToast(
+            'New Order',
+            `${newOrders.length} new order${newOrders.length > 1 ? 's' : ''} placed`,
+            'success'
+          );
+          lastCheckedRef.current.orders = now;
+        }
+
+        if (newWholesale.length > 0) {
+          addToast(
+            'New Wholesale Application',
+            `${newWholesale.length} new wholesale application${newWholesale.length > 1 ? 's' : ''} received`,
+            'warning'
+          );
+          lastCheckedRef.current.wholesale = now;
+        }
+
+        // Save updated timestamps
+        localStorage.setItem('cms_last_checked', JSON.stringify(lastCheckedRef.current));
+      }
+    } catch (err) {
+      // Silently fail - don't show errors for notifications
+      console.error('Failed to fetch notifications:', err);
+    }
+  };
+
+  const addToast = (title: string, message: string, variant: string = 'info') => {
+    const id = `toast-${Date.now()}-${Math.random()}`;
+    setToasts((prev) => [...prev, { id, title, message, variant }]);
+  };
+
+  const removeToast = (id: string) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
   };
 
   if (!isAuthenticated) {
@@ -141,14 +305,29 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({ children }) => {
               <Nav.Link as={Link} to="/cms/orders" active={isActive('/cms/orders')} onClick={handleNavClick}>
                 <FaShoppingCart className="me-1" />
                 Orders
+                {newOrdersCount > 0 && (
+                  <Badge bg="success" className="ms-2" pill>
+                    {newOrdersCount}
+                  </Badge>
+                )}
               </Nav.Link>
               <Nav.Link as={Link} to="/cms/contacts" active={isActive('/cms/contacts')} onClick={handleNavClick}>
                 <FaEnvelope className="me-1" />
                 Contacts
+                {newContactsCount > 0 && (
+                  <Badge bg="info" className="ms-2" pill>
+                    {newContactsCount}
+                  </Badge>
+                )}
               </Nav.Link>
               <Nav.Link as={Link} to="/cms/wholesale" active={isActive('/cms/wholesale')} onClick={handleNavClick}>
                 <FaHandshake className="me-1" />
                 Wholesale
+                {newWholesaleCount > 0 && (
+                  <Badge bg="warning" className="ms-2" pill>
+                    {newWholesaleCount}
+                  </Badge>
+                )}
               </Nav.Link>
               <Nav.Link as={Link} to="/cms/stock" active={isActive('/cms/stock')} onClick={handleNavClick}>
                 <FaWarehouse className="me-1" />
@@ -181,6 +360,23 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({ children }) => {
           {children}
         </Container>
       </div>
+      <ToastContainer position="top-end" className="p-3" style={{ zIndex: 1060 }}>
+        {toasts.map((toast) => (
+          <Toast
+            key={toast.id}
+            onClose={() => removeToast(toast.id)}
+            show={true}
+            delay={5000}
+            autohide
+            bg={toast.variant}
+          >
+            <Toast.Header>
+              <strong className="me-auto">{toast.title}</strong>
+            </Toast.Header>
+            <Toast.Body className="text-white">{toast.message}</Toast.Body>
+          </Toast>
+        ))}
+      </ToastContainer>
     </div>
   );
 };

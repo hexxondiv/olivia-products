@@ -136,6 +136,8 @@ CREATE TABLE IF NOT EXISTS wholesale_submissions (
     phone VARCHAR(50) NOT NULL,
     businessName VARCHAR(255) NOT NULL,
     website VARCHAR(500),
+    companyLogo VARCHAR(500) NULL,
+    cacRegistrationNumber VARCHAR(100) NULL,
     city VARCHAR(100) NOT NULL,
     state VARCHAR(100) NOT NULL,
     country VARCHAR(100) NOT NULL,

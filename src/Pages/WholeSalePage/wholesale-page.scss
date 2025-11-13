@@ -29,6 +29,74 @@
       border-color: #003057;
       border-width: 2px;
     }
+    
+    &.logo-input {
+      padding: 8px;
+      font-family: sailecMedium;
+      font-size: 14px;
+      cursor: pointer;
+      
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+  
+  .logo-upload-container {
+    margin: 15px 0;
+    
+    .logo-preview {
+      margin-top: 15px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border: 1px solid #e7e7e7;
+      border-radius: 8px;
+      
+      img {
+        max-width: 150px;
+        max-height: 150px;
+        object-fit: contain;
+        border: 1px solid #e7e7e7;
+        border-radius: 5px;
+        padding: 5px;
+        background-color: #fff;
+      }
+      
+      .remove-logo-btn {
+        padding: 8px 15px;
+        background-color: #dc3545;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        font-family: sailecMedium;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        
+        &:hover {
+          background-color: #c82333;
+        }
+      }
+    }
+    
+    .upload-status {
+      display: block;
+      margin-top: 10px;
+      color: #003057;
+      font-family: sailecMedium;
+      font-size: 14px;
+    }
+    
+    .logo-hint {
+      display: block;
+      margin-top: 8px;
+      color: #666;
+      font-size: 12px;
+      font-family: sailecMedium;
+    }
   }
   textarea {
     width: 100%;

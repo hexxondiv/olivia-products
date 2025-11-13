@@ -152,9 +152,9 @@ try {
     // Save wholesale submission to database
     try {
         $wholesaleSql = "INSERT INTO wholesale_submissions (formType, firstName, lastName, email, phone, 
-                        businessName, website, city, state, country, aboutBusiness, businessTypes, 
+                        businessName, website, companyLogo, cacRegistrationNumber, city, state, country, aboutBusiness, businessTypes, 
                         status, submittedVia, wholesaleEmailSent, acknowledgementEmailSent) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', ?, ?, ?)";
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', ?, ?, ?)";
         
         $wholesaleParams = [
             strtolower($wholesaleData['formType']),
@@ -164,6 +164,8 @@ try {
             $wholesaleData['phone'],
             $wholesaleData['businessName'],
             $wholesaleData['website'] ?? null,
+            $wholesaleData['companyLogo'] ?? null,
+            $wholesaleData['cacRegistrationNumber'] ?? null,
             $wholesaleData['city'],
             $wholesaleData['state'],
             $wholesaleData['country'],

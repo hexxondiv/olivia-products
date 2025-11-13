@@ -15,6 +15,9 @@ interface Wholesale {
   email: string;
   phone: string;
   businessName: string;
+  website?: string;
+  companyLogo?: string;
+  cacRegistrationNumber?: string;
   city: string;
   state: string;
   country: string;
@@ -375,40 +378,81 @@ export const CMSWholesale: React.FC = () => {
             <Modal.Header closeButton>
               <Modal.Title>Application Details - {selectedWholesale.formType}</Modal.Title>
             </Modal.Header>
-            <Modal.Body>
-              <p><strong>Name:</strong> {selectedWholesale.firstName} {selectedWholesale.lastName}</p>
-              <p><strong>Email:</strong> {selectedWholesale.email}</p>
-              <p className="phone-row">
-                <strong>Phone:</strong> {selectedWholesale.phone}
-                {phoneNumber && (
-                  <span className="phone-actions">
-                    <Button
-                      variant="outline-success"
-                      size="sm"
-                      className="phone-action-btn whatsapp-btn"
-                      href={whatsappUrl}
+            <Modal.Body className="wholesale-modal-body">
+              <div className="wholesale-modal-content">
+                <div className="wholesale-modal-main">
+                  <p><strong>Name:</strong> {selectedWholesale.firstName} {selectedWholesale.lastName || <em className="text-muted">*Not Provided*</em>}</p>
+                  <p><strong>Email:</strong> {selectedWholesale.email}</p>
+                  <p className="phone-row">
+                    <strong>Phone:</strong> {selectedWholesale.phone}
+                    {phoneNumber && (
+                      <span className="phone-actions">
+                        <Button
+                          variant="outline-success"
+                          size="sm"
+                          className="phone-action-btn whatsapp-btn"
+                          href={whatsappUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title="Open WhatsApp"
+                          as="a"
+                        >
+                          <FaWhatsapp /> WhatsApp
+                        </Button>
+                        <Button
+                          variant="outline-primary"
+                          size="sm"
+                          className="phone-action-btn call-btn"
+                          href={callUrl}
+                          title="Call"
+                          as="a"
+                        >
+                          <FaPhone /> Call
+                        </Button>
+                      </span>
+                    )}
+                  </p>
+                  <p><strong>Business Name:</strong> {selectedWholesale.businessName}</p>
+                  <p><strong>CAC Registration Number:</strong> {selectedWholesale.cacRegistrationNumber ? (
+                    <a 
+                      href={`https://icrp.cac.gov.ng/public-search`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      title="Open WhatsApp"
-                      as="a"
+                      title="Verify on CAC Portal"
                     >
-                      <FaWhatsapp /> WhatsApp
-                    </Button>
-                    <Button
-                      variant="outline-primary"
-                      size="sm"
-                      className="phone-action-btn call-btn"
-                      href={callUrl}
-                      title="Call"
-                      as="a"
-                    >
-                      <FaPhone /> Call
-                    </Button>
-                  </span>
-                )}
-              </p>
-              <p><strong>Business Name:</strong> {selectedWholesale.businessName}</p>
-              <p><strong>Location:</strong> {selectedWholesale.city}, {selectedWholesale.state}, {selectedWholesale.country}</p>
+                      {selectedWholesale.cacRegistrationNumber}
+                    </a>
+                  ) : (
+                    <em className="text-muted">*Not Provided*</em>
+                  )}</p>
+                  <p><strong>Website:</strong> {selectedWholesale.website ? (
+                    <a href={selectedWholesale.website} target="_blank" rel="noopener noreferrer">{selectedWholesale.website}</a>
+                  ) : (
+                    <em className="text-muted">*Not Provided*</em>
+                  )}</p>
+                  <p><strong>Location:</strong> {selectedWholesale.city}, {selectedWholesale.state}, {selectedWholesale.country}</p>
+                </div>
+                <div className="wholesale-modal-logo">
+                  <div className="company-logo-display">
+                    {selectedWholesale.companyLogo ? (
+                      <img 
+                        src={selectedWholesale.companyLogo} 
+                        alt={`${selectedWholesale.businessName} logo`}
+                        className="company-logo-img"
+                      />
+                    ) : (
+                      <div className="company-logo-placeholder">
+                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2" fill="none"/>
+                          <path d="M9 9C9 10.1046 9.89543 11 11 11C12.1046 11 13 10.1046 13 9C13 7.89543 12.1046 7 11 7C9.89543 7 9 7.89543 9 9Z" stroke="currentColor" strokeWidth="2" fill="none"/>
+                          <path d="M5 19L8.5 15.5L11 18L15 14L19 18V19H5Z" stroke="currentColor" strokeWidth="2" fill="none"/>
+                        </svg>
+                        <span>No Logo</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
               <p><strong>Status:</strong> <Badge bg={getStatusBadge(selectedWholesale.status)}>{selectedWholesale.status}</Badge></p>
               <p><strong>Date:</strong> {new Date(selectedWholesale.createdAt).toLocaleString()}</p>
               {selectedWholesale.businessTypes && selectedWholesale.businessTypes.length > 0 && (

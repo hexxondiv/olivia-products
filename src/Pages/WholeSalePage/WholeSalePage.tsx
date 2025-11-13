@@ -19,18 +19,24 @@ export const WholeSalePage: React.FC = () => {
     phone: "",
     businessName: "",
     website: "",
+    cacRegistrationNumber: "",
     city: "",
     state: "",
     country: "",
     aboutBusiness: "",
   });
   const [selectedBusinessTypes, setSelectedBusinessTypes] = useState<string[]>([]);
+  const [companyLogo, setCompanyLogo] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [logoUploading, setLogoUploading] = useState(false);
+  const [logoPath, setLogoPath] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"success" | "error" | null>(null);
   const [submitMessage, setSubmitMessage] = useState("");
   const [isInfoExpanded, setIsInfoExpanded] = useState<boolean>(false);
   const formRef = useRef<HTMLFormElement>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
 
   const options: Option[] = [
     { id: "1", label: "Retailer" },
@@ -68,6 +74,91 @@ export const WholeSalePage: React.FC = () => {
         ...prev,
         [name]: "",
       }));
+    }
+  };
+
+  const handleLogoChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) {
+      setCompanyLogo(null);
+      setLogoPreview(null);
+      setLogoPath(null);
+      return;
+    }
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      setErrors((prev) => ({
+        ...prev,
+        companyLogo: 'Invalid file type. Only JPEG, PNG, GIF, and WebP are allowed.',
+      }));
+      return;
+    }
+
+    // Validate file size (5MB max)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      setErrors((prev) => ({
+        ...prev,
+        companyLogo: 'File too large. Maximum size is 5MB.',
+      }));
+      return;
+    }
+
+    // Clear previous errors
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors.companyLogo;
+      return newErrors;
+    });
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setLogoPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    setCompanyLogo(file);
+    setLogoUploading(true);
+
+    // Upload logo immediately
+    try {
+      const formData = new FormData();
+      formData.append('logo', file);
+
+      const apiUrl = process.env.REACT_APP_API_URL
+        ? process.env.REACT_APP_API_URL.replace(/submit-(order|contact|wholesale)\.php$/, "upload-wholesale-logo.php")
+        : "/api/upload-wholesale-logo.php";
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setLogoPath(data.path);
+      } else {
+        setErrors((prev) => ({
+          ...prev,
+          companyLogo: data.message || 'Failed to upload logo. Please try again.',
+        }));
+        setCompanyLogo(null);
+        setLogoPreview(null);
+      }
+    } catch (error) {
+      setErrors((prev) => ({
+        ...prev,
+        companyLogo: 'Failed to upload logo. Please try again.',
+      }));
+      setCompanyLogo(null);
+      setLogoPreview(null);
+      console.error('Logo upload error:', error);
+    } finally {
+      setLogoUploading(false);
     }
   };
 
@@ -166,6 +257,7 @@ export const WholeSalePage: React.FC = () => {
           formType,
           ...formData,
           businessTypes: selectedBusinessTypes,
+          companyLogo: logoPath,
         }),
       });
 
@@ -185,12 +277,19 @@ export const WholeSalePage: React.FC = () => {
           phone: "",
           businessName: "",
           website: "",
+          cacRegistrationNumber: "",
           city: "",
           state: "",
           country: "",
           aboutBusiness: "",
         });
         setSelectedBusinessTypes([]);
+        setCompanyLogo(null);
+        setLogoPreview(null);
+        setLogoPath(null);
+        if (logoInputRef.current) {
+          logoInputRef.current.value = '';
+        }
         setFormType("wholesale");
         
         // Scroll to top to show success message
@@ -251,6 +350,9 @@ export const WholeSalePage: React.FC = () => {
     
     message += "*BUSINESS INFORMATION*\n";
     message += `*Business Name:* ${formData.businessName}\n`;
+    if (formData.cacRegistrationNumber) {
+      message += `*CAC Registration Number:* ${formData.cacRegistrationNumber}\n`;
+    }
     if (formData.website) {
       message += `*Website:* ${formData.website}\n`;
     }
@@ -303,12 +405,19 @@ export const WholeSalePage: React.FC = () => {
       phone: "",
       businessName: "",
       website: "",
+      cacRegistrationNumber: "",
       city: "",
       state: "",
       country: "",
       aboutBusiness: "",
     });
     setSelectedBusinessTypes([]);
+    setCompanyLogo(null);
+    setLogoPreview(null);
+    setLogoPath(null);
+    if (logoInputRef.current) {
+      logoInputRef.current.value = '';
+    }
     setFormType("wholesale");
     
     // Scroll to top to show success message
@@ -502,6 +611,51 @@ export const WholeSalePage: React.FC = () => {
           {errors.businessName && (
             <span className="error-message">{errors.businessName}</span>
           )}
+          <h6>CAC Registration Number (Optional)</h6>
+          <input
+            placeholder="Company registration number (CAC)"
+            type="text"
+            name="cacRegistrationNumber"
+            value={formData.cacRegistrationNumber}
+            onChange={handleChange}
+          />
+          <h6>Company Logo (Optional)</h6>
+          <div className="logo-upload-container">
+            <input
+              ref={logoInputRef}
+              type="file"
+              accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+              onChange={handleLogoChange}
+              className="logo-input"
+              disabled={logoUploading}
+            />
+            {logoPreview && (
+              <div className="logo-preview">
+                <img src={logoPreview} alt="Company logo preview" />
+                <button
+                  type="button"
+                  className="remove-logo-btn"
+                  onClick={() => {
+                    setCompanyLogo(null);
+                    setLogoPreview(null);
+                    setLogoPath(null);
+                    if (logoInputRef.current) {
+                      logoInputRef.current.value = '';
+                    }
+                  }}
+                >
+                  Remove
+                </button>
+              </div>
+            )}
+            {logoUploading && (
+              <span className="upload-status">Uploading logo...</span>
+            )}
+            {errors.companyLogo && (
+              <span className="error-message">{errors.companyLogo}</span>
+            )}
+            <small className="logo-hint">Maximum file size: 5MB. Supported formats: JPEG, PNG, GIF, WebP</small>
+          </div>
         <h6>Type of business</h6>
         <div className="chec-body col-md-12">
           <div className="check-group">
