@@ -35,49 +35,19 @@
     }
   }
 
-  &__form {
-    max-width: 420px;
-  }
+  &__logo-link {
+    display: inline-block;
+    transition: transform $transition-base;
 
-  &__subscribe {
-    background: rgba(#fff, 0.08);
-    padding: 0.4rem;
-    border-radius: 999px;
-
-    .form-control {
-      background: transparent;
-      border: none;
-      color: #fff;
-      font-family: $font-sans;
-      padding: 0.8rem 1.25rem;
-
-      &::placeholder {
-        color: rgba(#fff, 0.45);
-      }
-
-      &:focus {
-        box-shadow: none;
-      }
+    &:hover {
+      transform: scale(1.05);
     }
   }
 
-  &__subscribe-btn {
-    @include modern-button("success", "md");
-    padding: 0.9rem 1.35rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: $font-size-lg;
-  }
-
-  &__legal {
-    font-family: $font-sans;
-    color: rgba(#fff, 0.65);
-
-    a {
-      color: #fff;
-      text-decoration: underline;
-    }
+  &__logo {
+    width: clamp(140px, 20vw, 180px);
+    height: auto;
+    filter: brightness(0) invert(1);
   }
 
   &__socials {

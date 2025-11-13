@@ -1,17 +1,14 @@
 import React from "react";
-import { BsArrowRight } from "react-icons/bs";
 import { FaFacebook } from "react-icons/fa";
 import { FaSquareInstagram, FaTiktok } from "react-icons/fa6";
 import { Link, NavLink } from "react-router-dom";
 import {
-  Button,
   Col,
   Container,
-  Form,
-  InputGroup,
   Row,
   Stack,
 } from "react-bootstrap";
+import Logo from "../../assets/images/logo.png";
 import "./footer.scss";
 
 export const Footer = () => {
@@ -21,28 +18,9 @@ export const Footer = () => {
       <Container className="footer__inner">
         <Row className="gy-5 align-items-start">
           <Col lg={5}>
-            <h3 className="mb-3">Our emails are zero waste, too</h3>
-            <p className="mb-4">
-              Subscribe to get exclusive deals, zero waste tips, and product
-              launches—no spam, no waste.
-            </p>
-            <Form className="footer__form">
-              <InputGroup className="footer__subscribe">
-                <Form.Control
-                  type="email"
-                  placeholder="Email address"
-                  aria-label="Email address"
-                />
-                <Button variant="success" type="submit" className="footer__subscribe-btn">
-                  <BsArrowRight aria-hidden="true" />
-                  <span className="visually-hidden">Subscribe</span>
-                </Button>
-              </InputGroup>
-            </Form>
-            <small className="d-block mt-3 footer__legal">
-              By signing up, you consent to our <Link to="">Privacy Policy</Link>. You may
-              unsubscribe at any time.
-            </small>
+            <Link to="/" className="footer__logo-link">
+              <img src={Logo} alt="Olivia Products" className="footer__logo" />
+            </Link>
             <Stack direction="horizontal" gap={3} className="mt-4 footer__socials">
               <Link to="" aria-label="Instagram">
                 <FaSquareInstagram />
@@ -95,7 +73,7 @@ export const Footer = () => {
                     <NavLink to="/contact-us">Contact Us</NavLink>
                   </li>
                   <li>
-                    <NavLink to="">Returns & Exchanges</NavLink>
+                    <NavLink to="/terms-and-conditions">Returns & Exchanges</NavLink>
                   </li>
                   <li>
                     <NavLink to="/faqs">FAQ</NavLink>

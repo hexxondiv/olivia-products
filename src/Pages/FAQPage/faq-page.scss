@@ -1,96 +1,281 @@
+@use "sass:color";
+@use "../../_variables" as *;
+
 .faq-div {
-  padding: 20px;
+  padding: $spacing-xl $spacing-md;
+  margin-top: $spacing-2xl;
+
   .faq-banner {
-    background: #eef0fd;
-    margin-top: 80px;
-    height: 500px;
-    padding: 90px 40px;
-    border-radius: 20px;
-    p {
-      font-size: 25px;
-      margin-top: 20px;
+    background: $color-sky;
+    margin-top: $spacing-2xl;
+    padding: clamp($spacing-2xl, 5vw, $spacing-4xl) clamp($spacing-xl, 4vw, $spacing-3xl);
+    border-radius: 1.75rem;
+    box-shadow: $shadow-card;
+    min-height: auto;
+
+    @media (min-width: 768px) {
+      min-height: 400px;
     }
-  }
-  h1 {
-    font-size: 50px;
-  }
-  input {
-    width: 100%;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 20px;
-    background: transparent;
+
+    h1 {
+      font-size: clamp($font-size-2xl, 4vw, $font-size-4xl);
+      font-family: $font-heading;
+      color: $color-charcoal;
+      margin-bottom: $spacing-lg;
+      line-height: $line-height-tight;
+    }
+
+    p {
+      font-size: clamp($font-size-base, 2vw, $font-size-xl);
+      margin-top: $spacing-lg;
+      line-height: $line-height-relaxed;
+      color: $body-text-color;
+    }
   }
 
   .input-divd {
-    border-radius: 20px;
-    border: solid 1px #ccc;
-    height: 50px;
-    padding-left: 10px;
-  }
-  .icon {
-    font-size: 30px;
-    margin-top: 10px;
-  }
-  .question-btn {
-    height: 100px;
-    border-radius: 35px;
-    padding: 30px;
-    margin-top: 30px;
-    cursor: pointer;
-  }
-  .box-1 {
-    border: solid 3px #707bb1;
+    border-radius: 1.25rem;
+    border: 2px solid rgba($color-slate, 0.2);
+    height: auto;
+    min-height: 50px;
+    padding: $spacing-sm $spacing-md;
+    background: #fff;
+    transition: all $transition-base;
+    margin-top: $spacing-lg;
 
-    font-size: 22px;
-    span {
-      background: #334bce;
+    @media (min-width: 768px) {
+      margin-top: 0;
+    }
+
+    &:focus-within {
+      border-color: $color-lime;
+      box-shadow: 0 0 0 0.25rem $focus-ring-color;
+    }
+
+    .icon {
+      font-size: $font-size-xl;
+      color: $color-slate;
+      margin-right: $spacing-sm;
+      flex-shrink: 0;
+    }
+
+    input {
+      @include modern-input;
       border: none;
-      width: 40px;
-      padding-left: 5px;
-      border-radius: 5px;
-      margin-top: -5px;
-      height: 45px;
+      padding: 0;
+      background: transparent;
+      box-shadow: none;
 
+      &:focus {
+        box-shadow: none;
+      }
+    }
+  }
+
+  .action-buttons {
+    margin-top: $spacing-2xl;
+  }
+
+  .question-btn {
+    min-height: 10px;
+    border-radius: 2.25rem;
+    padding: $spacing-xl $spacing-xl;
+    cursor: pointer;
+    align-items: center;
+    transition: all $transition-base;
+    font-family: $font-heading;
+    font-weight: 600;
+    text-decoration: none;
+    display: flex;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: $shadow-lg;
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    a,
+    p,
+    > span:first-child {
+      margin: 0;
+      font-size: clamp($font-size-base, 1.5vw, $font-size-xl);
+      flex-grow: 1;
+      font-family: inherit;
+      font-weight: inherit;
+      display: flex;
+      align-items: center;
+    }
+
+    .icon {
+      font-size: $font-size-lg;
+      margin: 0;
+      flex-shrink: 0;
+    }
+
+    > span:last-child {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 0.5rem;
+      margin-left: $spacing-md;
+      flex-shrink: 0;
+    }
+  }
+
+  .box-1 {
+    border: 3px solid color.scale($color-indigo, $lightness: 20%);
+    background: #fff;
+    color: $color-indigo;
+    font-size: clamp($font-size-base, 1.5vw, $font-size-xl);
+
+    &:hover {
+      border-color: $color-indigo;
+      box-shadow: 0 8px 24px rgba($color-indigo, 0.15);
+    }
+
+    span {
+      background: $color-indigo;
       color: #fff;
     }
   }
+
   .box-2 {
-    background: #334bce;
+    background: $color-indigo;
     color: #fff;
-    font-size: 22px;
+    font-size: clamp($font-size-base, 1.5vw, $font-size-xl);
+
+    &:hover {
+      background: color.scale($color-indigo, $lightness: -10%);
+      box-shadow: 0 8px 24px rgba($color-indigo, 0.3);
+    }
+
     span {
       background: #fff;
-      border: none;
-      color: #334bce;
-      width: 40px;
-      padding-left: 5px;
-      border-radius: 5px;
-      margin-top: -5px;
+      color: $color-indigo;
+    }
+  }
+
+  .whatsapp-btn {
+    background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+    color: #fff;
+    border: none;
+    justify-content:flex-start;
+    gap: 15%;
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.25);
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      transform: translate(-50%, -50%);
+      transition: width $transition-slow, height $transition-slow;
+    }
+
+    &:hover {
+      background: linear-gradient(135deg, #20BA5A 0%, #0F7A6D 100%);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(37, 211, 102, 0.35);
+
+      &::before {
+        width: 300px;
+        height: 300px;
+      }
+    }
+
+    &:active {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+    }
+
+    &:focus-visible {
+      outline: 0;
+      box-shadow: 0 0 0 0.25rem rgba(37, 211, 102, 0.35);
+    }
+
+    .whatsapp-icon {
+      font-size: clamp($font-size-xl, 2vw, $font-size-2xl);
+      flex-shrink: 0;
+      animation: pulse 2s ease-in-out infinite;
+      position: relative;
+      z-index: 1;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    }
+
+    .whatsapp-text {
+      font-size: clamp($font-size-base, 1.5vw, $font-size-xl);
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      position: relative;
+      z-index: 1;
+      white-space: nowrap;
+
+      @media (max-width: 576px) {
+        font-size: $font-size-base;
+        white-space: nowrap;
+      }
     }
   }
 }
-.question-body {
-  input {
-    width: 100%;
-    padding: 10px 20px;
-    border: solid 1px #e7e7e7;
-    border-radius: 5px;
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
   }
 }
+
+.question-body {
+  input {
+    @include modern-input;
+    margin-bottom: $spacing-md;
+  }
+}
+
 .act-btn {
-  background: #334bce;
-  font-family: sailecMedium;
+  @include modern-button("primary");
+  font-family: $font-heading;
 }
+
 .act-btn1 {
-  background: rgb(100, 1, 1);
-  font-family: sailecMedium;
-  border: solid 1px rgb(100, 1, 1);
+  @include modern-button("outline");
+  font-family: $font-heading;
+  border-color: color.scale(#640101, $lightness: 10%);
+  color: color.scale(#640101, $lightness: 10%);
+
+  &:hover {
+    background-color: rgba(#640101, 0.05);
+    border-color: #640101;
+    color: #640101;
+  }
 }
+
 .flip-card {
   background-color: transparent;
   height: 200px;
   perspective: 1000px;
+  width: 100%;
+
+  @media (min-width: 768px) {
+    height: 220px;
+  }
+
+  @media (min-width: 992px) {
+    height: 240px;
+  }
 }
 
 .flip-card-inner {
@@ -98,7 +283,7 @@
   width: 100%;
   height: 100%;
   text-align: center;
-  transition: transform 0.8s;
+  transition: transform $transition-slow;
   transform-style: preserve-3d;
 }
 
@@ -111,25 +296,45 @@
   position: absolute;
   width: 100%;
   height: 100%;
-  padding: 50px 20px;
-  -webkit-backface-visibility: hidden; /* Safari */
+  padding: $spacing-xl $spacing-lg;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 1.25rem;
+  box-shadow: $shadow-card;
+  -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
+  transition: box-shadow $transition-base;
 }
 
-/* Style the front side (fallback if image is missing) */
 .flip-card-front {
-  //   background-color: #bbb;
-  color: black;
-}
+  color: $color-charcoal;
+  background-color: var(--bg-color, $color-sky);
 
-/* Style the back side */
-.flip-card-back {
-  transform: rotateY(180deg);
-  background: #334bce;
-  p {
-    color: white !important;
+  h3 {
+    font-family: $font-heading;
+    font-size: clamp($font-size-base, 2vw, $font-size-lg);
+    color: inherit;
+    margin: 0;
+    line-height: $line-height-tight;
   }
 }
+
+.flip-card-back {
+  transform: rotateY(180deg);
+  background: $color-indigo;
+  color: #fff;
+
+  p {
+    color: #fff !important;
+    font-size: clamp($font-size-sm, 1.5vw, $font-size-base);
+    margin: 0;
+    line-height: $line-height-relaxed;
+  }
+}
+
 .questions-cover {
-  margin: 100px 0;
+  margin: $spacing-4xl 0;
+  padding-top: $spacing-2xl;
 }
