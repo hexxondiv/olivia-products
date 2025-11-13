@@ -20,6 +20,7 @@ export const ViewProductPage: React.FC = () => {
   const [transitionDirection, setTransitionDirection] = useState<"left" | "right">("right");
   const [quantity, setQuantity] = useState(1);
   const [reviewRefreshTrigger, setReviewRefreshTrigger] = useState(0);
+  const [isProductDetailsExpanded, setIsProductDetailsExpanded] = useState(false);
   const { addToCart, cart, updateQuantity } = useCart();
   const { getProductById, products: allProductsData, loading, error } = useProducts();
 
@@ -57,6 +58,7 @@ export const ViewProductPage: React.FC = () => {
 
   useEffect(() => {
     setActiveImage(0);
+    setIsProductDetailsExpanded(false);
     // Sync quantity with cart item if it exists
     if (product) {
       const cartItem = cart.find((item) => item.id === product.id);
@@ -277,55 +279,71 @@ export const ViewProductPage: React.FC = () => {
             </div>
           )}</TabletAndBelow>
         {/* Images */}
-        <div className="product-images col-md-6 d-md-flex">
-          <div className="image-thumbnails col-2">
-            {images.map((img, index) => (
-              <img
-                key={index}
-                src={img}
-                alt={`Thumbnail ${index + 1}`}
-                className={`thumbnail ${index === activeImage ? "active" : ""}`}
-                onClick={() => {
-                  setTransitionDirection(index > activeImage ? "right" : "left");
-                  setActiveImage(index);
-                }}
-              />
-            ))}
-          </div>
-
-          <div className="main-carousel col-md-10">
-            <Desktop> {primaryCategory && (
-            <div className="mt-3 all-sections">
-              <Link to={`/collections?category=${encodeURIComponent(primaryCategory)}`} style={{ color: product.color }}>
-                ← Back to all in “{primaryCategory}”
-              </Link>
-            </div>
-          )}</Desktop>
-            <div
-              className={`image-container ${transitionDirection}`}
-              style={{ transform: `translateX(-${activeImage * 100}%)` }}
-            >
-              {images.map((img, idx) => (
-                <img key={idx} src={img} alt="" className="main-image" width="100%" />
+        <div className="product-images col-md-6 d-md-flex flex-md-column">
+          <div className="d-md-flex">
+            <div className="image-thumbnails col-2">
+              {images.map((img, index) => (
+                <img
+                  key={index}
+                  src={img}
+                  alt={`Thumbnail ${index + 1}`}
+                  className={`thumbnail ${index === activeImage ? "active" : ""}`}
+                  onClick={() => {
+                    setTransitionDirection(index > activeImage ? "right" : "left");
+                    setActiveImage(index);
+                  }}
+                />
               ))}
             </div>
 
-            <button
-              className="prev-arrow"
-              onClick={() => setActiveImage((prev) => (prev - 1 + images.length) % images.length)}
-              aria-label="Previous image"
-            >
-              <span className="arrow-icon">←</span>
-            </button>
+            <div className="main-carousel col-md-10">
+              <Desktop> {primaryCategory && (
+              <div className="mt-3 all-sections">
+                <Link to={`/collections?category=${encodeURIComponent(primaryCategory)}`} style={{ color: product.color }}>
+                  ← Back to all in "{primaryCategory}"
+                </Link>
+              </div>
+            )}</Desktop>
+              <div
+                className={`image-container ${transitionDirection}`}
+                style={{ transform: `translateX(-${activeImage * 100}%)` }}
+              >
+                {images.map((img, idx) => (
+                  <img key={idx} src={img} alt="" className="main-image" width="100%" />
+                ))}
+              </div>
 
-            <button
-              className="next-arrow"
-              onClick={() => setActiveImage((prev) => (prev + 1) % images.length)}
-              aria-label="Next image"
-            >
-              <span className="arrow-icon">→</span>
-            </button>
+              <button
+                className="prev-arrow"
+                onClick={() => setActiveImage((prev) => (prev - 1 + images.length) % images.length)}
+                aria-label="Previous image"
+              >
+                <span className="arrow-icon">←</span>
+              </button>
+
+              <button
+                className="next-arrow"
+                onClick={() => setActiveImage((prev) => (prev + 1) % images.length)}
+                aria-label="Next image"
+              >
+                <span className="arrow-icon">→</span>
+              </button>
+            </div>
           </div>
+
+          {/* Reviews Section - Desktop only, under images */}
+          <Desktop>
+            <div className="reviews-section-desktop mt-4">
+              <ProductReviews productId={product.id} refreshTrigger={reviewRefreshTrigger} />
+              <ReviewForm 
+                productId={product.id} 
+                productName={formatProductName()}
+                onReviewSubmitted={() => {
+                  setReviewRefreshTrigger(prev => prev + 1);
+                }}
+              />
+            </div>
+          </Desktop>
         </div>
 
         {/* Details */}
@@ -337,8 +355,29 @@ export const ViewProductPage: React.FC = () => {
 
         <em>  {product.tagline && <p>{product.tagline}</p>}</em>
 
-          <h5>Product Details :</h5>
-          {product.moreDetail && <p>{product.moreDetail}</p>}
+          {/* Collapsible Product Details */}
+          {product.moreDetail && (
+            <div className="product-details-section">
+              <button
+                type="button"
+                className="product-details-toggle"
+                onClick={() => setIsProductDetailsExpanded(!isProductDetailsExpanded)}
+                aria-expanded={isProductDetailsExpanded}
+              >
+                <span>Product Details</span>
+                <span className={`toggle-icon ${isProductDetailsExpanded ? "expanded" : ""}`}>
+                  ▼
+                </span>
+              </button>
+              <div className={`product-details-content ${isProductDetailsExpanded ? "expanded" : ""}`}>
+                <div className="product-details-content-inner">
+                  <p className="product-details-text" style={{ whiteSpace: 'pre-line' }}>
+                    {product.moreDetail}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           <h5>Fruity Ingredients:</h5>
           <ul className="list-unstyled">
@@ -447,18 +486,19 @@ export const ViewProductPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Reviews Section */}
-      <div className="container col-md-10 offset-md-1 mt-5">
-        <ProductReviews productId={product.id} refreshTrigger={reviewRefreshTrigger} />
-        <ReviewForm 
-          productId={product.id} 
-          productName={formatProductName()}
-          onReviewSubmitted={() => {
-            // Trigger a refresh of reviews
-            setReviewRefreshTrigger(prev => prev + 1);
-          }}
-        />
-      </div>
+      {/* Reviews Section - Mobile/Tablet only */}
+      <TabletAndBelow>
+        <div className="container col-md-10 offset-md-1 mt-5">
+          <ProductReviews productId={product.id} refreshTrigger={reviewRefreshTrigger} />
+          <ReviewForm 
+            productId={product.id} 
+            productName={formatProductName()}
+            onReviewSubmitted={() => {
+              setReviewRefreshTrigger(prev => prev + 1);
+            }}
+          />
+        </div>
+      </TabletAndBelow>
       
     </>
   );
