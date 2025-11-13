@@ -460,7 +460,8 @@ export const CMSProducts: React.FC = () => {
 
   const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.heading.toLowerCase().includes(searchTerm.toLowerCase())
+    product.heading.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (product.sufix && product.sufix.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const handleOpenStockAdjust = (product: Product, movementType: 'adjustment' | 'purchase' | 'return' | 'damaged') => {
@@ -635,7 +636,7 @@ export const CMSProducts: React.FC = () => {
                     )}
                   </td>
                   <td>{product.id}</td>
-                  <td>{product.name}</td>
+                  <td>{product.name}{product.sufix ? ` ${product.sufix}` : ''}</td>
                   <td>{product.heading}</td>
                   <td>₦{product.price.toLocaleString()}</td>
                   <td>{product.rating}</td>
@@ -752,7 +753,7 @@ export const CMSProducts: React.FC = () => {
               )}
               <div className="product-header">
                 <div className="product-title">
-                  <h3>{product.name}</h3>
+                  <h3>{product.name}{product.sufix ? ` ${product.sufix}` : ''}</h3>
                   <div className="product-heading">{product.heading}</div>
                 </div>
                 <div className="product-id">ID: {product.id}</div>
