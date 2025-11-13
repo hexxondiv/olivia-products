@@ -8,6 +8,7 @@ import './cms-products.scss';
 
 interface Product {
   id?: number;
+  barcode?: string;
   name: string;
   heading: string;
   sufix?: string;
@@ -461,7 +462,8 @@ export const CMSProducts: React.FC = () => {
   const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     product.heading.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (product.sufix && product.sufix.toLowerCase().includes(searchTerm.toLowerCase()))
+    (product.sufix && product.sufix.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (product.barcode && product.barcode.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const handleOpenStockAdjust = (product: Product, movementType: 'adjustment' | 'purchase' | 'return' | 'damaged') => {
@@ -607,7 +609,7 @@ export const CMSProducts: React.FC = () => {
             <thead>
               <tr>
                 <th>Image</th>
-                <th>ID</th>
+                <th>Barcode</th>
                 <th>Name</th>
                 <th>Heading</th>
                 <th>Price</th>
@@ -635,7 +637,7 @@ export const CMSProducts: React.FC = () => {
                       <div className="product-thumbnail-placeholder">No Image</div>
                     )}
                   </td>
-                  <td>{product.id}</td>
+                  <td>{product.barcode || '-'}</td>
                   <td>{product.name}{product.sufix ? ` ${product.sufix}` : ''}</td>
                   <td>{product.heading}</td>
                   <td>₦{product.price.toLocaleString()}</td>
@@ -756,7 +758,7 @@ export const CMSProducts: React.FC = () => {
                   <h3>{product.name}{product.sufix ? ` ${product.sufix}` : ''}</h3>
                   <div className="product-heading">{product.heading}</div>
                 </div>
-                <div className="product-id">ID: {product.id}</div>
+                <div className="product-id">Barcode: {product.barcode || 'N/A'}</div>
               </div>
               
               <div className="product-details">
