@@ -1,7 +1,7 @@
 # Product Stock Management Scheme
 
 ## Overview
-This document outlines the comprehensive plan for implementing stock/inventory management for the Olivia Products e-commerce system. The system will track product quantities, manage stock levels, prevent overselling, and provide inventory management tools in the CMS.
+This document outlines the comprehensive plan for implementing stock/inventory management for the Olivia Industries Ltd e-commerce system. The system will track product quantities, manage stock levels, prevent overselling, and provide inventory management tools in the CMS.
 
 ---
 

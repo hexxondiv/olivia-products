@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./contact-us.scss";
-import { FaPaperclip, FaWhatsapp } from "react-icons/fa"; // Using an icon from react-icons
+import { FaPaperclip, FaWhatsapp, FaFacebook, FaLinkedin, FaYoutube } from "react-icons/fa";
+import { FaSquareInstagram, FaXTwitter } from "react-icons/fa6";
 import Hero from "../../assets/images/contact-icons.png";
 import { SEO } from "../../Components/SEO/SEO";
+import { getApiUrl } from "../../Utils/apiConfig";
 
 import { Col, Row, Alert } from "react-bootstrap";
 export const ContactUs = () => {
@@ -18,6 +20,47 @@ export const ContactUs = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null); // 'success' or 'error'
   const [submitMessage, setSubmitMessage] = useState("");
+  const [contactInfo, setContactInfo] = useState(null);
+  const [loadingContactInfo, setLoadingContactInfo] = useState(true);
+
+  useEffect(() => {
+    fetchContactInfo();
+  }, []);
+
+  const fetchContactInfo = async () => {
+    try {
+      const apiUrl = getApiUrl();
+      const response = await fetch(`${apiUrl}/contact-info.php`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setContactInfo(data.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch contact information:", error);
+    } finally {
+      setLoadingContactInfo(false);
+    }
+  };
+
+  const getSocialMediaIcon = (platform) => {
+    const platformLower = platform.toLowerCase();
+    switch (platformLower) {
+      case 'facebook':
+        return <FaFacebook />;
+      case 'instagram':
+        return <FaSquareInstagram />;
+      case 'twitter':
+      case 'x':
+        return <FaXTwitter />;
+      case 'linkedin':
+        return <FaLinkedin />;
+      case 'youtube':
+        return <FaYoutube />;
+      default:
+        return null;
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -118,15 +161,20 @@ export const ContactUs = () => {
   };
 
   const formatContactForWhatsApp = () => {
-    // Get WhatsApp number from environment variable, same as checkout page
-    const envWhatsApp = process.env.REACT_APP_SALES_WHATSAPP_NUMBER;
-    // Debug: log the env var (remove in production)
-    console.log('REACT_APP_SALES_WHATSAPP_NUMBER:', envWhatsApp);
-    const contactWhatsAppNumber = (envWhatsApp && envWhatsApp.trim() !== "") ? envWhatsApp.trim() : "+2348068527731";
+    // Get WhatsApp number from contact info API, fallback to env variable, then default
+    let contactWhatsAppNumber = "+2348068527731";
+    if (contactInfo?.salesWhatsApp) {
+      contactWhatsAppNumber = contactInfo.salesWhatsApp.trim();
+    } else {
+      const envWhatsApp = process.env.REACT_APP_SALES_WHATSAPP_NUMBER;
+      if (envWhatsApp && envWhatsApp.trim() !== "") {
+        contactWhatsAppNumber = envWhatsApp.trim();
+      }
+    }
     
     let message = "*NEW CONTACT FORM SUBMISSION*\n";
     message += "==================\n\n";
-    message += "Hello, Olivia Products!\n\n";
+    message += "Hello, @CelineOlivia!\n\n";
     message += "I'd like to get in touch. Here are my details:\n\n";
     
     message += "*CONTACT INFORMATION*\n";
@@ -195,7 +243,7 @@ export const ContactUs = () => {
       <SEO
         title="Contact Us"
         description="Get in touch with Olivia Fresh. Contact us for inquiries about our laundry, hygiene, and hair care products. We're here to help with customer service, wholesale inquiries, and product information."
-        keywords="contact Olivia Fresh, customer service, product inquiries, wholesale contact, Nigeria, Olivia Products support"
+        keywords="contact Olivia Fresh, customer service, product inquiries, wholesale contact, Nigeria, Olivia Industries Ltd support"
         url="/contact-us"
         type="website"
       />
@@ -307,36 +355,70 @@ export const ContactUs = () => {
         </div>
         <div className="col-md-5 gf-cova" >
           <div className="general-info">
-            <h4>Olivia Products Nigeria Ltd</h4>
-            <p>Location: Okaka plaza suite 1 first Avenue festac town, Lagos State
-
-</p>
-<p>Contact:
-:</p>
-<ul>
-  <li><span>Lagos:</span>+234 901 419 6902</li>
-  <li><span>Whatsapp:</span> +234 912 350 9090</li>
-  <li><span>Monday - Friday:</span>8am - 5pm</li>
-  <h5>Write to us:</h5>
-  <li><span>General Enquiries</span> customercare@celineolivia.com</li>
-  <li><span>Sales Enquiries</span> sales@celineolivia.com</li>
-  <li><span>Supplier Enquiries</span> purchases@celineolivia.com</li>
-  
-  </ul>
-  <h5>Follow us on:</h5>
+            <h4>{contactInfo?.companyName || "Olivia Industries Ltd"}</h4>
+            {contactInfo?.location && (
+              <p>Location: {contactInfo.location}</p>
+            )}
+            <p className="contact-label">Contact:</p>
+            <ul>
+              {contactInfo?.phone && (
+                <li><span>Lagos:</span>{contactInfo.phone}</li>
+              )}
+              {contactInfo?.whatsapp && (
+                <li><span>Whatsapp:</span> {contactInfo.whatsapp}</li>
+              )}
+              {contactInfo?.businessHours && (
+                <li><span>Monday - Friday:</span>{contactInfo.businessHours}</li>
+              )}
+              <h5>Write to us:</h5>
+              {contactInfo?.emailGeneral && (
+                <li><span>General Enquiries</span> <a href={`mailto:${contactInfo.emailGeneral}`}>{contactInfo.emailGeneral}</a></li>
+              )}
+              {contactInfo?.emailSales && (
+                <li><span>Sales Enquiries</span> <a href={`mailto:${contactInfo.emailSales}`}>{contactInfo.emailSales}</a></li>
+              )}
+              {contactInfo?.emailSupplier && (
+                <li><span>Supplier Enquiries</span> <a href={`mailto:${contactInfo.emailSupplier}`}>{contactInfo.emailSupplier}</a></li>
+              )}
+            </ul>
+            {contactInfo?.socialMedia && Object.keys(contactInfo.socialMedia).length > 0 && (
+              <>
+                <h5>Follow us on:</h5>
+                <div className="social-media-links">
+                  {Object.entries(contactInfo.socialMedia).map(([platform, url]) => {
+                    if (!url) return null;
+                    const icon = getSocialMediaIcon(platform);
+                    return (
+                      <a
+                        key={platform}
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={platform}
+                        className="social-link"
+                      >
+                        {icon}
+                      </a>
+                    );
+                  })}
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
-      <div className="col-md-12">
-        <iframe
-          src="https://www.google.com/maps?q=Okaka+plaza+suite+1+first+Avenue+festac+town+Lagos+State&output=embed"
-          height="450"
-          width="100%"
-          allowFullScreen=""
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-        ></iframe>
-      </div>
+      {contactInfo?.mapEmbedUrl && (
+        <div className="col-md-12">
+          <iframe
+            src={contactInfo.mapEmbedUrl}
+            height="450"
+            width="100%"
+            allowFullScreen=""
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          ></iframe>
+        </div>
+      )}
     </div>
     </>
   );

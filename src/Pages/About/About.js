@@ -37,7 +37,7 @@ const tabs = [
       image: Abt1,
       heading: "15 YEARS OF EXCELLENCE",
       heading2: "OUR COMMITMENT",
-      description: "Since 2009, Olivia Products has grown to become one of Nigeria's leading manufacturers of consumer care products.",
+      description: "Since 2009, Olivia Industries Ltd has grown to become one of Nigeria's leading manufacturers of consumer care products.",
       description2:
         "With over 15 years of operations, we've built a reputation for quality, innovation, and trust. Our state-of-the-art manufacturing facility in Lagos produces world-class products that touch millions of lives daily across Nigeria.",
     },
@@ -50,7 +50,7 @@ const tabs = [
       heading2: "OUR PROMISE",
       description: "Every product undergoes strict quality control and testing before reaching our customers.",
       description2:
-        "From formulation to packaging, we ensure purity, safety, and exceptional performance. Our commitment to excellence has made Olivia Products a trusted household name, with products ranging from hair care and personal hygiene to household cleaning solutions.",
+        "From formulation to packaging, we ensure purity, safety, and exceptional performance. Our commitment to excellence has made Olivia Industries Ltd a trusted household name, with products ranging from hair care and personal hygiene to household cleaning solutions.",
     },
   },
   {
@@ -88,8 +88,8 @@ export const About = () => {
     <>
       <SEO
         title="About Us"
-        description="Olivia Products Nigeria Ltd is one of the largest manufacturer and distributor of Laundry, Hygiene and Hair Care products in Nigeria. Established in 2009, with over 15 years of operations in Lagos."
-        keywords="Olivia Products, about Olivia Fresh, manufacturing Nigeria, laundry products manufacturer, hygiene products Nigeria, company history, Lagos manufacturing"
+        description="Olivia Industries Ltd is one of the largest manufacturer and distributor of Laundry, Hygiene and Hair Care products in Nigeria. Established in 2009, with over 15 years of operations in Lagos."
+        keywords="Olivia Industries Ltd, about Olivia Fresh, manufacturing Nigeria, laundry products manufacturer, hygiene products Nigeria, company history, Lagos manufacturing"
         url="/about-us"
         type="website"
       />
@@ -105,11 +105,11 @@ export const About = () => {
         <div className="col-md-3  offset-md-2 ">
           <h4>COMPANY OVERVIEW</h4>
           <p>
-            Olivia Products Nigeria Ltd is one of the largest manufacturer and
+            Olivia Industries Ltd is one of the largest manufacturer and
             distributor of Laundry, Hygiene and hair Care products in Nigeria.
           </p>
           <p>
-            Olivia Products was established in 2009, having its manufacturing
+            Olivia Industries Ltd was established in 2009, having its manufacturing
             plant & HQ based in Lagos-Nigeria, producing various brands of
             consumer products in non-food categories.
           </p>
@@ -187,21 +187,21 @@ export const About = () => {
             <IoPerson className="icon" />
             <div>
               <h6>Mrs Olivia Mbaeme</h6>
-              <p>Chairman, Olivia Products Limited</p>
+              <p>Chairman, Olivia Industries Ltd</p>
             </div>
           </div>
           <div className="director d-flex">
             <IoPerson className="icon" />
             <div>
               <h6>Mr. Chinedu Okafor</h6>
-              <p>Sales and Marketing Director, Olivia Products Limited</p>
+              <p>Sales and Marketing Director, Olivia Industries Ltd</p>
             </div>
           </div>
           <div className="director d-flex">
             <IoPerson className="icon" />
             <div>
               <h6>Engr. Emmanuel Okafor</h6>
-              <p>Managing Director, Olivia Products Limited</p>
+              <p>Managing Director, Olivia Industries Ltd</p>
             </div>
           </div>
         </div>{" "}

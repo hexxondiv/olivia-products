@@ -1,6 +1,6 @@
 <?php
 /**
- * Dynamic Sitemap Generator for Olivia Products
+ * Dynamic Sitemap Generator for Olivia Industries Ltd
  * 
  * This script generates a sitemap.xml file dynamically based on:
  * - Static pages (defined in routes)

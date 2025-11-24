@@ -7,8 +7,8 @@ export const Careers = () => {
     <>
       <SEO
         title="Careers"
-        description="Join the Olivia Products team. Build your career with one of Nigeria's leading manufacturers of consumer care products. We offer growth opportunities, competitive benefits, and a dynamic work environment."
-        keywords="Olivia Products careers, jobs Nigeria, manufacturing careers, consumer products jobs, Lagos jobs, career opportunities"
+        description="Join the Olivia Team. Build your career with one of Nigeria's leading manufacturers of consumer care products. We offer growth opportunities, competitive benefits, and a dynamic work environment."
+        keywords="Olivia Industries Ltd careers, jobs Nigeria, manufacturing careers, consumer products jobs, Lagos jobs, career opportunities"
         url="/careers"
         type="website"
       />
@@ -20,9 +20,9 @@ export const Careers = () => {
       <div className="careers-content">
         <div className="col-md-8 offset-md-2">
           <div className="careers-intro">
-            <h2>Build Your Career with Olivia Products</h2>
+            <h2>Build Your Career with Olivia Industries Ltd</h2>
             <p>
-              At Olivia Products, we believe in fostering talent, encouraging innovation, 
+              At Olivia Industries Ltd, we believe in fostering talent, encouraging innovation, 
               and creating opportunities for growth. As one of Nigeria's leading manufacturers 
               of consumer care products, we offer a dynamic work environment where your skills 
               and dedication can make a real impact.
@@ -108,7 +108,7 @@ export const Careers = () => {
 
           <div className="careers-note">
             <p>
-              <strong>Note:</strong> Olivia Products is an equal opportunity employer. We celebrate 
+              <strong>Note:</strong> Olivia Industries Ltd is an equal opportunity employer. We celebrate 
               diversity and are committed to creating an inclusive environment for all employees.
             </p>
           </div>

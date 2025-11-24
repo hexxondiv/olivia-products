@@ -1,6 +1,6 @@
 # Deployment Guide for celineolivia.com
 
-This guide will help you deploy the Olivia Products application to a shared hosting server.
+This guide will help you deploy the Olivia Industries Ltd application to a shared hosting server.
 
 ## Prerequisites
 
@@ -68,7 +68,7 @@ define('MAILGUN_DOMAIN', 'your-mailgun-domain.com');
 define('MAILGUN_PRIVATE_KEY', 'your-private-api-key');
 define('MAILGUN_PUBLIC_KEY', 'your-public-api-key');
 define('MAILGUN_FROM_ADDRESS', 'info@celineolivia.com');
-define('MAILGUN_FROM_NAME', 'Olivia Products');
+define('MAILGUN_FROM_NAME', 'Olivia Industries Ltd');
 define('MAILGUN_REPLY_TO', 'info@celineolivia.com');
 define('MAILGUN_FORCE_FROM_ADDRESS', 'info@celineolivia.com');
 define('SALES_EMAIL', 'sales@celineolivia.com');

@@ -1,6 +1,6 @@
 # Database Setup Guide
 
-This guide explains how to set up the database for the Olivia Products application.
+This guide explains how to set up the database for the Olivia Industries Ltd application.
 
 ## Quick Setup (Recommended)
 

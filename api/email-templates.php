@@ -177,7 +177,7 @@ function getSalesOrderEmailTemplate($orderData) {
         </div>
         
         <div class="footer">
-            <p style="margin: 0;">This is an automated email from Olivia Products order system.</p>
+            <p style="margin: 0;">This is an automated email from Olivia order system.</p>
             <p style="margin: 5px 0 0 0;">Please process this order promptly.</p>
         </div>
     </div>
@@ -321,7 +321,7 @@ function getCustomerOrderEmailTemplate($orderData) {
             
             <div class="info-box">
                 <h3 style="margin-top: 0; color: #003057;">Hello ' . htmlspecialchars($customer['fullName']) . '!</h3>
-                <p style="margin: 0; line-height: 1.6;">Thank you for choosing Olivia Products. We have successfully received your order and our team will contact you within 24 hours to confirm the details and arrange for delivery.</p>
+                <p style="margin: 0; line-height: 1.6;">Thank you for choosing Olivia Industries Ltd. We have successfully received your order and our team will contact you within 24 hours to confirm the details and arrange for delivery.</p>
             </div>
             
             <h3 style="color: #003057; margin-top: 30px;">Order Summary</h3>
@@ -374,7 +374,7 @@ function getCustomerOrderEmailTemplate($orderData) {
         </div>
         
         <div class="footer">
-            <p style="margin: 0; font-weight: 600; color: #003057;">Olivia Products</p>
+            <p style="margin: 0; font-weight: 600; color: #003057;">Olivia Industries Ltd</p>
             <p style="margin: 5px 0;">Thank you for your business!</p>
             <p style="margin: 10px 0 0 0; font-size: 0.9em;">This is an automated confirmation email. Please do not reply to this email.</p>
         </div>
@@ -396,7 +396,7 @@ function getCustomerOrderEmailTextTemplate($orderData) {
     $text = "THANK YOU FOR YOUR ORDER!\n";
     $text .= "========================\n\n";
     $text .= "Hello {$customer['fullName']}!\n\n";
-    $text .= "Thank you for choosing Olivia Products. We have successfully received your order and our team will contact you within 24 hours to confirm the details and arrange for delivery.\n\n";
+    $text .= "Thank you for choosing Olivia Industries Ltd. We have successfully received your order and our team will contact you within 24 hours to confirm the details and arrange for delivery.\n\n";
     
     $text .= "ORDER DETAILS\n";
     $text .= "-------------\n";
@@ -439,7 +439,7 @@ function getCustomerOrderEmailTextTemplate($orderData) {
     $text .= "- If you have any questions, please contact us at " . MAILGUN_REPLY_TO . "\n\n";
     
     $text .= "Thank you for your business!\n\n";
-    $text .= "Olivia Products\n";
+    $text .= "Olivia Industries Ltd\n";
     $text .= "This is an automated confirmation email. Please do not reply to this email.\n";
     
     return $text;
@@ -528,7 +528,7 @@ function getContactFormEmailTemplate($contactData) {
         </div>
         
         <div class="footer">
-            <p style="margin: 0;">This is an automated email from Olivia Products contact form system.</p>
+            <p style="margin: 0;">This is an automated email from Olivia contact form system.</p>
             <p style="margin: 5px 0 0 0;">Please respond to this inquiry promptly.</p>
         </div>
     </div>
@@ -565,7 +565,7 @@ function getContactFormEmailTextTemplate($contactData) {
     $text .= "-------\n";
     $text .= "$message\n\n";
     
-    $text .= "This is an automated email from Olivia Products contact form system.\n";
+    $text .= "This is an automated email from Olivia contact form system.\n";
     $text .= "Please respond to this inquiry promptly.\n";
     
     return $text;
@@ -609,7 +609,7 @@ function getContactAcknowledgementEmailTemplate($contactData) {
         <div class="content">
             <div class="info-box">
                 <h3 style="margin-top: 0; color: #003057;">Hello ' . $fullName . '!</h3>
-                <p style="margin: 0; line-height: 1.6;">Thank you for reaching out to Olivia Products. We have successfully received your message submitted on ' . $submittedAt . ' and our team will review it and respond to you as soon as possible.</p>
+                <p style="margin: 0; line-height: 1.6;">Thank you for reaching out to Olivia Industries Ltd. We have successfully received your message submitted on ' . $submittedAt . ' and our team will review it and respond to you as soon as possible.</p>
             </div>
             
             <div class="next-steps">
@@ -638,7 +638,7 @@ function getContactAcknowledgementEmailTemplate($contactData) {
         </div>
         
         <div class="footer">
-            <p style="margin: 0; font-weight: 600; color: #003057;">Olivia Products</p>
+            <p style="margin: 0; font-weight: 600; color: #003057;">Olivia Industries Ltd</p>
             <p style="margin: 5px 0;">We appreciate your interest in our products!</p>
             <p style="margin: 10px 0 0 0; font-size: 0.9em;">This is an automated acknowledgement email. Please do not reply to this email.</p>
         </div>
@@ -657,7 +657,7 @@ function getContactAcknowledgementEmailTextTemplate($contactData) {
     $text = "THANK YOU FOR CONTACTING US!\n";
     $text .= "============================\n\n";
     $text .= "Hello $fullName!\n\n";
-    $text .= "Thank you for reaching out to Olivia Products. We have successfully received your message submitted on $submittedAt and our team will review it and respond to you as soon as possible.\n\n";
+    $text .= "Thank you for reaching out to Olivia Industries Ltd. We have successfully received your message submitted on $submittedAt and our team will review it and respond to you as soon as possible.\n\n";
     
     $text .= "WHAT'S NEXT?\n";
     $text .= "------------\n";
@@ -675,7 +675,7 @@ function getContactAcknowledgementEmailTextTemplate($contactData) {
     $text .= "Location: Okaka plaza suite 1 first Avenue festac town, Lagos State\n\n";
     
     $text .= "We appreciate your interest in our products!\n\n";
-    $text .= "Olivia Products\n";
+    $text .= "Olivia Industries Ltd\n";
     $text .= "This is an automated acknowledgement email. Please do not reply to this email.\n";
     
     return $text;
@@ -809,7 +809,7 @@ function getWholesaleFormEmailTemplate($wholesaleData) {
         </div>
         
         <div class="footer">
-            <p style="margin: 0;">This is an automated email from Olivia Products ' . strtolower($formType) . ' partnership form system.</p>
+            <p style="margin: 0;">This is an automated email from Olivia ' . strtolower($formType) . ' partnership form system.</p>
             <p style="margin: 5px 0 0 0;">Please respond to this inquiry promptly.</p>
         </div>
     </div>
@@ -869,7 +869,7 @@ function getWholesaleFormEmailTextTemplate($wholesaleData) {
     $text .= "------------------\n";
     $text .= "$aboutBusiness\n\n";
     
-    $text .= "This is an automated email from Olivia Products " . strtolower($formType) . " partnership form system.\n";
+    $text .= "This is an automated email from Olivia " . strtolower($formType) . " partnership form system.\n";
     $text .= "Please respond to this inquiry promptly.\n";
     
     return $text;
@@ -914,7 +914,7 @@ function getWholesaleAcknowledgementEmailTemplate($wholesaleData) {
         <div class="content">
             <div class="info-box">
                 <h3 style="margin-top: 0; color: #003057;">Hello ' . $firstName . '!</h3>
-                <p style="margin: 0; line-height: 1.6;">Thank you for your interest in becoming a ' . strtolower($formType) . ' partner with Olivia Products. We have successfully received your application submitted on ' . $submittedAt . ' and our team will review it and respond to you as soon as possible.</p>
+                <p style="margin: 0; line-height: 1.6;">Thank you for your interest in becoming a ' . strtolower($formType) . ' partner with Olivia Industries Ltd. We have successfully received your application submitted on ' . $submittedAt . ' and our team will review it and respond to you as soon as possible.</p>
             </div>
             
             <div class="next-steps">
@@ -944,7 +944,7 @@ function getWholesaleAcknowledgementEmailTemplate($wholesaleData) {
         </div>
         
         <div class="footer">
-            <p style="margin: 0; font-weight: 600; color: #003057;">Olivia Products</p>
+            <p style="margin: 0; font-weight: 600; color: #003057;">Olivia Industries Ltd</p>
             <p style="margin: 5px 0;">We look forward to the possibility of partnering with you!</p>
             <p style="margin: 10px 0 0 0; font-size: 0.9em;">This is an automated acknowledgement email. Please do not reply to this email.</p>
         </div>
@@ -964,7 +964,7 @@ function getWholesaleAcknowledgementEmailTextTemplate($wholesaleData) {
     $text = "THANK YOU FOR YOUR " . strtoupper($formType) . " PARTNERSHIP INQUIRY!\n";
     $text .= str_repeat("=", strlen($formType) + 35) . "\n\n";
     $text .= "Hello $firstName!\n\n";
-    $text .= "Thank you for your interest in becoming a " . strtolower($formType) . " partner with Olivia Products. We have successfully received your application submitted on $submittedAt and our team will review it and respond to you as soon as possible.\n\n";
+    $text .= "Thank you for your interest in becoming a " . strtolower($formType) . " partner with Olivia Industries Ltd. We have successfully received your application submitted on $submittedAt and our team will review it and respond to you as soon as possible.\n\n";
     
     $text .= "WHAT'S NEXT?\n";
     $text .= "------------\n";
@@ -983,7 +983,7 @@ function getWholesaleAcknowledgementEmailTextTemplate($wholesaleData) {
     $text .= "Location: Okaka plaza suite 1 first Avenue festac town, Lagos State\n\n";
     
     $text .= "We look forward to the possibility of partnering with you!\n\n";
-    $text .= "Olivia Products\n";
+    $text .= "Olivia Industries Ltd\n";
     $text .= "This is an automated acknowledgement email. Please do not reply to this email.\n";
     
     return $text;
@@ -1183,7 +1183,7 @@ function getCustomerStatusUpdateEmailTemplate($orderData, $newStatus, $oldStatus
         </div>
         
         <div class="footer">
-            <p style="margin: 0; font-weight: 600; color: #003057;">Olivia Products</p>
+            <p style="margin: 0; font-weight: 600; color: #003057;">Olivia Industries Ltd</p>
             <p style="margin: 5px 0;">Thank you for your business!</p>
             <p style="margin: 10px 0 0 0; font-size: 0.9em;">This is an automated status update email. Please do not reply to this email.</p>
         </div>
@@ -1306,7 +1306,7 @@ function getCustomerStatusUpdateEmailTextTemplate($orderData, $newStatus, $oldSt
     $text .= "WhatsApp: +234 912 350 9090\n\n";
     
     $text .= "Thank you for your business!\n\n";
-    $text .= "Olivia Products\n";
+    $text .= "Olivia Industries Ltd\n";
     $text .= "This is an automated status update email. Please do not reply to this email.\n";
     
     return $text;
@@ -1467,7 +1467,7 @@ function getCustomerPaymentStatusEmailTemplate($orderData, $isPaid) {
         </div>
         
         <div class="footer">
-            <p style="margin: 0; font-weight: 600; color: #003057;">Olivia Products</p>
+            <p style="margin: 0; font-weight: 600; color: #003057;">Olivia Industries Ltd</p>
             <p style="margin: 5px 0;">Thank you for your business!</p>
             <p style="margin: 10px 0 0 0; font-size: 0.9em;">This is an automated payment status update email. Please do not reply to this email.</p>
         </div>
@@ -1552,7 +1552,7 @@ function getCustomerPaymentStatusEmailTextTemplate($orderData, $isPaid) {
     $text .= "WhatsApp: +234 912 350 9090\n\n";
     
     $text .= "Thank you for your business!\n\n";
-    $text .= "Olivia Products\n";
+    $text .= "Olivia Industries Ltd\n";
     $text .= "This is an automated payment status update email. Please do not reply to this email.\n";
     
     return $text;
@@ -1561,7 +1561,7 @@ function getCustomerPaymentStatusEmailTextTemplate($orderData, $isPaid) {
 /**
  * Get contact reply email template (HTML with Bootstrap)
  */
-function getContactReplyEmailTemplate($contactData, $replyMessage, $adminName = 'Olivia Products Team') {
+function getContactReplyEmailTemplate($contactData, $replyMessage, $adminName = 'Olivia Team') {
     $fullName = htmlspecialchars($contactData['fullName']);
     $originalMessage = nl2br(htmlspecialchars($contactData['message']));
     $replyMessage = nl2br(htmlspecialchars($replyMessage));
@@ -1596,7 +1596,7 @@ function getContactReplyEmailTemplate($contactData, $replyMessage, $adminName = 
         <div class="content">
             <p>Hello ' . $fullName . ',</p>
             
-            <p>Thank you for contacting Olivia Products. We have reviewed your inquiry and are pleased to provide the following response:</p>
+            <p>Thank you for contacting Olivia Industries Ltd. We have reviewed your inquiry and are pleased to provide the following response:</p>
             
             <div class="reply-box">
                 <h3 style="margin-top: 0; color: #003057;">Our Response</h3>
@@ -1624,16 +1624,16 @@ function getContactReplyEmailTemplate($contactData, $replyMessage, $adminName = 
                 <p style="margin: 5px 0;"><strong>Business Hours:</strong> Monday - Friday, 8am - 5pm</p>
             </div>
             
-            <p>We appreciate your interest in Olivia Products!</p>
+            <p>We appreciate your interest in Olivia Industries Ltd!</p>
             
             <p>Best regards,<br>
             <strong>' . htmlspecialchars($adminName) . '</strong><br>
-            Olivia Products Team</p>
+            Olivia Team</p>
         </div>
         
         <div class="footer">
-            <p style="margin: 0; font-weight: 600; color: #003057;">Olivia Products</p>
-            <p style="margin: 5px 0;">Thank you for choosing Olivia Products!</p>
+            <p style="margin: 0; font-weight: 600; color: #003057;">Olivia Industries Ltd</p>
+            <p style="margin: 5px 0;">Thank you for choosing Olivia Industries Ltd!</p>
         </div>
     </div>
 </body>
@@ -1643,7 +1643,7 @@ function getContactReplyEmailTemplate($contactData, $replyMessage, $adminName = 
 /**
  * Get contact reply email template (Plain Text)
  */
-function getContactReplyEmailTextTemplate($contactData, $replyMessage, $adminName = 'Olivia Products Team') {
+function getContactReplyEmailTextTemplate($contactData, $replyMessage, $adminName = 'Olivia Team') {
     $fullName = $contactData['fullName'];
     $originalMessage = $contactData['message'];
     $replyDate = date('F j, Y \a\t g:i A');
@@ -1651,7 +1651,7 @@ function getContactReplyEmailTextTemplate($contactData, $replyMessage, $adminNam
     $text = "RESPONSE TO YOUR INQUIRY\n";
     $text .= "========================\n\n";
     $text .= "Hello $fullName,\n\n";
-    $text .= "Thank you for contacting Olivia Products. We have reviewed your inquiry and are pleased to provide the following response:\n\n";
+    $text .= "Thank you for contacting Olivia Industries Ltd. We have reviewed your inquiry and are pleased to provide the following response:\n\n";
     $text .= "OUR RESPONSE\n";
     $text .= "------------\n";
     $text .= "$replyMessage\n\n";
@@ -1666,10 +1666,10 @@ function getContactReplyEmailTextTemplate($contactData, $replyMessage, $adminNam
     $text .= "Phone: +234 901 419 6902\n";
     $text .= "WhatsApp: +234 912 350 9090\n";
     $text .= "Business Hours: Monday - Friday, 8am - 5pm\n\n";
-    $text .= "We appreciate your interest in Olivia Products!\n\n";
+    $text .= "We appreciate your interest in Olivia Industries Ltd!\n\n";
     $text .= "Best regards,\n";
     $text .= "$adminName\n";
-    $text .= "Olivia Products Team\n";
+    $text .= "Olivia Team\n";
     
     return $text;
 }
@@ -1728,13 +1728,13 @@ function getWholesaleStatusUpdateEmailTemplate($wholesaleData, $newStatus, $oldS
         'rejected' => [
             'title' => 'Application Status Update',
             'icon' => 'ℹ️',
-            'message' => 'Thank you for your interest in becoming a ' . strtolower($formType) . ' partner with Olivia Products.',
+            'message' => 'Thank you for your interest in becoming a ' . strtolower($formType) . ' partner with Olivia Industries Ltd.',
             'nextSteps' => [
                 'Unfortunately, we are unable to proceed with your application at this time',
                 'This decision was based on our current partnership criteria and business needs',
                 'We encourage you to reapply in the future as our requirements may change',
                 'If you have any questions about this decision, please contact us',
-                'We appreciate your interest in Olivia Products'
+                'We appreciate your interest in Olivia Industries Ltd'
             ],
             'color' => '#dc3545'
         ],
@@ -1746,7 +1746,7 @@ function getWholesaleStatusUpdateEmailTemplate($wholesaleData, $newStatus, $oldS
                 'Your application has been moved to our archives',
                 'If you wish to reactivate your application, please contact us',
                 'We may reach out to you in the future if opportunities arise',
-                'Thank you for your interest in Olivia Products'
+                'Thank you for your interest in Olivia Industries Ltd'
             ],
             'color' => '#6c757d'
         ]
@@ -1829,7 +1829,7 @@ function getWholesaleStatusUpdateEmailTemplate($wholesaleData, $newStatus, $oldS
         </div>
         
         <div class="footer">
-            <p style="margin: 0; font-weight: 600; color: #003057;">Olivia Products</p>
+            <p style="margin: 0; font-weight: 600; color: #003057;">Olivia Industries Ltd</p>
             <p style="margin: 5px 0;">We appreciate your interest in partnering with us!</p>
             <p style="margin: 10px 0 0 0; font-size: 0.9em;">This is an automated status update email. Please do not reply to this email.</p>
         </div>
@@ -1883,13 +1883,13 @@ function getWholesaleStatusUpdateEmailTextTemplate($wholesaleData, $newStatus, $
         ],
         'rejected' => [
             'title' => 'APPLICATION STATUS UPDATE',
-            'message' => 'Thank you for your interest in becoming a ' . strtolower($formType) . ' partner with Olivia Products.',
+            'message' => 'Thank you for your interest in becoming a ' . strtolower($formType) . ' partner with Olivia Industries Ltd.',
             'nextSteps' => [
                 'Unfortunately, we are unable to proceed with your application at this time',
                 'This decision was based on our current partnership criteria and business needs',
                 'We encourage you to reapply in the future as our requirements may change',
                 'If you have any questions about this decision, please contact us',
-                'We appreciate your interest in Olivia Products'
+                'We appreciate your interest in Olivia Industries Ltd'
             ]
         ],
         'archived' => [
@@ -1899,7 +1899,7 @@ function getWholesaleStatusUpdateEmailTextTemplate($wholesaleData, $newStatus, $
                 'Your application has been moved to our archives',
                 'If you wish to reactivate your application, please contact us',
                 'We may reach out to you in the future if opportunities arise',
-                'Thank you for your interest in Olivia Products'
+                'Thank you for your interest in Olivia Industries Ltd'
             ]
         ]
     ];
@@ -1934,7 +1934,7 @@ function getWholesaleStatusUpdateEmailTextTemplate($wholesaleData, $newStatus, $
     $text .= "Location: Okaka plaza suite 1 first Avenue festac town, Lagos State\n\n";
     
     $text .= "We appreciate your interest in partnering with us!\n\n";
-    $text .= "Olivia Products\n";
+    $text .= "Olivia Industries Ltd\n";
     $text .= "This is an automated status update email. Please do not reply to this email.\n";
     
     return $text;

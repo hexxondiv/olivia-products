@@ -81,7 +81,7 @@ export const TopNav = () => {
       <Navbar expand="lg" bg="light" sticky="top" className="top-nav shadow-sm" expanded={isOpen}>
         <Container fluid="lg">
           <Navbar.Brand as={Link} to="/" className="d-flex align-items-center gap-2">
-            <img src={Logo} alt="Olivia Products" className="top-nav__logo" />
+            <img src={Logo} alt="Olivia Industries Ltd" className="top-nav__logo" />
           </Navbar.Brand>
           <div className="d-flex align-items-center gap-2">
             <div className="d-lg-none">

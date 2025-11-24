@@ -1,7 +1,8 @@
--- Olivia Products CMS Database Schema
+-- Olivia CMS Database Schema
 -- Run this SQL to create the database and tables
 
 -- CREATE DATABASE IF NOT EXISTS olivia_products CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- USE celicoyh_olivia;
 USE olivia_products;
 
 -- Products Table
@@ -341,9 +342,107 @@ CREATE TABLE IF NOT EXISTS submitted_questions (
 -- Note: Use seed-admin.php to create/update admin user with proper password hash
 -- This INSERT will create the user if it doesn't exist, but won't update password if user exists
 -- Run: php api/seed-admin.php to ensure password hash is correct
--- Get admin role ID for the foreign key
+-- Ensure roleId column exists (for backward compatibility with older schemas)
+-- Step 1: Get admin role ID first
 SET @admin_role_id = (SELECT id FROM roles WHERE name = 'admin' LIMIT 1);
+-- Step 2: Add roleId column if it doesn't exist (as nullable first to handle existing rows)
+SET @dbname = DATABASE();
+SET @tablename = 'admin_users';
+SET @preparedStatement = (SELECT IF(
+  (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE
+      (TABLE_SCHEMA = @dbname)
+      AND (TABLE_NAME = @tablename)
+      AND (COLUMN_NAME = 'roleId')
+  ) > 0,
+  'SELECT 1',
+  'ALTER TABLE admin_users ADD COLUMN roleId INT NULL AFTER role'
+));
+PREPARE alterIfNotExists FROM @preparedStatement;
+EXECUTE alterIfNotExists;
+DEALLOCATE PREPARE alterIfNotExists;
+-- Step 3: Update existing rows to have admin roleId if they don't have one
+UPDATE admin_users SET roleId = @admin_role_id WHERE roleId IS NULL;
+-- Step 4: Add index if it doesn't exist
+SET @preparedStatement = (SELECT IF(
+  (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE
+      (TABLE_SCHEMA = @dbname)
+      AND (TABLE_NAME = @tablename)
+      AND (INDEX_NAME = 'idx_roleId')
+  ) > 0,
+  'SELECT 1',
+  'ALTER TABLE admin_users ADD INDEX idx_roleId (roleId)'
+));
+PREPARE alterIfNotExists FROM @preparedStatement;
+EXECUTE alterIfNotExists;
+DEALLOCATE PREPARE alterIfNotExists;
+-- Step 5a: Make column NOT NULL (safe to run even if already NOT NULL)
+ALTER TABLE admin_users MODIFY COLUMN roleId INT NOT NULL;
+-- Step 5b: Add foreign key constraint if it doesn't exist
+SET @preparedStatement = (SELECT IF(
+  (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+    WHERE
+      (TABLE_SCHEMA = @dbname)
+      AND (TABLE_NAME = @tablename)
+      AND (COLUMN_NAME = 'roleId')
+      AND (REFERENCED_TABLE_NAME = 'roles')
+  ) > 0,
+  'SELECT 1',
+  'ALTER TABLE admin_users ADD FOREIGN KEY (roleId) REFERENCES roles(id) ON DELETE RESTRICT'
+));
+PREPARE alterIfNotExists FROM @preparedStatement;
+EXECUTE alterIfNotExists;
+DEALLOCATE PREPARE alterIfNotExists;
+-- Step 6: Insert or update admin user
 INSERT INTO admin_users (username, email, passwordHash, fullName, role, roleId) 
 VALUES ('admin', 'admin@celineolivia.com', '$2y$12$GnPmpJfz7JNR1bIuTGW/yudJ9VY5e0Uk0ypIJYCo8TpZ91EX/J/3W', 'Administrator', 'admin', @admin_role_id)
-ON DUPLICATE KEY UPDATE username=username;
+ON DUPLICATE KEY UPDATE username=username, roleId=@admin_role_id;
+
+-- Contact Information Table (for managing company contact details)
+CREATE TABLE IF NOT EXISTS contact_info (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    companyName VARCHAR(255) NOT NULL DEFAULT 'Olivia Industries Ltd',
+    location TEXT NOT NULL,
+    phone VARCHAR(50),
+    whatsapp VARCHAR(50),
+    salesWhatsApp VARCHAR(50) COMMENT 'Sales WhatsApp number (used for REACT_APP_SALES_WHATSAPP_NUMBER)',
+    businessHours VARCHAR(255),
+    emailGeneral VARCHAR(255) COMMENT 'General enquiries email',
+    emailSales VARCHAR(255) COMMENT 'Sales enquiries email',
+    emailSupplier VARCHAR(255) COMMENT 'Supplier enquiries email',
+    mapEmbedUrl TEXT COMMENT 'Google Maps embed URL or address for map',
+    socialMedia JSON COMMENT 'Social media links (Facebook, Instagram, Twitter, etc.)',
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_companyName (companyName)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Insert default contact information
+INSERT INTO contact_info (
+    companyName, 
+    location, 
+    phone, 
+    whatsapp, 
+    salesWhatsApp,
+    businessHours, 
+    emailGeneral, 
+    emailSales, 
+    emailSupplier,
+    mapEmbedUrl
+) VALUES (
+    'Olivia Industries Ltd',
+    'Okaka plaza suite 1 first Avenue festac town, Lagos State',
+    '+234 901 419 6902',
+    '+234 912 350 9090',
+    '+2348068527731',
+    'Monday - Friday: 8am - 5pm',
+    'customercare@celineolivia.com',
+    'sales@celineolivia.com',
+    'purchases@celineolivia.com',
+    'https://www.google.com/maps?q=Okaka+plaza+suite+1+first+Avenue+festac+town+Lagos+State&output=embed'
+) ON DUPLICATE KEY UPDATE companyName=companyName;
 

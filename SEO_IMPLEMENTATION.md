@@ -1,6 +1,6 @@
 # SEO Implementation Summary
 
-This document outlines all SEO optimizations implemented for the Olivia Products website.
+This document outlines all SEO optimizations implemented for the Olivia Industries Ltd website.
 
 ## ✅ Completed SEO Optimizations
 

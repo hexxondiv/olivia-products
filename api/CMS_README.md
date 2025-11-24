@@ -1,4 +1,4 @@
-# Olivia Products CMS API Documentation
+# Olivia CMS API Documentation
 
 This CMS provides RESTful API endpoints for managing products, orders, contact submissions, and wholesale applications.
 

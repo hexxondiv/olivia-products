@@ -24,6 +24,6 @@ export const YoutubePosts = [
     id: 4,
     url: "https://youtube.com/shorts/?v=6AHIDaDFey4&si=ykvbhUBjsems6JzS",
     caption: "Celebrate Excellence, Inspire Tomorrow:",
-    description: "Olivia Products showcasing the values that define our brand.",
+    description: "Olivia Industries Ltd showcasing the values that define our brand.",
   },
 ];

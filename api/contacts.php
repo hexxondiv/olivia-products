@@ -259,7 +259,7 @@ function handlePost() {
     
     // Get current user info
     $sentBy = $user['id'];
-    $adminName = $user['fullName'] ?? $user['username'] ?? 'Olivia Products Team';
+    $adminName = $user['fullName'] ?? $user['username'] ?? 'Olivia Team';
     
     $sentTo = '';
     $status = 'sent';
@@ -280,7 +280,7 @@ function handlePost() {
             require_once __DIR__ . '/mailgun-helper.php';
             require_once __DIR__ . '/email-templates.php';
             
-            $subject = 'Response to Your Inquiry - Olivia Products';
+            $subject = 'Response to Your Inquiry - Olivia Industries Ltd';
             $htmlBody = getContactReplyEmailTemplate($contact, $message, $adminName);
             $textBody = getContactReplyEmailTextTemplate($contact, $message, $adminName);
             
@@ -311,7 +311,7 @@ function handlePost() {
             $whatsappMessage = "*RESPONSE TO YOUR INQUIRY*\n";
             $whatsappMessage .= "━━━━━━━━━━━━━━━━━━━━\n\n";
             $whatsappMessage .= "Hello " . $contact['fullName'] . ",\n\n";
-            $whatsappMessage .= "Thank you for contacting Olivia Products. Here's our response:\n\n";
+            $whatsappMessage .= "Thank you for contacting Olivia Industries Ltd. Here's our response:\n\n";
             $whatsappMessage .= "*OUR RESPONSE*\n";
             $whatsappMessage .= "─────────────\n";
             $whatsappMessage .= $message . "\n\n";
@@ -326,7 +326,7 @@ function handlePost() {
             $whatsappMessage .= "💬 WhatsApp: +234 912 350 9090\n\n";
             $whatsappMessage .= "Best regards,\n";
             $whatsappMessage .= "*" . $adminName . "*\n";
-            $whatsappMessage .= "Olivia Products Team";
+            $whatsappMessage .= "Olivia Team";
             
             // Create WhatsApp URL (frontend will open this)
             $encodedMessage = urlencode($whatsappMessage);

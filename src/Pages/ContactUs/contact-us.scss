@@ -4,12 +4,79 @@
       background: #304e05;
   padding: 20px;
   margin-top: 120px;
-  h5{color:#fff !important;
-  margin-top:30px;}
-    li {
-      color: #fff; font-family: sailecMedium;}
-      span{color:skyblue;}
+  
+  h4 {
+    color: #fff !important;
+  }
+  
+  p {
+    color: #fff !important;
+    font-family: sailecMedium;
+    margin-bottom: 10px;
+    
+    // Style for "Contact:" label - make it more prominent
+    &.contact-label {
+      font-weight: 600;
+      font-size: 18px;
+      margin-bottom: 15px;
+      color: #a8d5ba !important; /* Light green for better contrast on dark background */
+    }
+  }
+  
+  h5 {
+    color: #fff !important;
+    margin-top: 30px;
+    font-weight: 600;
+  }
+  
+  li {
+    color: #fff; 
+    font-family: sailecMedium;
+    margin-bottom: 8px;
+    
+    span {
+      color: #FFD700 !important; /* Gold/yellow for excellent contrast on dark green */
+      font-weight: 600;
+      margin-right: 5px;
+    }
+    
+    a {
+      color: #fff;
+      text-decoration: none;
+      
+      &:hover {
+        color: #a8d5ba;
+        text-decoration: underline;
+      }
+    }
+  }
      
+  .social-media-links {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+    
+    .social-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 20px;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-3px) scale(1.1);
+        color: #fff;
+      }
+    }
+  }
 }
 .gf-cova{
   @media screen and (min-width:820px) {
@@ -208,13 +275,30 @@
       
       &.whatsapp-btn {
         background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
-        color: #fff;
+        color: #fff !important;
         border: none;
+        
+        span {
+          color: #fff !important;
+        }
+        
+        .btn-icon {
+          color: #fff !important;
+        }
         
         &:hover:not(:disabled) {
           background: linear-gradient(135deg, #20BA5A 0%, #0F7A6D 100%);
           transform: translateY(-2px);
           box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+          color: #fff !important;
+          
+          span {
+            color: #fff !important;
+          }
+          
+          .btn-icon {
+            color: #fff !important;
+          }
         }
       }
       

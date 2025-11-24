@@ -72,7 +72,7 @@ export const FAQPage = () => {
       : "+2348068527731";
     
     // Create a simple message for FAQ page
-    let message = "Hello, Olivia Products!\n\n";
+    let message = "Hello, @CelineOlivia!\n\n";
     message += "I have a question and would like to chat with your team.\n\n";
     message += "Thank you!";
     
@@ -108,7 +108,7 @@ export const FAQPage = () => {
                   Looking for help? Here are our most frequently asked questions.
                 </h1>
                 <p>
-                  Everything you need to know about Olivia Products. Can't find the
+                  Everything you need to know about Olivia Industries Ltd. Can't find the
                   answer to a question you have? No worries, just click "I have got a
                   question" or "Chat with our team!"
                 </p>

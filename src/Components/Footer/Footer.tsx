@@ -19,7 +19,7 @@ export const Footer = () => {
         <Row className="gy-5 align-items-start">
           <Col lg={5}>
             <Link to="/" className="footer__logo-link">
-              <img src={Logo} alt="Olivia Products" className="footer__logo" />
+              <img src={Logo} alt="Olivia Industries Ltd" className="footer__logo" />
             </Link>
             <Stack direction="horizontal" gap={3} className="mt-4 footer__socials">
               <Link to="" aria-label="Instagram">
@@ -89,12 +89,12 @@ export const Footer = () => {
           </Col>
           <Col>
             <ul className="list-unstyled d-flex flex-wrap gap-3 mb-0 footer__policies">
-              <li>&copy; {new Date().getFullYear()} Olivia Products</li>
+              <li>&copy; {new Date().getFullYear()} Olivia Industries Ltd</li>
               <li>
-                <NavLink to="">Terms & Conditions</NavLink>
+                <NavLink to="/terms-and-conditions">Terms & Conditions</NavLink>
               </li>
               <li>
-                <NavLink to="">Privacy Policy</NavLink>
+                <NavLink to="/terms-and-conditions">Privacy Policy</NavLink>
               </li>
             </ul>
           </Col>

@@ -55,7 +55,7 @@ export const CMSLogin: React.FC = () => {
         <Card className="cms-login-card">
           <Card.Body>
             <div className="text-center mb-4">
-              <h2>Olivia Products CMS</h2>
+              <h2>Olivia CMS</h2>
               <p className="text-muted">Sign in to access the admin panel</p>
             </div>
 

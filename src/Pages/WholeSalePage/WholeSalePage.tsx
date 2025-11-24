@@ -349,7 +349,7 @@ export const WholeSalePage: React.FC = () => {
     
     let message = `*NEW ${formTypeLabel.toUpperCase()} PARTNERSHIP INQUIRY*\n`;
     message += "==================\n\n";
-    message += "Hello, Olivia Products!\n\n";
+    message += "Hello, @CelineOlivia!\n\n";
     message += `I'm interested in becoming a *${formTypeLabel} Partner*. Here are my details:\n\n`;
     
     message += "*PARTNERSHIP TYPE*\n";
@@ -445,8 +445,8 @@ export const WholeSalePage: React.FC = () => {
     <>
       <SEO
         title="Wholesale & Distribution"
-        description="Become an approved wholesale partner with Olivia Products. Join our network of distributors and retailers across Nigeria. Apply for wholesale pricing and distribution opportunities."
-        keywords="Olivia Products wholesale, wholesale application, distribution partners, bulk orders, retailer application, Nigeria wholesale"
+        description="Become an approved wholesale partner with Olivia Industries Ltd. Join our network of distributors and retailers across Nigeria. Apply for wholesale pricing and distribution opportunities."
+        keywords="Olivia Industries Ltd wholesale, wholesale application, distribution partners, bulk orders, retailer application, Nigeria wholesale"
         url="/wholesale-page"
         type="website"
       />
@@ -454,7 +454,7 @@ export const WholeSalePage: React.FC = () => {
       <div className="wholesale-page col-md-6 offset-md-3">
         <form ref={formRef} onSubmit={handleSubmit}>
           <div className="col-md-2 col-4">
-            <img src={Logo} width="70%" alt="Olivia Products" />
+            <img src={Logo} width="70%" alt="Olivia Industries Ltd" />
           </div>
 
           {/* Collapsible Information Section */}
@@ -471,7 +471,7 @@ export const WholeSalePage: React.FC = () => {
             </button>
             <div className={`info-content ${isInfoExpanded ? "expanded" : ""}`}>
               <div className="info-content-inner">
-                <h5>Welcome to Olivia Products Partnership Program</h5>
+                <h5>Welcome to Olivia Partnership Program</h5>
                 <p>
                   We're excited that you're interested in partnering with us! Our partnership program offers opportunities for Wholesale, Distribution, and Retail partners to grow their business with our premium products.
                 </p>
@@ -819,10 +819,10 @@ export const WholeSalePage: React.FC = () => {
             <Link to="/terms-and-conditions" target="_blank" rel="noopener noreferrer">
               Terms and Conditions
             </Link>{" "}
-            of Olivia Products Partnership Program.
+            of Olivia Partnership Program.
           </p>
           <p>
-            Thank you for your interest in Olivia Products. If partnership is
+            Thank you for your interest in Olivia Industries Ltd. If partnership is
             approved someone will reach out shortly to discuss next steps.
           </p>
           <div className="form-actions">

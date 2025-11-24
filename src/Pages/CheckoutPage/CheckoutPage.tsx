@@ -98,7 +98,7 @@ export const CheckoutPage: React.FC = () => {
       minute: "2-digit",
     });
     
-    let message = "*NEW ORDER PLACED*\n================== \n Hello, Olivia Products!\n";
+    let message = "*NEW ORDER PLACED*\n================== \n Hello, @CelineOlivia!\n";
     message += "I'd like to place a _new order_. Here are the details:\n\n";
     
     message += "*Order ID:* `" + orderIdToUse + "`\n";

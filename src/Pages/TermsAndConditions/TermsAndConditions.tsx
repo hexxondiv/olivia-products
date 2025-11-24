@@ -1,8 +1,69 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { FaFacebook, FaLinkedin, FaYoutube } from "react-icons/fa";
+import { FaSquareInstagram, FaXTwitter } from "react-icons/fa6";
 import "./terms-and-conditions.scss";
+import { getApiUrl } from "../../Utils/apiConfig";
+
+interface ContactInfo {
+  companyName?: string;
+  location?: string;
+  phone?: string;
+  whatsapp?: string;
+  salesWhatsApp?: string;
+  businessHours?: string;
+  emailGeneral?: string;
+  emailSales?: string;
+  emailSupplier?: string;
+  mapEmbedUrl?: string;
+  socialMedia?: {
+    [key: string]: string | undefined;
+  };
+}
 
 export const TermsAndConditions: React.FC = () => {
+  const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
+  const [loadingContactInfo, setLoadingContactInfo] = useState(true);
+
+  useEffect(() => {
+    fetchContactInfo();
+  }, []);
+
+  const fetchContactInfo = async () => {
+    try {
+      const apiUrl = getApiUrl();
+      const response = await fetch(`${apiUrl}/contact-info.php`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setContactInfo(data.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch contact information:", error);
+    } finally {
+      setLoadingContactInfo(false);
+    }
+  };
+
+  const getSocialMediaIcon = (platform: string) => {
+    const platformLower = platform.toLowerCase();
+    switch (platformLower) {
+      case 'facebook':
+        return <FaFacebook />;
+      case 'instagram':
+        return <FaSquareInstagram />;
+      case 'twitter':
+      case 'x':
+        return <FaXTwitter />;
+      case 'linkedin':
+        return <FaLinkedin />;
+      case 'youtube':
+        return <FaYoutube />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="terms-page">
       <div className="terms-container">
@@ -15,7 +76,7 @@ export const TermsAndConditions: React.FC = () => {
           <section className="terms-section">
             <h2>1. Introduction</h2>
             <p>
-              Welcome to Olivia Products Nigeria Ltd Partnership Program. These Terms and Conditions ("Terms") govern your participation in our Wholesale, Distribution, and Retail partnership programs. By submitting a partnership application or entering into a partnership agreement with Olivia Products, you agree to be bound by these Terms.
+              Welcome to Olivia Industries Ltd Partnership Program. These Terms and Conditions ("Terms") govern your participation in our Wholesale, Distribution, and Retail partnership programs. By submitting a partnership application or entering into a partnership agreement with Olivia Industries Ltd, you agree to be bound by these Terms.
             </p>
             <p>
               Please read these Terms carefully before applying for or entering into a partnership with us. If you do not agree with any part of these Terms, you should not proceed with the partnership application.
@@ -37,7 +98,7 @@ export const TermsAndConditions: React.FC = () => {
               <h3>2.2 Distribution Partners</h3>
               <ul>
                 <li>Distribution partners operate within exclusive or non-exclusive territories</li>
-                <li>Territory assignments are determined by Olivia Products at our sole discretion</li>
+                <li>Territory assignments are determined by Olivia Industries Ltd at our sole discretion</li>
                 <li>Distribution partners must meet minimum sales targets as specified in the agreement</li>
                 <li>Special pricing and support are provided to qualified distribution partners</li>
               </ul>
@@ -45,7 +106,7 @@ export const TermsAndConditions: React.FC = () => {
             <div className="terms-subsection">
               <h3>2.3 Retail Partners</h3>
               <ul>
-                <li>Retail partners stock and sell Olivia Products in their retail locations</li>
+                <li>Retail partners stock and sell Olivia Industries Ltd products in their retail locations</li>
                 <li>Retail partners must maintain appropriate inventory levels</li>
                 <li>Products must be displayed and marketed in accordance with our brand guidelines</li>
                 <li>Retail partners may be required to participate in promotional activities</li>
@@ -56,7 +117,7 @@ export const TermsAndConditions: React.FC = () => {
           <section className="terms-section">
             <h2>3. Application and Approval Process</h2>
             <ul>
-              <li>All partnership applications are subject to review and approval by Olivia Products</li>
+              <li>All partnership applications are subject to review and approval by Olivia Industries Ltd</li>
               <li>We reserve the right to accept or reject any application at our sole discretion</li>
               <li>Review process typically takes 5-7 business days</li>
               <li>Approved partners will receive a formal partnership agreement</li>
@@ -71,7 +132,7 @@ export const TermsAndConditions: React.FC = () => {
               <h3>4.1 Pricing</h3>
               <ul>
                 <li>All prices are quoted in Nigerian Naira (₦) unless otherwise specified</li>
-                <li>Prices are subject to change with 30 days written notice</li>
+                <li>Prices are subject to change with instant written notice</li>
                 <li>Volume discounts apply based on order quantities</li>
                 <li>Special pricing may be available for qualified partners</li>
               </ul>
@@ -103,7 +164,7 @@ export const TermsAndConditions: React.FC = () => {
           <section className="terms-section">
             <h2>6. Product Quality and Warranties</h2>
             <ul>
-              <li>Olivia Products guarantees that all products meet our quality standards</li>
+              <li>Olivia Industries Ltd guarantees that all products meet our quality standards</li>
               <li>Products are manufactured in accordance with applicable regulations and standards</li>
               <li>Warranties are limited to those specified in the product documentation</li>
               <li>Partners must handle and store products in accordance with our guidelines</li>
@@ -114,9 +175,9 @@ export const TermsAndConditions: React.FC = () => {
           <section className="terms-section">
             <h2>7. Marketing and Brand Guidelines</h2>
             <ul>
-              <li>Partners must use Olivia Products branding and marketing materials in accordance with our brand guidelines</li>
+              <li>Partners must use Olivia Industries Ltd branding and marketing materials in accordance with our brand guidelines</li>
               <li>Unauthorized use of our trademarks, logos, or intellectual property is prohibited</li>
-              <li>Marketing materials must be approved by Olivia Products before use</li>
+              <li>Marketing materials must be approved by Olivia Industries Ltd before use</li>
               <li>Partners may be required to participate in joint marketing activities</li>
               <li>False or misleading advertising about our products is strictly prohibited</li>
             </ul>
@@ -135,17 +196,17 @@ export const TermsAndConditions: React.FC = () => {
           <section className="terms-section">
             <h2>9. Intellectual Property</h2>
             <ul>
-              <li>All intellectual property rights in Olivia Products, including trademarks, logos, and product designs, remain the property of Olivia Products</li>
+              <li>All intellectual property rights in Olivia Industries Ltd, including trademarks, logos, and product designs, remain the property of Olivia Industries Ltd</li>
               <li>Partners are granted a limited, non-exclusive license to use our intellectual property solely for the purpose of the partnership</li>
               <li>This license terminates upon termination of the partnership</li>
-              <li>Partners may not register or claim ownership of any Olivia Products intellectual property</li>
+              <li>Partners may not register or claim ownership of any Olivia Industries Ltd intellectual property</li>
             </ul>
           </section>
 
           <section className="terms-section">
             <h2>10. Confidentiality</h2>
             <ul>
-              <li>Partners agree to keep confidential all proprietary information disclosed by Olivia Products</li>
+              <li>Partners agree to keep confidential all proprietary information disclosed by Olivia Industries Ltd</li>
               <li>Confidential information includes pricing, product specifications, marketing strategies, and business plans</li>
               <li>Confidentiality obligations survive termination of the partnership</li>
               <li>Partners may not disclose confidential information to third parties without written consent</li>
@@ -155,7 +216,7 @@ export const TermsAndConditions: React.FC = () => {
           <section className="terms-section">
             <h2>11. Termination</h2>
             <div className="terms-subsection">
-              <h3>11.1 Termination by Olivia Products</h3>
+              <h3>11.1 Termination by Olivia Industries Ltd</h3>
               <p>We may terminate a partnership agreement immediately if:</p>
               <ul>
                 <li>The partner breaches any material term of the agreement</li>
@@ -178,7 +239,7 @@ export const TermsAndConditions: React.FC = () => {
           <section className="terms-section">
             <h2>12. Limitation of Liability</h2>
             <ul>
-              <li>Olivia Products' liability is limited to the value of products purchased by the partner</li>
+              <li>Olivia Industries Ltd' liability is limited to the value of products purchased by the partner</li>
               <li>We are not liable for indirect, consequential, or incidental damages</li>
               <li>Partners are responsible for their own business decisions and operations</li>
               <li>Our liability is limited to the maximum extent permitted by law</li>
@@ -206,7 +267,7 @@ export const TermsAndConditions: React.FC = () => {
           <section className="terms-section">
             <h2>15. Modifications to Terms</h2>
             <ul>
-              <li>Olivia Products reserves the right to modify these Terms at any time</li>
+              <li>Olivia Industries Ltd reserves the right to modify these Terms at any time</li>
               <li>Partners will be notified of material changes with 30 days notice</li>
               <li>Continued partnership after changes constitutes acceptance of modified Terms</li>
               <li>Partners may terminate the agreement if they do not agree to modifications</li>
@@ -217,12 +278,51 @@ export const TermsAndConditions: React.FC = () => {
             <h2>16. Contact Information</h2>
             <p>For questions about these Terms or partnership inquiries, please contact:</p>
             <div className="contact-info">
-              <p><strong>Olivia Products Nigeria Ltd</strong></p>
-              <p>Okaka plaza suite 1 first Avenue festac town, Lagos State</p>
-              <p><strong>Email:</strong> <a href="mailto:Info@celineolivia.com">Info@celineolivia.com</a></p>
-              <p><strong>Phone (Lagos):</strong> +234 901 419 6902</p>
-              <p><strong>WhatsApp:</strong> +234 912 350 9090</p>
-              <p><strong>Business Hours:</strong> Monday - Friday, 8am - 5pm</p>
+              <p><strong>{contactInfo?.companyName || "Olivia Industries Ltd"}</strong></p>
+              {contactInfo?.location && (
+                <p>{contactInfo.location}</p>
+              )}
+              {contactInfo?.phone && (
+                <p><strong>Phone (Lagos):</strong> {contactInfo.phone}</p>
+              )}
+              {contactInfo?.whatsapp && (
+                <p><strong>WhatsApp:</strong> {contactInfo.whatsapp}</p>
+              )}
+              {contactInfo?.businessHours && (
+                <p><strong>Business Hours:</strong> {contactInfo.businessHours}</p>
+              )}
+              {contactInfo?.emailGeneral && (
+                <p><strong>General Email:</strong> <a href={`mailto:${contactInfo.emailGeneral}`}>{contactInfo.emailGeneral}</a></p>
+              )}
+              {contactInfo?.emailSales && (
+                <p><strong>Sales Email:</strong> <a href={`mailto:${contactInfo.emailSales}`}>{contactInfo.emailSales}</a></p>
+              )}
+              {contactInfo?.emailSupplier && (
+                <p><strong>Supplier Email:</strong> <a href={`mailto:${contactInfo.emailSupplier}`}>{contactInfo.emailSupplier}</a></p>
+              )}
+              {contactInfo?.socialMedia && Object.keys(contactInfo.socialMedia).length > 0 && (
+                <div className="social-media-section">
+                  <p><strong>Follow us on:</strong></p>
+                  <div className="social-media-links">
+                    {Object.entries(contactInfo.socialMedia).map(([platform, url]) => {
+                      if (!url) return null;
+                      const icon = getSocialMediaIcon(platform);
+                      return (
+                        <a
+                          key={platform}
+                          href={url as string}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={platform}
+                          className="social-link"
+                        >
+                          {icon}
+                        </a>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           </section>
 

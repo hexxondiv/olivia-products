@@ -48,7 +48,7 @@ export const Home = () => {
         </div>
         <div className="col-md-6">
           <p>
-            At Olivia Products, we take pride in redefining everyday care
+            At Olivia Industries Ltd, we take pride in redefining everyday care
             through innovation, quality, and trust. Our growing portfolio spans
             across hair care, skin care, dish wash, fabric cleaner, tile and
             toilet wash, car wash, window cleaner, and air fresheners—each
@@ -72,13 +72,13 @@ export const Home = () => {
             <h6>OUR PRODUCTS</h6>
             <h2>Millions trust our touch. Every day begins with Olivia.</h2>
             <p>
-              At Olivia Products, quality is never compromised. Every item we
+              At Olivia Industries Ltd, quality is never compromised. Every item we
               produce undergoes rigorous testing to ensure purity, safety, and
               exceptional performance. From formulation to packaging, each
               product meets the highest standards before leaving our factory —
               because we believe our customers deserve nothing less than
-              perfection. It’s this unwavering commitment to excellence that has
-              made Olivia Products a trusted name in homes across Nigeria.
+              perfection. It's this unwavering commitment to excellence that has
+              made Olivia Industries Ltd a trusted name in homes across Nigeria.
             </p>
             <h5>From homes to hearts — Olivia makes a difference every day.</h5>
           </div>
@@ -91,7 +91,7 @@ export const Home = () => {
         <center>
           <h2>Our Approved Partners</h2>
           <p style={{ color: "#4b3d97", marginBottom: "40px" }}>
-            Trusted businesses partnering with Olivia Products
+            Trusted businesses partnering with Olivia Industries Ltd
           </p>
         </center>
         <WholesaleCarousel />
@@ -116,10 +116,10 @@ export const Home = () => {
           <h5>OLIVIACARE</h5>
 
           <h2>
-            Make A Difference With <span>Olivia Products</span>
+            Make A Difference With <span>Olivia Industries Ltd</span>
           </h2>
           <p>
-            At Olivia Products, making a difference goes beyond what we create —
+            At Olivia Industries Ltd, making a difference goes beyond what we create —
             it’s about how we care. We’re dedicated to enriching everyday lives
             and uplifting communities through purposeful action. Our focus
             remains on empowering the youth, nurturing talent, and supporting

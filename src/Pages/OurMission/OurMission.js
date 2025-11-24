@@ -49,8 +49,8 @@ export const OurMission = () => {
     <>
       <SEO
         title="Our Mission & Impact"
-        description="Olivia Products is dedicated to making a difference through Oliviacare. We focus on empowering youth, nurturing talent, and supporting education to help build brighter futures in Nigeria."
-        keywords="Olivia Products mission, Oliviacare, community impact, youth empowerment, education support, corporate social responsibility, Nigeria"
+        description="Olivia Industries Ltd is dedicated to making a difference through Oliviacare. We focus on empowering youth, nurturing talent, and supporting education to help build brighter futures in Nigeria."
+        keywords="Olivia Industries Ltd mission, Oliviacare, community impact, youth empowerment, education support, corporate social responsibility, Nigeria"
         url="/our-mission"
         type="website"
       />
@@ -63,12 +63,12 @@ export const OurMission = () => {
         <div className="col-md-10 offset-md-1">
           <div className="row align-items-center">
             <div className="col-md-6">
-              <img src={LogoAnime} alt="Olivia Products" className="mission-logo" />
+              <img src={LogoAnime} alt="Olivia Industries Ltd" className="mission-logo" />
             </div>
             <div className="col-md-6">
-              <h2>Making A Difference With Olivia Products</h2>
+              <h2>Making A Difference With Olivia Industries Ltd</h2>
               <p className="mission-intro">
-                At Olivia Products, making a difference goes beyond what we create — 
+                At Olivia Industries Ltd, making a difference goes beyond what we create — 
                 it's about how we care. We're dedicated to enriching everyday lives 
                 and uplifting communities through purposeful action. Our focus remains 
                 on empowering the youth, nurturing talent, and supporting education — 

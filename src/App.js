@@ -20,6 +20,7 @@ import { CMSStock } from "./Pages/CMS/CMSStock";
 import { CMSTestimonials } from "./Pages/CMS/CMSTestimonials";
 import { CMSFlashInfo } from "./Pages/CMS/CMSFlashInfo";
 import { CMSFAQs } from "./Pages/CMS/CMSFAQs";
+import { CMSContactInfo } from "./Pages/CMS/CMSContactInfo";
 import { CMSProfile } from "./Pages/CMS/CMSProfile";
 import { CMSAdminUsers } from "./Pages/CMS/CMSAdminUsers";
 import { PublicRoutes } from "./Pages/PublicRoutes";
@@ -143,6 +144,14 @@ function App() {
             element={
               <CMSProtectedRoute>
                 <CMSFAQs />
+              </CMSProtectedRoute>
+            }
+          />
+          <Route
+            path="/cms/contact-info"
+            element={
+              <CMSProtectedRoute>
+                <CMSContactInfo />
               </CMSProtectedRoute>
             }
           />

@@ -122,7 +122,7 @@
   }
 }
 
-.contact-info {
+.terms-section .contact-info {
   background-color: #f8f9fa;
   padding: 20px;
   border-radius: 8px;
@@ -131,13 +131,14 @@
   p {
     margin-bottom: 10px;
     font-size: 16px;
+    color: #333 !important;
 
     @media screen and (max-width: 820px) {
       font-size: 14px;
     }
 
     strong {
-      color: #003057;
+      color: #003057 !important;
       font-family: sailecBold;
     }
 
@@ -148,6 +149,37 @@
 
       &:hover {
         text-decoration: underline;
+      }
+    }
+  }
+
+  .social-media-section {
+    margin-top: 20px;
+    
+    .social-media-links {
+      display: flex;
+      gap: 15px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+      
+      .social-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: #003057;
+        color: #fff;
+        font-size: 20px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        
+        &:hover {
+          background: #004080;
+          transform: translateY(-3px) scale(1.1);
+          color: #fff;
+        }
       }
     }
   }

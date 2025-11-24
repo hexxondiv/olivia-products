@@ -161,7 +161,7 @@ function sendContactAcknowledgementToCustomer($contactData) {
     
     $customerEmail = $contactData['email'];
     $customerName = $contactData['fullName'] ?? 'Customer';
-    $subject = 'Thank You for Contacting Olivia Products';
+    $subject = 'Thank You for Contacting Olivia Industries Ltd';
     
     // Generate email templates
     $htmlBody = getContactAcknowledgementEmailTemplate($contactData);
@@ -211,7 +211,7 @@ function sendWholesaleAcknowledgementToCustomer($wholesaleData) {
     
     $customerEmail = $wholesaleData['email'];
     $formType = ucfirst(strtolower($wholesaleData['formType']));
-    $subject = 'Thank You for Your ' . $formType . ' Partnership Inquiry - Olivia Products';
+    $subject = 'Thank You for Your ' . $formType . ' Partnership Inquiry - Olivia Industries Ltd';
     
     // Generate email templates
     $htmlBody = getWholesaleAcknowledgementEmailTemplate($wholesaleData);
@@ -259,7 +259,7 @@ function sendWholesaleStatusUpdateToCustomer($wholesaleData, $newStatus, $oldSta
         'archived' => 'Application Archived - ' . $formType . ' Partnership'
     ];
     
-    $subject = ($statusSubjects[$newStatus] ?? 'Application Status Update - ' . $formType . ' Partnership') . ' - Olivia Products';
+    $subject = ($statusSubjects[$newStatus] ?? 'Application Status Update - ' . $formType . ' Partnership') . ' - Olivia Industries Ltd';
     
     // Generate email templates
     $htmlBody = getWholesaleStatusUpdateEmailTemplate($wholesaleData, $newStatus, $oldStatus);
