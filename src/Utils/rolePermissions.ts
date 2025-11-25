@@ -71,6 +71,11 @@ export const routePermissions: RoutePermissions[] = [
     description: 'Flash Info - Admin and Support can manage',
   },
   {
+    path: '/cms/home-slides',
+    roles: ['admin', 'sales'],
+    description: 'Home Slides - Admin and Sales can manage',
+  },
+  {
     path: '/cms/contact-info',
     roles: ['admin', 'support'],
     description: 'Contact Information - Admin and Support can manage',
@@ -114,6 +119,7 @@ export const featurePermissions: FeaturePermissions = {
   'faqs.manage': { roles: ['admin', 'support'], description: 'Manage FAQs' },
   'testimonials.manage': { roles: ['admin', 'support'], description: 'Manage testimonials' },
   'flash-info.manage': { roles: ['admin', 'support'], description: 'Manage flash info' },
+  'home-slides.manage': { roles: ['admin', 'sales'], description: 'Manage home slides' },
   'contact-info.manage': { roles: ['admin', 'support'], description: 'Manage contact information' },
 
   // User management

@@ -16,7 +16,8 @@ import {
   FaBolt,
   FaQuestionCircle,
   FaUser,
-  FaAddressBook
+  FaAddressBook,
+  FaImages
 } from 'react-icons/fa';
 import { getApiUrl } from '../../Utils/apiConfig';
 import { canAccessRoute } from '../../Utils/rolePermissions';
@@ -366,6 +367,12 @@ export const CMSLayout: React.FC<CMSLayoutProps> = ({ children }) => {
                 <Nav.Link as={Link} to="/cms/flash-info" active={isActive('/cms/flash-info')} onClick={handleNavClick}>
                   <FaBolt className="me-1" />
                   Flash Info
+                </Nav.Link>
+              )}
+              {canAccessRoute(user?.role as any, '/cms/home-slides') && (
+                <Nav.Link as={Link} to="/cms/home-slides" active={isActive('/cms/home-slides')} onClick={handleNavClick}>
+                  <FaImages className="me-1" />
+                  Home Slides
                 </Nav.Link>
               )}
               {canAccessRoute(user?.role as any, '/cms/faqs') && (

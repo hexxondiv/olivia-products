@@ -20,6 +20,7 @@ import { CMSStock } from "./Pages/CMS/CMSStock";
 import { CMSTestimonials } from "./Pages/CMS/CMSTestimonials";
 import { CMSFlashInfo } from "./Pages/CMS/CMSFlashInfo";
 import { CMSFAQs } from "./Pages/CMS/CMSFAQs";
+import { CMSHomeSlides } from "./Pages/CMS/CMSHomeSlides";
 import { CMSContactInfo } from "./Pages/CMS/CMSContactInfo";
 import { CMSProfile } from "./Pages/CMS/CMSProfile";
 import { CMSAdminUsers } from "./Pages/CMS/CMSAdminUsers";
@@ -136,6 +137,14 @@ function App() {
             element={
               <CMSProtectedRoute>
                 <CMSFlashInfo />
+              </CMSProtectedRoute>
+            }
+          />
+          <Route
+            path="/cms/home-slides"
+            element={
+              <CMSProtectedRoute>
+                <CMSHomeSlides />
               </CMSProtectedRoute>
             }
           />
