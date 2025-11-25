@@ -40,7 +40,7 @@ try {
         dbExecute(
             "ALTER TABLE contact_info 
              ADD COLUMN salesWhatsApp VARCHAR(50) NULL 
-             COMMENT 'Sales WhatsApp number (used for REACT_APP_SALES_WHATSAPP_NUMBER)' 
+             COMMENT 'Sales WhatsApp number (used for SALES WHATSAPP MESSAGES)' 
              AFTER whatsapp"
         );
         echo "✓ salesWhatsApp column added\n\n";

@@ -13,9 +13,11 @@ export const FAQPage = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredFaqs, setFilteredFaqs] = useState([]);
+  const [contactInfo, setContactInfo] = useState(null);
 
   useEffect(() => {
     fetchFAQs();
+    fetchContactInfo();
   }, []);
 
   useEffect(() => {
@@ -64,12 +66,26 @@ export const FAQPage = () => {
     }
   };
 
+  const fetchContactInfo = async () => {
+    try {
+      const apiUrl = getApiUrl();
+      const response = await fetch(`${apiUrl}/contact-info.php`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setContactInfo(data.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch contact information:", error);
+    }
+  };
+
   const handleWhatsAppClick = () => {
-    // Get WhatsApp number from environment variable, same as other pages
-    const envWhatsApp = process.env.REACT_APP_SALES_WHATSAPP_NUMBER;
-    const whatsAppNumber = (envWhatsApp && envWhatsApp.trim() !== "") 
-      ? envWhatsApp.trim() 
-      : "+2348068527731";
+    // Get WhatsApp number from database contact info
+    let whatsAppNumber = "+2348068527731"; // Default fallback
+    if (contactInfo?.salesWhatsApp && contactInfo.salesWhatsApp.trim() !== "") {
+      whatsAppNumber = contactInfo.salesWhatsApp.trim();
+    }
     
     // Create a simple message for FAQ page
     let message = "Hello, @CelineOlivia!\n\n";

@@ -1,10 +1,11 @@
-import React, { useState, ChangeEvent, FormEvent, useRef } from "react";
+import React, { useState, ChangeEvent, FormEvent, useRef, useEffect } from "react";
 import "./wholesale-page.scss";
 import Logo from "../../assets/images/logo.png";
 import { Row, Col, Alert } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { FaWhatsapp } from "react-icons/fa";
 import { SEO } from "../../Components/SEO/SEO";
+import { getApiUrl } from "../../Utils/apiConfig";
 
 interface Option {
   id: string;
@@ -37,6 +38,7 @@ export const WholeSalePage: React.FC = () => {
   const [submitStatus, setSubmitStatus] = useState<"success" | "error" | null>(null);
   const [submitMessage, setSubmitMessage] = useState("");
   const [isInfoExpanded, setIsInfoExpanded] = useState<boolean>(false);
+  const [contactInfo, setContactInfo] = useState<any>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
 
@@ -51,6 +53,24 @@ export const WholeSalePage: React.FC = () => {
     { id: "8", label: "Wholesale" },
     { id: "9", label: "Others" },
   ];
+
+  useEffect(() => {
+    fetchContactInfo();
+  }, []);
+
+  const fetchContactInfo = async () => {
+    try {
+      const apiUrl = getApiUrl();
+      const response = await fetch(`${apiUrl}/contact-info.php`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setContactInfo(data.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch contact information:", error);
+    }
+  };
 
   const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { id, checked } = e.target;
@@ -340,11 +360,11 @@ export const WholeSalePage: React.FC = () => {
   };
 
   const formatWholesaleForWhatsApp = () => {
-    // Get WhatsApp number from environment variable, same as checkout page
-    const envWhatsApp = process.env.REACT_APP_SALES_WHATSAPP_NUMBER;
-    // Debug: log the env var (remove in production)
-    console.log('REACT_APP_SALES_WHATSAPP_NUMBER:', envWhatsApp);
-    const salesWhatsAppNumber = (envWhatsApp && envWhatsApp.trim() !== "") ? envWhatsApp.trim() : "+2348068527731";
+    // Get WhatsApp number from database contact info
+    let salesWhatsAppNumber = "+2348068527731"; // Default fallback
+    if (contactInfo?.salesWhatsApp && contactInfo.salesWhatsApp.trim() !== "") {
+      salesWhatsAppNumber = contactInfo.salesWhatsApp.trim();
+    }
     const formTypeLabel = formType.charAt(0).toUpperCase() + formType.slice(1);
     
     let message = `*NEW ${formTypeLabel.toUpperCase()} PARTNERSHIP INQUIRY*\n`;

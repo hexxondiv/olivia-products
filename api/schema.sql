@@ -293,6 +293,23 @@ CREATE TABLE IF NOT EXISTS flash_info (
     INDEX idx_contentType (contentType)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Home Slides Table
+CREATE TABLE IF NOT EXISTS home_slides (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    mainPicture VARCHAR(1000) NOT NULL COMMENT 'Background image URL',
+    text TEXT NOT NULL COMMENT 'Slide text content',
+    targetImg VARCHAR(1000) NOT NULL COMMENT 'Overlay/target image URL',
+    linkType ENUM('category', 'product', 'none') DEFAULT 'none' COMMENT 'Type of link',
+    linkValue VARCHAR(500) NULL COMMENT 'Category name or product ID',
+    displayOrder INT DEFAULT 0 COMMENT 'Display order (lower numbers first)',
+    isActive BOOLEAN DEFAULT TRUE,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_isActive (isActive),
+    INDEX idx_displayOrder (displayOrder),
+    INDEX idx_linkType (linkType)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Seed initial testimonials data
 -- Note: This will insert default testimonials. If you need to re-seed, delete existing records first or use seed-testimonials.php
 INSERT IGNORE INTO testimonials (name, comment, rating, backgroundColor, displayOrder, isActive) VALUES
@@ -409,7 +426,7 @@ CREATE TABLE IF NOT EXISTS contact_info (
     location TEXT NOT NULL,
     phone VARCHAR(50),
     whatsapp VARCHAR(50),
-    salesWhatsApp VARCHAR(50) COMMENT 'Sales WhatsApp number (used for REACT_APP_SALES_WHATSAPP_NUMBER)',
+    salesWhatsApp VARCHAR(50) COMMENT 'Sales WhatsApp number (used for SALES WHATSAPP MESSAGES)',
     businessHours VARCHAR(255),
     emailGeneral VARCHAR(255) COMMENT 'General enquiries email',
     emailSales VARCHAR(255) COMMENT 'Sales enquiries email',

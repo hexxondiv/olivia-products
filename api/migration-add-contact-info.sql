@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS contact_info (
     location TEXT NOT NULL,
     phone VARCHAR(50),
     whatsapp VARCHAR(50),
-    salesWhatsApp VARCHAR(50) COMMENT 'Sales WhatsApp number (used for REACT_APP_SALES_WHATSAPP_NUMBER)',
+    salesWhatsApp VARCHAR(50) COMMENT 'Sales WhatsApp number (used for SALES WHATSAPP MESSAGES)',
     businessHours VARCHAR(255),
     emailGeneral VARCHAR(255) COMMENT 'General enquiries email',
     emailSales VARCHAR(255) COMMENT 'Sales enquiries email',

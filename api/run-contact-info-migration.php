@@ -37,7 +37,7 @@ try {
         location TEXT NOT NULL,
         phone VARCHAR(50),
         whatsapp VARCHAR(50),
-        salesWhatsApp VARCHAR(50) COMMENT 'Sales WhatsApp number (used for REACT_APP_SALES_WHATSAPP_NUMBER)',
+        salesWhatsApp VARCHAR(50) COMMENT 'Sales WhatsApp number (used for SALES WHATSAPP MESSAGES)',
         businessHours VARCHAR(255),
         emailGeneral VARCHAR(255) COMMENT 'General enquiries email',
         emailSales VARCHAR(255) COMMENT 'Sales enquiries email',
@@ -140,7 +140,7 @@ try {
         dbExecute(
             "ALTER TABLE contact_info 
              ADD COLUMN salesWhatsApp VARCHAR(50) NULL 
-             COMMENT 'Sales WhatsApp number (used for REACT_APP_SALES_WHATSAPP_NUMBER)' 
+             COMMENT 'Sales WhatsApp number (used for SALES WHATSAPP MESSAGES)' 
              AFTER whatsapp"
         );
         

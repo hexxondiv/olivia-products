@@ -341,7 +341,7 @@ export const CMSContactInfo: React.FC = () => {
               </div>
 
               <Form.Group className="mb-3">
-                <Form.Label>Sales WhatsApp <span className="text-muted">(for REACT_APP_SALES_WHATSAPP_NUMBER)</span></Form.Label>
+                <Form.Label>Sales WhatsApp</Form.Label>
                 <Form.Control
                   type="text"
                   value={formData.salesWhatsApp || ''}

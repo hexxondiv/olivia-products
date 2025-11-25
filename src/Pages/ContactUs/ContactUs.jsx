@@ -161,15 +161,10 @@ export const ContactUs = () => {
   };
 
   const formatContactForWhatsApp = () => {
-    // Get WhatsApp number from contact info API, fallback to env variable, then default
-    let contactWhatsAppNumber = "+2348068527731";
-    if (contactInfo?.salesWhatsApp) {
+    // Get WhatsApp number from database contact info
+    let contactWhatsAppNumber = "+2348068527731"; // Default fallback
+    if (contactInfo?.salesWhatsApp && contactInfo.salesWhatsApp.trim() !== "") {
       contactWhatsAppNumber = contactInfo.salesWhatsApp.trim();
-    } else {
-      const envWhatsApp = process.env.REACT_APP_SALES_WHATSAPP_NUMBER;
-      if (envWhatsApp && envWhatsApp.trim() !== "") {
-        contactWhatsAppNumber = envWhatsApp.trim();
-      }
     }
     
     let message = "*NEW CONTACT FORM SUBMISSION*\n";

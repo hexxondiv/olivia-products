@@ -214,7 +214,8 @@ try {
     $tables = [
         'products', 'orders', 'order_items', 'contact_submissions', 
         'contact_replies', 'wholesale_submissions', 'admin_users',
-        'stock_movements', 'stock_alerts', 'testimonials', 'flash_info'
+        'stock_movements', 'stock_alerts', 'testimonials', 'flash_info',
+        'home_slides', 'faqs', 'submitted_questions', 'contact_info'
     ];
     
     $existingTables = [];

@@ -8,6 +8,7 @@ import { OptimizedImage } from "../../Components/OptimizedImage/OptimizedImage";
 import "./checkout-page.scss";
 import { MdDelete, MdEmail } from "react-icons/md";
 import { FaWhatsapp } from "react-icons/fa";
+import { getApiUrl } from "../../Utils/apiConfig";
 
 export const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
@@ -35,6 +36,7 @@ export const CheckoutPage: React.FC = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [contactInfo, setContactInfo] = useState<any>(null);
 
   const calculateTotalPrice = () => {
     return cart.reduce((total, item) => {
@@ -87,7 +89,11 @@ export const CheckoutPage: React.FC = () => {
   };
 
   const formatOrderForWhatsApp = (orderId?: string) => {
-    const salesWhatsAppNumber = process.env.REACT_APP_SALES_WHATSAPP_NUMBER || "+2348068527731";
+    // Get WhatsApp number from database contact info
+    let salesWhatsAppNumber = "+2348068527731"; // Default fallback
+    if (contactInfo?.salesWhatsApp && contactInfo.salesWhatsApp.trim() !== "") {
+      salesWhatsAppNumber = contactInfo.salesWhatsApp.trim();
+    }
     // Use provided orderId or generate a new one (for backwards compatibility)
     const orderIdToUse = orderId || generateOrderId();
     const orderDate = new Date().toLocaleString("en-NG", {
@@ -540,6 +546,24 @@ export const CheckoutPage: React.FC = () => {
       navigate("/collections");
     }
   }, [cart.length, navigate]);
+
+  useEffect(() => {
+    fetchContactInfo();
+  }, []);
+
+  const fetchContactInfo = async () => {
+    try {
+      const apiUrl = getApiUrl();
+      const response = await fetch(`${apiUrl}/contact-info.php`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setContactInfo(data.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch contact information:", error);
+    }
+  };
 
   if (cart.length === 0) {
     return null; // Will redirect

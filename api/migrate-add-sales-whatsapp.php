@@ -1,7 +1,7 @@
 <?php
 /**
  * Migration: Add salesWhatsApp column to contact_info table
- * This adds the salesWhatsApp field for managing REACT_APP_SALES_WHATSAPP_NUMBER
+ * This adds the salesWhatsApp field for managing SALES WHATSAPP MESSAGES
  */
 
 require_once __DIR__ . '/config.php';
@@ -23,7 +23,7 @@ try {
         dbExecute(
             "ALTER TABLE contact_info 
              ADD COLUMN salesWhatsApp VARCHAR(50) NULL 
-             COMMENT 'Sales WhatsApp number (used for REACT_APP_SALES_WHATSAPP_NUMBER)' 
+             COMMENT 'Sales WhatsApp number (used for SALES WHATSAPP MESSAGES)' 
              AFTER whatsapp"
         );
         
