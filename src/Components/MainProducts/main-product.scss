@@ -17,7 +17,8 @@
   width: 100%;
   padding-top: 100%; // Maintain square aspect ratio
   overflow: hidden;
-  background: linear-gradient(135deg, $color-black 0%, $color-black 100%);
+  // Default background, can be overridden by inline style (backgroundColor prop)
+  background: var(--product-bg-color, $color-black);
   
   .product-image {
     position: absolute;

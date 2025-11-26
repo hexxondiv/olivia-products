@@ -275,6 +275,34 @@
   .mt-2 {
     margin-top: 1rem;
   }
+
+  // Button styling within modal body (for buttons not in footer)
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    position: relative;
+
+    // Spinner sizing within buttons
+    .spinner-border-sm,
+    .spinner-border {
+      width: 0.875rem;
+      height: 0.875rem;
+      border-width: 0.15em;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+
+    // Ensure icons and spinners are properly aligned
+    svg,
+    .spinner-border-sm,
+    .spinner-border {
+      display: inline-flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+  }
 }
 
 // Modal Footer
@@ -302,6 +330,36 @@
     transition: all $transition-base;
     border: none;
     min-width: 100px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    position: relative;
+
+    // Spinner sizing within buttons
+    .spinner-border-sm,
+    .spinner-border {
+      width: 0.875rem;
+      height: 0.875rem;
+      border-width: 0.15em;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+
+    // Ensure icons and spinners are properly aligned
+    svg,
+    .spinner-border-sm,
+    .spinner-border {
+      display: inline-flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    // Maintain button size when spinner appears
+    &[disabled] {
+      min-width: inherit;
+      width: auto;
+    }
 
     &.btn-secondary {
       background-color: $gray-600;

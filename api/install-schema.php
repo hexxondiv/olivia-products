@@ -117,6 +117,7 @@ try {
     $options = [
         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true, // Enable buffered queries to avoid unbuffered query errors
     ];
     
     $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
@@ -166,6 +167,7 @@ try {
                 if (preg_match('/USE\s+(\w+)/i', $statement, $matches)) {
                     $dbName = $matches[1];
                     $dsn = "mysql:host=" . DB_HOST . ";dbname=" . $dbName . ";charset=utf8mb4";
+                    // Use the same options including buffered queries
                     $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
                     output("✓ Connected to database: $dbName", 'success');
                 }
@@ -173,7 +175,30 @@ try {
             }
             
             // Execute the statement
-            $pdo->exec($statement);
+            // Check if statement might return results or contains queries that return results
+            // PREPARE/EXECUTE statements often contain INFORMATION_SCHEMA SELECT queries
+            $containsSelect = preg_match('/\b(SELECT|SHOW|SET\s+@\w+\s*=\s*\(SELECT|DESCRIBE|EXPLAIN|INFORMATION_SCHEMA)\b/i', $statement);
+            $isPrepareStatement = preg_match('/^\s*PREPARE/i', $statement);
+            $isExecuteStatement = preg_match('/^\s*EXECUTE/i', $statement);
+            $mightReturnResults = $containsSelect || $isPrepareStatement || $isExecuteStatement;
+            
+            if ($mightReturnResults) {
+                // Use query() for statements that return results or contain SELECT queries
+                // This ensures result sets are properly handled
+                $stmt = $pdo->query($statement);
+                // Fetch all results to ensure the result set is closed
+                if ($stmt) {
+                    try {
+                        $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    } catch (PDOException $e) {
+                        // Some statements might not return fetchable results, which is fine
+                    }
+                    $stmt->closeCursor();
+                }
+            } else {
+                // Use exec() for statements that don't return results (CREATE, INSERT, UPDATE, etc.)
+                $pdo->exec($statement);
+            }
             
             // Try to identify what was created
             if (preg_match('/CREATE\s+(?:DATABASE|TABLE)\s+(?:IF\s+NOT\s+EXISTS\s+)?`?(\w+)`?/i', $statement, $matches)) {
@@ -220,7 +245,8 @@ try {
     
     $existingTables = [];
     $stmt = $pdo->query("SHOW TABLES");
-    while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+    $rows = $stmt->fetchAll(PDO::FETCH_NUM);
+    foreach ($rows as $row) {
         $existingTables[] = $row[0];
     }
     

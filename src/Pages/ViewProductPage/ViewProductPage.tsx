@@ -10,6 +10,7 @@ import { Spinner, Alert } from "react-bootstrap";
 import { ProductReviews } from "./ProductReviews";
 import { ReviewForm } from "./ReviewForm";
 import { SEO } from "../../Components/SEO/SEO";
+import { getApiUrl } from "../../Utils/apiConfig";
 
 const PRODUCT_DETAIL_BASE = "/product";
 
@@ -25,6 +26,7 @@ export const ViewProductPage: React.FC = () => {
   const [productLoading, setProductLoading] = useState(false);
   const [productError, setProductError] = useState<string | null>(null);
   const [directProduct, setDirectProduct] = useState<any>(null);
+  const [productBackgroundColor, setProductBackgroundColor] = useState<string | undefined>(undefined);
   const { addToCart, cart, updateQuantity } = useCart();
   const { getProductById, products: allProductsData, loading, error } = useProducts();
 
@@ -113,6 +115,25 @@ export const ViewProductPage: React.FC = () => {
       )
       .slice(0, 8);
   }, [product, cleanCats, allProductsData]);
+
+  // Fetch global product background color setting
+  useEffect(() => {
+    const fetchBackgroundColor = async () => {
+      try {
+        const apiUrl = getApiUrl();
+        const response = await fetch(`${apiUrl}/contact-info.php`);
+        const data = await response.json();
+        
+        if (data.success && data.data?.productBackgroundColor) {
+          setProductBackgroundColor(data.data.productBackgroundColor);
+        }
+      } catch (err) {
+        console.error('Failed to fetch product background color:', err);
+      }
+    };
+    
+    fetchBackgroundColor();
+  }, []);
 
   useEffect(() => {
     setActiveImage(0);
@@ -387,7 +408,7 @@ export const ViewProductPage: React.FC = () => {
               ))}
             </div>
 
-            <div className="main-carousel col-md-10">
+            <div className="main-carousel col-md-10" style={{ }}>
               <Desktop> {primaryCategory && (
               <div className="mt-3 all-sections">
                 <Link to={`/collections?category=${encodeURIComponent(primaryCategory)}`} style={{ color: product.color }}>
@@ -397,10 +418,14 @@ export const ViewProductPage: React.FC = () => {
             )}</Desktop>
               <div
                 className={`image-container ${transitionDirection}`}
-                style={{ transform: `translateX(-${activeImage * 100}%)` }}
+                style={{ 
+                  transform: `translateX(-${activeImage * 100}%)`,
+                  backgroundColor: productBackgroundColor || undefined,
+                  borderRadius: productBackgroundColor ? '20px' : undefined
+                }}
               >
                 {images.map((img, idx) => (
-                  <img key={idx} src={img} alt="" className="main-image" width="100%" />
+                  <img key={idx} src={img} alt="" className={`main-image ${idx === 0 ? 'first-image' : 'fill-image'}`} width="100%" />
                 ))}
               </div>
 

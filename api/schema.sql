@@ -433,6 +433,7 @@ CREATE TABLE IF NOT EXISTS contact_info (
     emailSupplier VARCHAR(255) COMMENT 'Supplier enquiries email',
     mapEmbedUrl TEXT COMMENT 'Google Maps embed URL or address for map',
     socialMedia JSON COMMENT 'Social media links (Facebook, Instagram, Twitter, etc.)',
+    productBackgroundColor VARCHAR(50) NULL DEFAULT '#000000' COMMENT 'Global background color for product cards in ProductsHolder',
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_companyName (companyName)
@@ -449,7 +450,8 @@ INSERT INTO contact_info (
     emailGeneral, 
     emailSales, 
     emailSupplier,
-    mapEmbedUrl
+    mapEmbedUrl,
+    productBackgroundColor
 ) VALUES (
     'Olivia Industries Ltd',
     'Okaka plaza suite 1 first Avenue festac town, Lagos State',
@@ -460,6 +462,7 @@ INSERT INTO contact_info (
     'customercare@celineolivia.com',
     'sales@celineolivia.com',
     'purchases@celineolivia.com',
-    'https://www.google.com/maps?q=Okaka+plaza+suite+1+first+Avenue+festac+town+Lagos+State&output=embed'
+    'https://www.google.com/maps?q=Okaka+plaza+suite+1+first+Avenue+festac+town+Lagos+State&output=embed',
+    '#000000'
 ) ON DUPLICATE KEY UPDATE companyName=companyName;
 

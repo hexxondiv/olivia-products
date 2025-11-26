@@ -26,6 +26,7 @@ interface ContactInfo {
     youtube?: string;
     [key: string]: string | undefined;
   };
+  productBackgroundColor?: string;
 }
 
 export const CMSContactInfo: React.FC = () => {
@@ -44,7 +45,8 @@ export const CMSContactInfo: React.FC = () => {
     emailSales: '',
     emailSupplier: '',
     mapEmbedUrl: '',
-    socialMedia: {}
+    socialMedia: {},
+    productBackgroundColor: '#000000'
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -72,7 +74,8 @@ export const CMSContactInfo: React.FC = () => {
           emailSales: '',
           emailSupplier: '',
           mapEmbedUrl: '',
-          socialMedia: {}
+          socialMedia: {},
+          productBackgroundColor: '#000000'
         });
       } else {
         setError('Failed to load contact information');
@@ -171,7 +174,8 @@ export const CMSContactInfo: React.FC = () => {
         emailSales: formData.emailSales || null,
         emailSupplier: formData.emailSupplier || null,
         mapEmbedUrl: formData.mapEmbedUrl || null,
-        socialMedia: formData.socialMedia || {}
+        socialMedia: formData.socialMedia || {},
+        productBackgroundColor: formData.productBackgroundColor || '#000000'
       };
       
       const url = contactInfo?.id 
@@ -427,6 +431,18 @@ export const CMSContactInfo: React.FC = () => {
                   </Form.Group>
                 ))}
               </div>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Product Background Color</Form.Label>
+                <Form.Control
+                  type="color"
+                  value={formData.productBackgroundColor || '#000000'}
+                  onChange={(e) => handleInputChange('productBackgroundColor', e.target.value)}
+                />
+                <Form.Text className="text-muted">
+                  Background color for product cards in ProductsHolder (applies to all products)
+                </Form.Text>
+              </Form.Group>
 
               <div className="d-flex justify-content-end gap-2">
                 <Button variant="secondary" onClick={handleCloseModal} disabled={submitting}>

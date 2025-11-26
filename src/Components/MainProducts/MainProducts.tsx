@@ -56,6 +56,7 @@ export interface ProductProps {
   stockEnabled?: boolean;
   stockStatus?: 'in_stock' | 'low_stock' | 'out_of_stock' | 'on_backorder' | null;
   stockQuantity?: number;
+  backgroundColor?: string;
   onAddToCart: (item: {
     id: number;
     firstImg: string;
@@ -76,6 +77,7 @@ const MainProduct: React.FC<ProductProps> = ({
   stockEnabled,
   stockStatus,
   stockQuantity,
+  backgroundColor,
   onAddToCart,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -128,7 +130,15 @@ const MainProduct: React.FC<ProductProps> = ({
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <div className="image-wrapper" style={{ position: 'relative' }}>
+        <div 
+          className="image-wrapper" 
+          style={{ 
+            position: 'relative', 
+            ...(backgroundColor ? { 
+              '--product-bg-color': backgroundColor
+            } as React.CSSProperties : {}) 
+          }}
+        >
           {getStockBadge() && (
             <div style={{ position: 'absolute', top: '8px', right: '8px', zIndex: 10 }}>
               {getStockBadge()}

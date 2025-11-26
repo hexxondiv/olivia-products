@@ -15,6 +15,7 @@ interface Product {
   price: number;
   rating: number;
   color?: string;
+  backgroundColor?: string;
   detail?: string;
   moreDetail?: string;
   tagline?: string;
@@ -68,6 +69,7 @@ export const CMSProducts: React.FC = () => {
     price: 0,
     rating: 0,
     color: '',
+    backgroundColor: '',
     detail: '',
     moreDetail: '',
     tagline: '',
@@ -191,6 +193,7 @@ export const CMSProducts: React.FC = () => {
         price: product.price || 0,
         rating: product.rating || 0,
         color: product.color || '',
+        backgroundColor: product.backgroundColor || '',
         detail: product.detail || '',
         moreDetail: product.moreDetail || '',
         tagline: product.tagline || '',
@@ -963,6 +966,17 @@ export const CMSProducts: React.FC = () => {
                       value={formData.color || '#000000'}
                       onChange={(e) => handleInputChange('color', e.target.value)}
                     />
+                  </Form.Group>
+                </Col>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Background Color</Form.Label>
+                    <Form.Control
+                      type="color"
+                      value={formData.backgroundColor || '#000000'}
+                      onChange={(e) => handleInputChange('backgroundColor', e.target.value)}
+                    />
+                    <Form.Text className="text-muted">Background color for product card in ProductsHolder</Form.Text>
                   </Form.Group>
                 </Col>
               </Row>

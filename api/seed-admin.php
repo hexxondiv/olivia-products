@@ -29,7 +29,7 @@ function seedAdmin() {
         // Default admin credentials
         $username = 'admin';
         $email = 'admin@celineolivia.com';
-        $password = 'admin123'; // CHANGE THIS!
+        $password = 'adminPassword'; // CHANGE THIS!
         $fullName = 'Administrator';
         $roleName = 'admin';
         

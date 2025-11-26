@@ -108,7 +108,8 @@ function handleGet() {
                     'emailSupplier' => '',
                     'mapEmbedUrl' => '',
                     'salesWhatsApp' => '',
-                    'socialMedia' => []
+                    'socialMedia' => [],
+                    'productBackgroundColor' => '#000000'
                 ]
             ]);
             return;
@@ -166,8 +167,8 @@ function handlePost() {
     }
     
     // Prepare data
-    $sql = "INSERT INTO contact_info (companyName, location, phone, whatsapp, salesWhatsApp, businessHours, emailGeneral, emailSales, emailSupplier, mapEmbedUrl, socialMedia) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO contact_info (companyName, location, phone, whatsapp, salesWhatsApp, businessHours, emailGeneral, emailSales, emailSupplier, mapEmbedUrl, socialMedia, productBackgroundColor) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     
     $params = [
         $data['companyName'] ?? '',
@@ -180,7 +181,8 @@ function handlePost() {
         $data['emailSales'] ?? null,
         $data['emailSupplier'] ?? null,
         $data['mapEmbedUrl'] ?? null,
-        json_encode($socialMedia)
+        json_encode($socialMedia),
+        $data['productBackgroundColor'] ?? '#000000'
     ];
     
     $id = dbExecute($sql, $params);
@@ -231,7 +233,7 @@ function handlePut() {
     $fields = [];
     $params = [];
     
-    $allowedFields = ['companyName', 'location', 'phone', 'whatsapp', 'salesWhatsApp', 'businessHours', 'emailGeneral', 'emailSales', 'emailSupplier', 'mapEmbedUrl', 'socialMedia'];
+    $allowedFields = ['companyName', 'location', 'phone', 'whatsapp', 'salesWhatsApp', 'businessHours', 'emailGeneral', 'emailSales', 'emailSupplier', 'mapEmbedUrl', 'socialMedia', 'productBackgroundColor'];
     
     foreach ($allowedFields as $field) {
         if (isset($data[$field])) {

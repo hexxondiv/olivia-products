@@ -143,7 +143,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
         position: 'relative',
         width: width || '100%',
         height: height || 'auto',
-        backgroundColor: isLoaded ? '#000000' : '#f0f0f0', // Use black after image loads
+        backgroundColor: isLoaded ? 'transparent' : '#f0f0f0', // Transparent when loaded so parent background shows through
         overflow: 'hidden',
         transition: 'background-color 0.3s ease-in-out',
         ...style, // Merge custom styles to allow absolute positioning

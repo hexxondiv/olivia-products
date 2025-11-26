@@ -11,6 +11,7 @@ import { useCart } from "../../CartContext";
 import { calculatePriceForQuantity, getPriceByPurchaseType } from "../../Utils/pricingUtils";
 import { MdNavigateBefore, MdNavigateNext } from "react-icons/md";
 import { Desktop, TabletAndBelow } from "../../Utils/mediaQueries";
+import { getApiUrl } from "../../Utils/apiConfig";
 /**
  * ProductsHolder component
  * @param {string} category - Category filter
@@ -35,6 +36,7 @@ export const ProductsHolder = ({
   const [visibleItems, setVisibleItems] = useState(
     window.innerWidth < 768 ? 1 : 4
   ); // Initial visibleItems based on screen size
+  const [productBackgroundColor, setProductBackgroundColor] = useState(undefined);
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -53,6 +55,25 @@ export const ProductsHolder = ({
     incrementQuantity,
     decrementQuantity,
   } = useCart();
+
+  // Fetch global product background color setting
+  useEffect(() => {
+    const fetchBackgroundColor = async () => {
+      try {
+        const apiUrl = getApiUrl();
+        const response = await fetch(`${apiUrl}/contact-info.php`);
+        const data = await response.json();
+        
+        if (data.success && data.data?.productBackgroundColor) {
+          setProductBackgroundColor(data.data.productBackgroundColor);
+        }
+      } catch (err) {
+        console.error('Failed to fetch product background color:', err);
+      }
+    };
+    
+    fetchBackgroundColor();
+  }, []);
 
   // Wrapper for addToCart that calculates price based on quantity
   const addToCart = async (item) => {
@@ -204,18 +225,19 @@ export const ProductsHolder = ({
         <div className="products-grid">
           {sortedProducts.map((product, index) => (
             <div key={index} className="mb-4">
-              <MainProduct
-                productName={product.name + ' '+product.sufix}
-                productPrice={getDisplayPrice(product)}
-                firstImg={product.firstImg}
-                hoverImg={product.hoverImg}
-                rating={product.rating}
-                id={product.id}
-                stockEnabled={product.stockEnabled}
-                stockStatus={product.stockStatus}
-                stockQuantity={product.stockQuantity}
-                onAddToCart={addToCart}
-              />
+                    <MainProduct
+                      productName={product.name + ' '+product.sufix}
+                      productPrice={getDisplayPrice(product)}
+                      firstImg={product.firstImg}
+                      hoverImg={product.hoverImg}
+                      rating={product.rating}
+                      id={product.id}
+                      stockEnabled={product.stockEnabled}
+                      stockStatus={product.stockStatus}
+                      stockQuantity={product.stockQuantity}
+                      backgroundColor={productBackgroundColor}
+                      onAddToCart={addToCart}
+                    />
             </div>
           ))}
         </div>
@@ -304,6 +326,10 @@ export const ProductsHolder = ({
                       hoverImg={product.hoverImg}
                       rating={product.rating}
                       id={product.id}
+                      stockEnabled={product.stockEnabled}
+                      stockStatus={product.stockStatus}
+                      stockQuantity={product.stockQuantity}
+                      backgroundColor={productBackgroundColor}
                       onAddToCart={addToCart}
                     />
                   </div>
@@ -394,6 +420,7 @@ export const ProductsHolder = ({
                       hoverImg={product.hoverImg}
                       rating={product.rating}
                       id={product.id}
+                      backgroundColor={productBackgroundColor}
                       onAddToCart={addToCart}
                     />
                   </div>
@@ -420,6 +447,7 @@ export const ProductsHolder = ({
                     hoverImg={product.hoverImg}
                     rating={product.rating}
                     id={product.id}
+                    backgroundColor={productBackgroundColor}
                     onAddToCart={addToCart}
                   />
                 </div>

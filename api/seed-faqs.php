@@ -37,7 +37,7 @@ $faqsData = [
     ],
     [
         'question' => 'Do you offer international shipping?',
-        'answer' => 'Yes, we ship to over 50 countries worldwide.',
+        'answer' => 'Yes, we ship to over 12 countries worldwide.',
         'backgroundColor' => '#FFF2DF',
         'displayOrder' => 3,
         'isActive' => true
